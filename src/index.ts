@@ -2,7 +2,7 @@ import useRect from "./useRect";
 import * as React from 'react'
 import VC from 'deep-state'
 
-const defaultEstimateSize = () => 50
+const defaultEstimateSize = (index?: any) => 50;
 const useIsomorphicLayoutEffect = React.useLayoutEffect;
 
 export { useVirtual }
@@ -29,12 +29,27 @@ class VirtualController extends VC {
   outerSize = 0;
   range = { start: 0, end: 0 };
   isNowMounted = false;
-  measurements = [] as {
-    index: number
-    start: number
-    size: number
-    end: number
-  }[];
+
+  get measurements(){
+    const { estimateSize, measuredCache, paddingStart, size } = this;
+
+    const measurements = [] as {
+      index: number
+      start: number
+      size: number
+      end: number
+    }[];
+
+    for (let i = 0; i < size; i++){
+      const measuredSize = measuredCache[i];
+      const start: any = measurements[i - 1] ? measurements[i - 1].end : paddingStart;
+      const size = typeof measuredSize === 'number' ? measuredSize : estimateSize(i);
+      const end = start + size;
+
+      measurements[i] = { index: i, start, size, end }
+    }
+    return measurements;
+  }
 
   get sizeKey(){ return this.horizontal ? 'width' : 'height' }
   get scrollKey(){ return this.horizontal ? 'scrollLeft' : 'scrollTop' }
@@ -43,7 +58,7 @@ class VirtualController extends VC {
     let {
       size,
       estimateSize,
-      paddingStart,
+      measurements,
       paddingEnd,
       parentRef,
       range,
@@ -70,20 +85,6 @@ class VirtualController extends VC {
       [defaultScrollToFn, resolvedScrollToFn]
     )
 
-    const measurements = React.useMemo(() => {
-      const measurements = [];
-      for (let i = 0; i < size; i++){
-        const measuredSize = this.measuredCache[i];
-        const start: any = measurements[i - 1] ? measurements[i - 1].end : paddingStart;
-        const size = typeof measuredSize === 'number' ? measuredSize : estimateSize(i);
-        const end = start + size;
-
-        measurements[i] = { index: i, start, size, end }
-      }
-      return measurements;
-    }, [estimateSize, this.measuredCache, paddingStart, size])
-
-    this.measurements = measurements;
     this.totalSize = (measurements[size - 1]?.end || 0) + paddingEnd;
 
     useIsomorphicLayoutEffect(() => {
