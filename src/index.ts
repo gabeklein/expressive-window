@@ -24,7 +24,6 @@ class VirtualController extends VC {
   measuredCache: any = {};
 
   virtualItems = [] as any[];
-  totalSize = 0;
   scrollOffset = 0;
   outerSize = 0;
   range = { start: 0, end: 0 };
@@ -126,12 +125,17 @@ class VirtualController extends VC {
     scrollToOffset(toOffset, { align, ...rest })
   }
 
+  get totalSize(){
+    const { measurements, size, paddingEnd } = this;
+    const offset = measurements[size - 1];
+    return (offset ? offset.end : 0) + paddingEnd;
+  }
+
   willRender(){
     let {
       defaultScrollToFn,
       estimateSize,
       measurements,
-      paddingEnd,
       parentRef,
       range,
       scrollKey,
@@ -140,9 +144,8 @@ class VirtualController extends VC {
     } = this;
 
     const rect = useRect(parentRef);
-    this.outerSize = rect ? rect[sizeKey] : 0;
 
-    this.totalSize = (measurements[size - 1]?.end || 0) + paddingEnd;
+    this.outerSize = rect ? rect[sizeKey] : 0;
 
     useIsomorphicLayoutEffect(() => {
       const element = parentRef.current;
