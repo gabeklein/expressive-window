@@ -18,7 +18,8 @@ class VirtualController extends VC {
   paddingEnd = 0
   horizontal = false;
   estimateSize = defaultEstimateSize;
-  parentRef = { current: null };
+  parentRef = { current: null as any };
+  scrollToFn?: ((offset: any, next?: Function) => void) = undefined; 
 
   measuredCache: any = {};
 
@@ -45,11 +46,10 @@ class VirtualController extends VC {
       paddingStart,
       paddingEnd,
       parentRef,
-      scrollToFn,
       range,
       sizeKey,
       scrollKey
-    } = this as any;
+    } = this;
 
     const rect = useRect(parentRef);
     this.outerSize = rect ? rect[sizeKey] : 0;
@@ -62,9 +62,8 @@ class VirtualController extends VC {
       [parentRef, scrollKey]
     )
 
-    const resolvedScrollToFn = scrollToFn || defaultScrollToFn;
-
-    scrollToFn = React.useCallback(
+    const resolvedScrollToFn = this.scrollToFn || defaultScrollToFn;
+    const scrollToFn = React.useCallback(
       (offset: number) => {
         resolvedScrollToFn(offset, defaultScrollToFn)
       },
