@@ -20,6 +20,8 @@ class VirtualController extends VC {
   estimateSize = defaultEstimateSize;
   parentRef = { current: null };
 
+  measuredCache: any = {};
+
   virtualItems = [] as any[];
   totalSize = 0;
 
@@ -61,12 +63,10 @@ class VirtualController extends VC {
       [defaultScrollToFn, resolvedScrollToFn]
     )
 
-    const [measuredCache, setMeasuredCache] = React.useState<any>({})
-
     const measurements = React.useMemo(() => {
       const measurements = []
       for (let i = 0; i < size; i++) {
-        const measuredSize = measuredCache[i]
+        const measuredSize = this.measuredCache[i]
         const start: any = measurements[i - 1] ? measurements[i - 1].end : paddingStart
         const size =
           typeof measuredSize === 'number' ? measuredSize : estimateSize(i)
@@ -74,7 +74,7 @@ class VirtualController extends VC {
         measurements[i] = { index: i, start, size, end }
       }
       return measurements
-    }, [estimateSize, measuredCache, paddingStart, size])
+    }, [estimateSize, this.measuredCache, paddingStart, size])
 
     const totalSize = (measurements[size - 1]?.end || 0) + paddingEnd
 
@@ -130,10 +130,10 @@ class VirtualController extends VC {
                   defaultScrollToFn(scrollOffset + (measuredSize - item.size))
                 }
 
-                setMeasuredCache((old: any) => ({
-                  ...old,
+                this.measuredCache = {
+                  ...this.measuredCache,
                   [i]: measuredSize,
-                }))
+                }
               }
             }
           },
@@ -149,7 +149,7 @@ class VirtualController extends VC {
 
     useIsomorphicLayoutEffect(() => {
       if (mountedRef.current) {
-        if (estimateSize || size) setMeasuredCache({})
+        if (estimateSize || size) this.measuredCache = {};
       }
       mountedRef.current = true
     }, [estimateSize, size])
