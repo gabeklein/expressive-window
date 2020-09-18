@@ -1,6 +1,9 @@
-import useRect from "./useRect";
 import * as React from 'react'
 import VC from 'deep-state'
+
+import { useState, useReducer, useRef, useEffect, useLayoutEffect } from 'react'
+
+import observeRect from '@reach/observe-rect'
 
 const defaultEstimateSize = (index?: any) => 50;
 const useIsomorphicLayoutEffect = React.useLayoutEffect;
@@ -97,6 +100,41 @@ class VirtualController extends VC {
   get sizeKey(){ return this.horizontal ? 'width' : 'height' }
   get scrollKey(){ return this.horizontal ? 'scrollLeft' : 'scrollTop' }
 
+  useRect(){
+    const { parentRef, sizeKey } = this;
+    const [element, setElement] = useState(parentRef.current)
+    const [rect, dispatch] = useReducer(rectReducer, null)
+    const initialRectSet = useRef(false)
+
+    useLayoutEffect(() => {
+      if(parentRef.current !== element)
+        setElement(parentRef.current)
+    })
+
+    useLayoutEffect(() => {
+      if(!element || initialRectSet.current)
+        return;
+
+      initialRectSet.current = true
+      const rect = element.getBoundingClientRect();
+      dispatch({ rect });
+    }, [element])
+
+    useEffect(() => {
+      if(!element)
+        return;
+
+      const observer = observeRect(element, rect => {
+        dispatch({ rect });
+      });
+
+      observer.observe()
+      return () => observer.unobserve()
+    }, [element])
+
+    this.outerSize = rect ? rect[sizeKey] : 0;
+  }
+
   defaultScrollToFn = (offset: number) => {
     const { current } = this.parentRef;
 
@@ -149,9 +187,7 @@ class VirtualController extends VC {
       sizeKey
     } = this;
 
-    const rect = useRect(parentRef);
-
-    this.outerSize = rect ? rect[sizeKey] : 0;
+    this.useRect();
 
     useIsomorphicLayoutEffect(() => {
       const element = parentRef.current;
@@ -252,4 +288,12 @@ class VirtualController extends VC {
     this.start = Math.max(start - overscan, 0)
     this.end = Math.min(end + overscan, total - 1)
   }
+}
+
+function rectReducer(state: any, action: any) {
+  const rect = action.rect;
+  if(!state || state.height !== rect.height || state.width !== rect.width)
+    return rect;
+  else
+    return state
 }
