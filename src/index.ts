@@ -1,0 +1,264 @@
+import useRect from "./useRect";
+import * as React from 'react'
+import VC from 'deep-state'
+
+const defaultEstimateSize = () => 50
+const useIsomorphicLayoutEffect = React.useLayoutEffect;
+
+export { useVirtual }
+
+function useVirtual(opts: any): any {
+  return VirtualController.using(opts);
+}
+
+class VirtualController extends VC {
+  size = 0
+  overscan = 0
+  paddingStart = 0
+  paddingEnd = 0
+  horizontal = false;
+  estimateSize = defaultEstimateSize;
+  parentRef = { current: null };
+
+  willRender(){
+    const results: any = _useVirtual(this);
+    this.assign(results);
+  }
+}
+
+function _useVirtual({
+  size = 0,
+  estimateSize = defaultEstimateSize,
+  overscan = 0,
+  paddingStart = 0,
+  paddingEnd = 0,
+  parentRef,
+  horizontal,
+  scrollToFn,
+}: any) {
+  const sizeKey = horizontal ? 'width' : 'height'
+  const scrollKey = horizontal ? 'scrollLeft' : 'scrollTop'
+  const latestRef = React.useRef<any>({})
+
+  const { [sizeKey]: outerSize } = useRect(parentRef) || {
+    [sizeKey]: 0,
+  }
+
+  const defaultScrollToFn = React.useCallback(
+    offset => {
+      if (parentRef.current) {
+        parentRef.current[scrollKey] = offset
+      }
+    },
+    [parentRef, scrollKey]
+  )
+
+  const resolvedScrollToFn = scrollToFn || defaultScrollToFn
+
+  scrollToFn = React.useCallback(
+    (offset: number) => {
+      resolvedScrollToFn(offset, defaultScrollToFn)
+    },
+    [defaultScrollToFn, resolvedScrollToFn]
+  )
+
+  const [measuredCache, setMeasuredCache] = React.useState<any>({})
+
+  const measurements = React.useMemo(() => {
+    const measurements = []
+    for (let i = 0; i < size; i++) {
+      const measuredSize = measuredCache[i]
+      const start: any = measurements[i - 1] ? measurements[i - 1].end : paddingStart
+      const size =
+        typeof measuredSize === 'number' ? measuredSize : estimateSize(i)
+      const end = start + size
+      measurements[i] = { index: i, start, size, end }
+    }
+    return measurements
+  }, [estimateSize, measuredCache, paddingStart, size])
+
+  const totalSize = (measurements[size - 1]?.end || 0) + paddingEnd
+
+  Object.assign(latestRef.current, {
+    overscan,
+    measurements,
+    outerSize,
+    totalSize,
+  })
+
+  const [range, setRange] = React.useState({ start: 0, end: 0 })
+
+  useIsomorphicLayoutEffect(() => {
+    const element = parentRef.current
+
+    const onScroll = () => {
+      if (!element) return
+      const scrollOffset = element[scrollKey]
+      latestRef.current.scrollOffset = scrollOffset
+      setRange(prevRange => calculateRange(latestRef.current, prevRange))
+    }
+
+    // Determine initially visible range
+    onScroll()
+
+    element.addEventListener('scroll', onScroll, {
+      capture: false,
+      passive: true,
+    })
+
+    return () => {
+      element.removeEventListener('scroll', onScroll)
+    }
+  }, [parentRef.current, scrollKey, size /* required */])
+
+  const virtualItems = React.useMemo(() => {
+    const virtualItems = []
+    const end = Math.min(range.end, measurements.length - 1)
+
+    for (let i = range.start; i <= end; i++) {
+      const measurement = measurements[i]
+
+      const item = {
+        ...measurement,
+        measureRef: (el: any) => {
+          const { scrollOffset } = latestRef.current
+
+          if (el) {
+            const { [sizeKey]: measuredSize } = el.getBoundingClientRect()
+
+            if (measuredSize !== item.size) {
+              if (item.start < scrollOffset) {
+                defaultScrollToFn(scrollOffset + (measuredSize - item.size))
+              }
+
+              setMeasuredCache((old: any) => ({
+                ...old,
+                [i]: measuredSize,
+              }))
+            }
+          }
+        },
+      }
+
+      virtualItems.push(item)
+    }
+
+    return virtualItems
+  }, [range.start, range.end, measurements, sizeKey, defaultScrollToFn])
+
+  const mountedRef = React.useRef<boolean>(false)
+
+  useIsomorphicLayoutEffect(() => {
+    if (mountedRef.current) {
+      if (estimateSize || size) setMeasuredCache({})
+    }
+    mountedRef.current = true
+  }, [estimateSize, size])
+
+  const scrollToOffset = React.useCallback(
+    (toOffset, { align = 'start' } = {}) => {
+      const { scrollOffset, outerSize } = latestRef.current
+
+      if (align === 'auto') {
+        if (toOffset <= scrollOffset) {
+          align = 'start'
+        } else if (scrollOffset >= scrollOffset + outerSize) {
+          align = 'end'
+        } else {
+          align = 'start'
+        }
+      }
+
+      if (align === 'start') {
+        scrollToFn(toOffset)
+      } else if (align === 'end') {
+        scrollToFn(toOffset - outerSize)
+      } else if (align === 'center') {
+        scrollToFn(toOffset - outerSize / 2)
+      }
+    },
+    [scrollToFn]
+  )
+
+  const tryScrollToIndex = React.useCallback(
+    (index, { align = 'auto', ...rest } = {}) => {
+      const { measurements, scrollOffset, outerSize } = latestRef.current
+
+      const measurement = measurements[Math.max(0, Math.min(index, size - 1))]
+
+      if (!measurement) {
+        return
+      }
+
+      if (align === 'auto') {
+        if (measurement.end >= scrollOffset + outerSize) {
+          align = 'end'
+        } else if (measurement.start <= scrollOffset) {
+          align = 'start'
+        } else {
+          return
+        }
+      }
+
+      const toOffset =
+        align === 'center'
+          ? measurement.start + measurement.size / 2
+          : align === 'end'
+          ? measurement.end
+          : measurement.start
+
+      scrollToOffset(toOffset, { align, ...rest })
+    },
+    [scrollToOffset, size]
+  )
+
+  const scrollToIndex = React.useCallback(
+    (a: any, b: any) => {
+      // We do a double request here because of
+      // dynamic sizes which can cause offset shift
+      // and end up in the wrong spot. Unfortunately,
+      // we can't know about those dynamic sizes until
+      // we try and render them. So double down!
+      tryScrollToIndex(a,b)
+      requestAnimationFrame(() => {
+        tryScrollToIndex(a,b)
+      })
+    },
+    [tryScrollToIndex]
+  )
+
+  return {
+    virtualItems,
+    totalSize,
+    scrollToOffset,
+    scrollToIndex,
+  }
+}
+
+function calculateRange({
+  overscan,
+  measurements,
+  outerSize,
+  scrollOffset,
+}: any, prevRange: any) {
+  const total = measurements.length
+  let start = total - 1
+  while (start > 0 && measurements[start].end >= scrollOffset) {
+    start -= 1
+  }
+  let end = 0
+  while (end < total - 1 && measurements[end].start <= scrollOffset + outerSize) {
+    end += 1
+  }
+
+  // Always add at least one overscan item, so focus will work
+  start = Math.max(start - overscan, 0)
+  end = Math.min(end + overscan, total - 1)
+
+  if (!prevRange || prevRange.start !== start || prevRange.end !== end) {
+    return { start, end }
+  }
+
+  return prevRange
+}
+

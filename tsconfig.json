@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+      "outDir": "lib/",
+      "target": "ES6",
+      "jsx": "react",
+      "sourceMap": true,
+      "moduleResolution": "node",
+      "noUnusedLocals": true,
+      "strict": true,
+      "esModuleInterop": true,
+      "types": [ "node", "jest" ],
+      "lib": ["ES2018", "DOM"]
+  },
+  "exclude": [
+      "index.d.ts",
+      "tests"
+  ]
+}

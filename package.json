@@ -1,0 +1,27 @@
+{
+  "name": "react-virtual-controller",
+  "version": "0.1.0",
+  "module": "src",
+  "main": "lib",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest --watchAll"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "dependencies": {
+    "@reach/observe-rect": "^1.2.0",
+    "@testing-library/react": "^9.4.1",
+    "deep-state": "^1.0.0-beta.1",
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.49",
+    "jest": "^26.0.0",
+    "ts-jest": "^26.2.0",
+    "typescript": "^3.9.6"
+  }
+}
