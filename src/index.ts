@@ -24,26 +24,35 @@ class VirtualController extends VC {
 
   virtualItems = [] as any[];
   totalSize = 0;
+  scrollOffset = 0;
+  outerSize = 0;
+  range = { start: 0, end: 0 };
+  isNowMounted = false;
+  measurements = [] as {
+    index: number
+    start: number
+    size: number
+    end: number
+  }[];
+
+  get sizeKey(){ return this.horizontal ? 'width' : 'height' }
+  get scrollKey(){ return this.horizontal ? 'scrollLeft' : 'scrollTop' }
 
   willRender(){
     let {
       size,
       estimateSize,
-      overscan,
       paddingStart,
       paddingEnd,
       parentRef,
-      horizontal,
       scrollToFn,
+      range,
+      sizeKey,
+      scrollKey
     } = this as any;
 
-    const sizeKey = horizontal ? 'width' : 'height'
-    const scrollKey = horizontal ? 'scrollLeft' : 'scrollTop'
-    const latestRef = React.useRef<any>({})
-
-    const { [sizeKey]: outerSize } = useRect(parentRef) || {
-      [sizeKey]: 0,
-    }
+    const rect = useRect(parentRef);
+    this.outerSize = rect ? rect[sizeKey] : 0;
 
     const defaultScrollToFn = React.useCallback(
       offset => {
@@ -76,25 +85,16 @@ class VirtualController extends VC {
       return measurements
     }, [estimateSize, this.measuredCache, paddingStart, size])
 
-    const totalSize = (measurements[size - 1]?.end || 0) + paddingEnd
-
-    Object.assign(latestRef.current, {
-      overscan,
-      measurements,
-      outerSize,
-      totalSize,
-    })
-
-    const [range, setRange] = React.useState({ start: 0, end: 0 })
+    this.measurements = measurements;
+    this.totalSize = (measurements[size - 1]?.end || 0) + paddingEnd;
 
     useIsomorphicLayoutEffect(() => {
       const element = parentRef.current
 
       const onScroll = () => {
         if (!element) return
-        const scrollOffset = element[scrollKey]
-        latestRef.current.scrollOffset = scrollOffset
-        setRange(prevRange => calculateRange(latestRef.current, prevRange))
+        this.scrollOffset = element[scrollKey];
+        this.range = calculateRange(this, this.range);
       }
 
       // Determine initially visible range
@@ -120,7 +120,7 @@ class VirtualController extends VC {
         const item = {
           ...measurement,
           measureRef: (el: any) => {
-            const { scrollOffset } = latestRef.current
+            const { scrollOffset } = this;
 
             if (el) {
               const { [sizeKey]: measuredSize } = el.getBoundingClientRect()
@@ -145,18 +145,16 @@ class VirtualController extends VC {
       return virtualItems
     }, [range.start, range.end, measurements, sizeKey, defaultScrollToFn])
 
-    const mountedRef = React.useRef<boolean>(false)
-
     useIsomorphicLayoutEffect(() => {
-      if (mountedRef.current) {
+      if (this.isNowMounted) {
         if (estimateSize || size) this.measuredCache = {};
       }
-      mountedRef.current = true
+      this.isNowMounted = true
     }, [estimateSize, size])
 
     const scrollToOffset = React.useCallback(
       (toOffset, { align = 'start' } = {}) => {
-        const { scrollOffset, outerSize } = latestRef.current
+        const { scrollOffset, outerSize } = this;
 
         if (align === 'auto') {
           if (toOffset <= scrollOffset) {
@@ -181,7 +179,7 @@ class VirtualController extends VC {
 
     const tryScrollToIndex = React.useCallback(
       (index, { align = 'auto', ...rest } = {}) => {
-        const { measurements, scrollOffset, outerSize } = latestRef.current
+        const { measurements, scrollOffset, outerSize } = this;
 
         const measurement = measurements[Math.max(0, Math.min(index, size - 1))]
 
@@ -228,7 +226,6 @@ class VirtualController extends VC {
 
     this.assign({
       virtualItems,
-      totalSize,
       scrollToOffset,
       scrollToIndex,
     } as any);
