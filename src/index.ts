@@ -168,32 +168,28 @@ class VirtualController extends VC {
       return () => {
         element.removeEventListener('scroll', onScroll)
       }
-    }, [parentRef.current, scrollKey, size /* required */])
+    }, [parentRef.current, scrollKey, size])
 
     const virtualItems = React.useMemo(() => {
       const virtualItems = [];
       const end = Math.min(range.end, measurements.length - 1);
 
       for (let i = range.start; i <= end; i++){
-        const measurement = measurements[i]
-
         const item = {
-          ...measurement,
+          ...measurements[i],
           measureRef: (el: any) => {
             if(!el)
               return;
 
             const { scrollOffset } = this;
+            const { start, size } = item;
             const { [sizeKey]: measuredSize } = el.getBoundingClientRect();
 
-            if(measuredSize !== item.size){
-              if(item.start < scrollOffset)
-                defaultScrollToFn(scrollOffset + (measuredSize - item.size))
+            if(measuredSize !== size){
+              if(start < scrollOffset)
+                defaultScrollToFn(scrollOffset + measuredSize - size)
 
-              this.measuredCache = {
-                ...this.measuredCache,
-                [i]: measuredSize,
-              }
+              this.measuredCache[i] = measuredSize;
             }
           }
         }
