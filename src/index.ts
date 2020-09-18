@@ -170,36 +170,15 @@ class VirtualController extends VC {
       }
     }, [parentRef.current, scrollKey, size])
 
-    const virtualItems = React.useMemo(() => {
-      let { end, start } = this;
-      const virtualItems = [];
-      end = Math.min(end, measurements.length - 1);
-
-      for (let i = start; i <= end; i++){
-        const item = {
-          ...measurements[i],
-          measureRef: (el: any) => {
-            if(!el)
-              return;
-
-            const { scrollOffset } = this;
-            const { start, size } = item;
-            const { [sizeKey]: measuredSize } = el.getBoundingClientRect();
-
-            if(measuredSize !== size){
-              if(start < scrollOffset)
-                defaultScrollToFn(scrollOffset + measuredSize - size)
-
-              this.measuredCache[i] = measuredSize;
-            }
-          }
-        }
-
-        virtualItems.push(item)
-      }
-
-      return virtualItems
-    }, [this.start, this.end, measurements, sizeKey, defaultScrollToFn])
+    const virtualItems = React.useMemo(
+      this.getVirtualItems, [
+        this.start, 
+        this.end, 
+        measurements, 
+        sizeKey, 
+        defaultScrollToFn
+      ]
+    )
 
     useIsomorphicLayoutEffect(() => {
       if(!this.isNowMounted)
@@ -209,9 +188,39 @@ class VirtualController extends VC {
 
     }, [estimateSize, size])
 
-    this.assign({
-      virtualItems,
-    } as any);
+    this.assign({ virtualItems } as any);
+  }
+
+  getVirtualItems = () => {
+    let { end, start, measurements, sizeKey, defaultScrollToFn } = this;
+    end = Math.min(end, measurements.length - 1);
+
+    const virtualItems = [];
+
+    for (let i = start; i <= end; i++){
+      const item = {
+        ...measurements[i],
+        measureRef: (el: any) => {
+          if(!el)
+            return;
+
+          const { scrollOffset } = this;
+          const { start, size } = item;
+          const { [sizeKey]: measuredSize } = el.getBoundingClientRect();
+
+          if(measuredSize !== size){
+            if(start < scrollOffset)
+              defaultScrollToFn(scrollOffset + measuredSize - size)
+
+            this.measuredCache[i] = measuredSize;
+          }
+        }
+      }
+
+      virtualItems.push(item)
+    }
+
+    return virtualItems
   }
 
   calculateRange(){
