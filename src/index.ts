@@ -27,11 +27,11 @@ class VirtualController extends VC {
 
   willRender(){
     let {
-      size = 0,
-      estimateSize = defaultEstimateSize,
-      overscan = 0,
-      paddingStart = 0,
-      paddingEnd = 0,
+      size,
+      estimateSize,
+      overscan,
+      paddingStart,
+      paddingEnd,
       parentRef,
       horizontal,
       scrollToFn,
