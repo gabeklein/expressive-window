@@ -68,7 +68,12 @@ class VirtualController extends VC {
   }
 
   get measurements(){
-    const { estimateSize, measuredCache, paddingStart, size } = this;
+    const {
+      estimateSize,
+      measuredCache,
+      paddingStart,
+      size
+    } = this;
 
     const measurements = [] as {
       index: number
@@ -77,7 +82,7 @@ class VirtualController extends VC {
       end: number
     }[];
 
-    for (let i = 0; i < size; i++){
+    for(let i = 0; i < size; i++){
       const measuredSize = measuredCache[i];
       const start: any = measurements[i - 1] ? measurements[i - 1].end : paddingStart;
       const size = typeof measuredSize === 'number' ? measuredSize : estimateSize(i);
@@ -85,6 +90,7 @@ class VirtualController extends VC {
 
       measurements[i] = { index: i, start, size, end }
     }
+
     return measurements;
   }
 
@@ -106,12 +112,13 @@ class VirtualController extends VC {
     resolvedScrollToFn(offset, defaultScrollToFn);
   }
 
-  tryScrollToIndex = (index: number, { align = 'auto', ...rest } = {}) => {
+  tryScrollToIndex = (index: number, opts: any = {}) => {
     const { measurements, scrollOffset, outerSize, scrollToOffset, size } = this;
     const measurement = measurements[Math.max(0, Math.min(index, size - 1))]
+    let { align = 'auto', ...rest } = opts;
 
     if(!measurement)
-      return
+      return;
 
     if(align === 'auto')
       if(measurement.end >= scrollOffset + outerSize)
@@ -196,16 +203,17 @@ class VirtualController extends VC {
 
     const virtualItems = [];
 
-    for (let i = start; i <= end; i++){
+    for(let i = start; i <= end; i++){
       const item = {
         ...measurements[i],
-        measureRef: (el: any) => {
-          if(!el)
+        measureRef: (element: HTMLElement) => {
+          if(!element)
             return;
 
+          const rect = element.getBoundingClientRect();
+          const measuredSize = rect[sizeKey];
           const { scrollOffset } = this;
-          const { start, size } = item;
-          const { [sizeKey]: measuredSize } = el.getBoundingClientRect();
+          const { size, start } = item;
 
           if(measuredSize !== size){
             if(start < scrollOffset)
@@ -234,10 +242,10 @@ class VirtualController extends VC {
     let start = total - 1;
     let end = 0;
 
-    while (start > 0 && measurements[start].end >= scrollOffset)
+    while(start > 0 && measurements[start].end >= scrollOffset)
       start -= 1;
 
-    while (end < total - 1 && measurements[end].start <= scrollOffset + outerSize)
+    while(end < total - 1 && measurements[end].start <= scrollOffset + outerSize)
       end += 1;
 
     // Always add at least one overscan item, so focus will work
