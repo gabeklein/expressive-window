@@ -54,36 +54,93 @@ class VirtualController extends VC {
   get sizeKey(){ return this.horizontal ? 'width' : 'height' }
   get scrollKey(){ return this.horizontal ? 'scrollLeft' : 'scrollTop' }
 
+  defaultScrollToFn = (offset: number) => {
+    const { current } = this.parentRef;
+
+    if(current)
+      current[this.scrollKey] = offset;
+  }
+
+  scrollTo = (offset: number) => {
+    const { defaultScrollToFn } = this;
+    const resolvedScrollToFn: any = 
+      this.scrollToFn || defaultScrollToFn;
+
+    resolvedScrollToFn(offset, defaultScrollToFn);
+  }
+
+  scrollToOffset = (toOffset: number, opts: any) => {
+    const { scrollOffset, outerSize } = this;
+    let align = opts ? opts.align : 'start'; 
+
+    if(align === 'auto')
+      if(toOffset <= scrollOffset)
+        align = 'start'
+      else if(scrollOffset >= scrollOffset + outerSize)
+        align = 'end'
+      else 
+        align = 'start'
+
+    if(align === 'start')
+      this.scrollTo(toOffset)
+    else if(align === 'end')
+      this.scrollTo(toOffset - outerSize)
+    else if(align === 'center')
+      this.scrollTo(toOffset - outerSize / 2)
+  }
+
+  scrollToIndex = (a: any, b: any) => {
+    // We do a double request here because of
+    // dynamic sizes which can cause offset shift
+    // and end up in the wrong spot. Unfortunately,
+    // we can't know about those dynamic sizes until
+    // we try and render them. So double down!
+    this.tryScrollToIndex(a,b)
+    requestAnimationFrame(() => {
+      this.tryScrollToIndex(a,b)
+    })
+  }
+  
+  tryScrollToIndex = (index: number, { align = 'auto', ...rest } = {}) => {
+    const { measurements, scrollOffset, outerSize, scrollToOffset, size } = this;
+    const measurement = measurements[Math.max(0, Math.min(index, size - 1))]
+
+    if(!measurement)
+      return
+
+    if(align === 'auto')
+      if(measurement.end >= scrollOffset + outerSize)
+        align = 'end'
+      else if(measurement.start <= scrollOffset)
+        align = 'start'
+      else
+        return;
+
+    const toOffset =
+      align === 'center'
+        ? measurement.start + measurement.size / 2
+        : align === 'end'
+        ? measurement.end
+        : measurement.start
+
+    scrollToOffset(toOffset, { align, ...rest })
+  }
+
   willRender(){
     let {
-      size,
+      defaultScrollToFn,
       estimateSize,
       measurements,
       paddingEnd,
       parentRef,
       range,
-      sizeKey,
-      scrollKey
+      scrollKey,
+      size,
+      sizeKey
     } = this;
 
     const rect = useRect(parentRef);
     this.outerSize = rect ? rect[sizeKey] : 0;
-
-    const defaultScrollToFn = React.useCallback(
-      offset => {
-        if(parentRef.current)
-          parentRef.current[scrollKey] = offset;
-      },
-      [parentRef, scrollKey]
-    )
-
-    const resolvedScrollToFn = this.scrollToFn || defaultScrollToFn;
-    const scrollToFn = React.useCallback(
-      (offset: number) => {
-        resolvedScrollToFn(offset, defaultScrollToFn)
-      },
-      [defaultScrollToFn, resolvedScrollToFn]
-    )
 
     this.totalSize = (measurements[size - 1]?.end || 0) + paddingEnd;
 
@@ -152,76 +209,8 @@ class VirtualController extends VC {
 
     }, [estimateSize, size])
 
-    const scrollToOffset = React.useCallback(
-      (toOffset, opts) => {
-        const { scrollOffset, outerSize } = this;
-        let align = opts ? opts.align : 'start'; 
-
-        if(align === 'auto')
-          if(toOffset <= scrollOffset)
-            align = 'start'
-          else if(scrollOffset >= scrollOffset + outerSize)
-            align = 'end'
-          else 
-            align = 'start'
-
-        if(align === 'start')
-          scrollToFn(toOffset)
-        else if(align === 'end')
-          scrollToFn(toOffset - outerSize)
-        else if(align === 'center')
-          scrollToFn(toOffset - outerSize / 2)
-      },
-      [scrollToFn]
-    )
-
-    const tryScrollToIndex = React.useCallback(
-      (index, { align = 'auto', ...rest } = {}) => {
-        const { measurements, scrollOffset, outerSize } = this;
-        const measurement = measurements[Math.max(0, Math.min(index, size - 1))]
-
-        if(!measurement)
-          return
-
-        if(align === 'auto')
-          if(measurement.end >= scrollOffset + outerSize)
-            align = 'end'
-          else if(measurement.start <= scrollOffset)
-            align = 'start'
-          else
-            return;
-
-        const toOffset =
-          align === 'center'
-            ? measurement.start + measurement.size / 2
-            : align === 'end'
-            ? measurement.end
-            : measurement.start
-
-        scrollToOffset(toOffset, { align, ...rest })
-      },
-      [scrollToOffset, size]
-    )
-
-    const scrollToIndex = React.useCallback(
-      (a: any, b: any) => {
-        // We do a double request here because of
-        // dynamic sizes which can cause offset shift
-        // and end up in the wrong spot. Unfortunately,
-        // we can't know about those dynamic sizes until
-        // we try and render them. So double down!
-        tryScrollToIndex(a,b)
-        requestAnimationFrame(() => {
-          tryScrollToIndex(a,b)
-        })
-      },
-      [tryScrollToIndex]
-    )
-
     this.assign({
       virtualItems,
-      scrollToOffset,
-      scrollToIndex,
     } as any);
   }
 }
