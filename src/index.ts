@@ -21,14 +21,51 @@ class VirtualController extends VC {
   parentRef = { current: null as any };
   scrollToFn?: ((offset: any, next?: Function) => void) = undefined; 
 
-  measuredCache: any = {};
+  protected measuredCache: any = {};
+  protected scrollOffset = 0;
+  protected outerSize = 0;
+  protected start = 0;
+  protected end = 0;
+  protected isNowMounted = false;
 
-  virtualItems = [] as any[];
-  scrollOffset = 0;
-  outerSize = 0;
-  start = 0;
-  end = 0;
-  isNowMounted = false;
+  public virtualItems = [] as any[];
+  public get totalSize(){
+    const { measurements, size, paddingEnd } = this;
+    const offset = measurements[size - 1];
+    return (offset ? offset.end : 0) + paddingEnd;
+  }
+
+  public scrollToOffset = (toOffset: number, opts: any) => {
+    const { scrollOffset, outerSize } = this;
+    let align = opts ? opts.align : 'start'; 
+
+    if(align === 'auto')
+      if(toOffset <= scrollOffset)
+        align = 'start'
+      else if(scrollOffset >= scrollOffset + outerSize)
+        align = 'end'
+      else 
+        align = 'start'
+
+    if(align === 'start')
+      this.scrollTo(toOffset)
+    else if(align === 'end')
+      this.scrollTo(toOffset - outerSize)
+    else if(align === 'center')
+      this.scrollTo(toOffset - outerSize / 2)
+  }
+
+  public scrollToIndex = (index: number, opts?: any) => {
+    // We do a double request here because of
+    // dynamic sizes which can cause offset shift
+    // and end up in the wrong spot. Unfortunately,
+    // we can't know about those dynamic sizes until
+    // we try and render them. So double down!
+    this.tryScrollToIndex(index, opts)
+    requestAnimationFrame(() => {
+      this.tryScrollToIndex(index, opts)
+    })
+  }
 
   get measurements(){
     const { estimateSize, measuredCache, paddingStart, size } = this;
@@ -69,38 +106,6 @@ class VirtualController extends VC {
     resolvedScrollToFn(offset, defaultScrollToFn);
   }
 
-  scrollToOffset = (toOffset: number, opts: any) => {
-    const { scrollOffset, outerSize } = this;
-    let align = opts ? opts.align : 'start'; 
-
-    if(align === 'auto')
-      if(toOffset <= scrollOffset)
-        align = 'start'
-      else if(scrollOffset >= scrollOffset + outerSize)
-        align = 'end'
-      else 
-        align = 'start'
-
-    if(align === 'start')
-      this.scrollTo(toOffset)
-    else if(align === 'end')
-      this.scrollTo(toOffset - outerSize)
-    else if(align === 'center')
-      this.scrollTo(toOffset - outerSize / 2)
-  }
-
-  scrollToIndex = (a: any, b: any) => {
-    // We do a double request here because of
-    // dynamic sizes which can cause offset shift
-    // and end up in the wrong spot. Unfortunately,
-    // we can't know about those dynamic sizes until
-    // we try and render them. So double down!
-    this.tryScrollToIndex(a,b)
-    requestAnimationFrame(() => {
-      this.tryScrollToIndex(a,b)
-    })
-  }
-  
   tryScrollToIndex = (index: number, { align = 'auto', ...rest } = {}) => {
     const { measurements, scrollOffset, outerSize, scrollToOffset, size } = this;
     const measurement = measurements[Math.max(0, Math.min(index, size - 1))]
@@ -124,12 +129,6 @@ class VirtualController extends VC {
         : measurement.start
 
     scrollToOffset(toOffset, { align, ...rest })
-  }
-
-  get totalSize(){
-    const { measurements, size, paddingEnd } = this;
-    const offset = measurements[size - 1];
-    return (offset ? offset.end : 0) + paddingEnd;
   }
 
   willRender(){
