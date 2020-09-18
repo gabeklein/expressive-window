@@ -26,7 +26,8 @@ class VirtualController extends VC {
   virtualItems = [] as any[];
   scrollOffset = 0;
   outerSize = 0;
-  range = { start: 0, end: 0 };
+  start = 0;
+  end = 0;
   isNowMounted = false;
 
   get measurements(){
@@ -137,7 +138,6 @@ class VirtualController extends VC {
       estimateSize,
       measurements,
       parentRef,
-      range,
       scrollKey,
       size,
       sizeKey
@@ -152,7 +152,7 @@ class VirtualController extends VC {
 
       const onScroll = () => {
         if(element){
-          this.range = this.calculateRange();
+          this.calculateRange();
           this.scrollOffset = element[scrollKey];
         }
       }
@@ -171,10 +171,11 @@ class VirtualController extends VC {
     }, [parentRef.current, scrollKey, size])
 
     const virtualItems = React.useMemo(() => {
+      let { end, start } = this;
       const virtualItems = [];
-      const end = Math.min(range.end, measurements.length - 1);
+      end = Math.min(end, measurements.length - 1);
 
-      for (let i = range.start; i <= end; i++){
+      for (let i = start; i <= end; i++){
         const item = {
           ...measurements[i],
           measureRef: (el: any) => {
@@ -198,7 +199,7 @@ class VirtualController extends VC {
       }
 
       return virtualItems
-    }, [range.start, range.end, measurements, sizeKey, defaultScrollToFn])
+    }, [this.start, this.end, measurements, sizeKey, defaultScrollToFn])
 
     useIsomorphicLayoutEffect(() => {
       if(!this.isNowMounted)
@@ -218,27 +219,21 @@ class VirtualController extends VC {
       overscan,
       measurements,
       outerSize,
-      scrollOffset,
-      range: previous
+      scrollOffset
     } = this;
 
-    const total = measurements.length
-    let start = total - 1
+    const total = measurements.length;
+    let start = total - 1;
+    let end = 0;
+
     while (start > 0 && measurements[start].end >= scrollOffset)
       start -= 1;
-
-    let end = 0
 
     while (end < total - 1 && measurements[end].start <= scrollOffset + outerSize)
       end += 1;
 
     // Always add at least one overscan item, so focus will work
-    start = Math.max(start - overscan, 0)
-    end = Math.min(end + overscan, total - 1)
-
-    if(!previous || previous.start !== start || previous.end !== end)
-      return { start, end }
-
-    return previous;
+    this.start = Math.max(start - overscan, 0)
+    this.end = Math.min(end + overscan, total - 1)
   }
 }
