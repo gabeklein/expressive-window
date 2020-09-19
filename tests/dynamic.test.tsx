@@ -6,17 +6,14 @@ import { Container, Inner, Row } from './components'
 
 it('should render given dynamic size', async () => {
   function App() {
-    const parentRef = React.useRef()
-
     const rowVirtualizer = useVirtual({
       size: 20,
-      parentRef,
       overscan: 5,
     })
 
     return (
       <>
-        <Container ref={parentRef}>
+        <Container ref={rowVirtualizer.parentRef}>
           <Inner
             style={{
               height: `${rowVirtualizer.totalSize}px`,

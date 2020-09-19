@@ -1,5 +1,5 @@
 import * as React from 'react'
-import VC from 'deep-state'
+import VC, { ref } from 'deep-state'
 
 import { useState, useReducer, useRef, useEffect, useLayoutEffect } from 'react'
 
@@ -21,7 +21,6 @@ class VirtualController extends VC {
   paddingEnd = 0
   horizontal = false;
   estimateSize = defaultEstimateSize;
-  parentRef = { current: null as any };
   scrollToFn?: ((offset: any, next?: Function) => void) = undefined; 
 
   protected measuredCache: any = {};
@@ -32,6 +31,19 @@ class VirtualController extends VC {
   protected isNowMounted = false;
 
   public virtualItems = [] as any[];
+
+  public parentRef = ref(element => {
+    if(!element)
+      return;
+
+    const observer = observeRect(element, rect => {
+      this.outerSize = rect[this.sizeKey];
+    });
+
+    observer.observe()
+    return () => observer.unobserve()
+  });
+
   public get totalSize(){
     const { measurements, size, paddingEnd } = this;
     const offset = measurements[size - 1];
@@ -120,18 +132,6 @@ class VirtualController extends VC {
       dispatch({ rect });
     }, [element])
 
-    useEffect(() => {
-      if(!element)
-        return;
-
-      const observer = observeRect(element, rect => {
-        dispatch({ rect });
-      });
-
-      observer.observe()
-      return () => observer.unobserve()
-    }, [element])
-
     this.outerSize = rect ? rect[sizeKey] : 0;
   }
 
@@ -190,7 +190,7 @@ class VirtualController extends VC {
     this.useRect();
 
     useIsomorphicLayoutEffect(() => {
-      const element = parentRef.current;
+      const element = parentRef.current!;
 
       const onScroll = () => {
         if(element){
