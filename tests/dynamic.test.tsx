@@ -6,29 +6,29 @@ import { Container, Inner, Row } from './components'
 
 it('should render given dynamic size', async () => {
   function App() {
-    const rowVirtualizer = useVirtual({
+    const {
+      parentRef,
+      totalSize,
+      virtualItems
+    } = useVirtual({
       size: 20,
       overscan: 5,
     })
 
     return (
       <>
-        <Container ref={rowVirtualizer.parentRef}>
-          <Inner
-            style={{
-              height: `${rowVirtualizer.totalSize}px`,
-            }}
-          >
-            {rowVirtualizer.virtualItems.map(virtualRow => (
+        <Container ref={parentRef}>
+          <Inner style={{ height: `${totalSize}px` }}>
+            {virtualItems.map(row => (
               <Row
-                key={virtualRow.index}
-                ref={virtualRow.measureRef}
+                key={row.index}
+                ref={row.measureRef}
                 style={{
-                  height: `${virtualRow.size}px`,
-                  transform: `translateY(${virtualRow.start}px)`,
+                  height: `${row.size}px`,
+                  transform: `translateY(${row.start}px)`,
                 }}
               >
-                Row {virtualRow.index}
+                Row {row.index}
               </Row>
             ))}
           </Inner>

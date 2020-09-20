@@ -6,7 +6,11 @@ import { Container, Inner, Row } from './components'
 
 it('should render', async () => {
   function App() {
-    const rowVirtualizer = useVirtual({
+    const {
+      parentRef,
+      totalSize,
+      virtualItems
+    } = useVirtual({
       size: 10000,
       estimateSize: React.useCallback(() => 35, []),
       overscan: 5,
@@ -14,21 +18,16 @@ it('should render', async () => {
 
     return (
       <>
-        <Container ref={rowVirtualizer.parentRef}>
-          <Inner
-            style={{
-              height: `${rowVirtualizer.totalSize}px`,
-            }}
-          >
-            {rowVirtualizer.virtualItems.map(virtualRow => (
+        <Container ref={parentRef}>
+          <Inner style={{ height: `${totalSize}px` }}>
+            {virtualItems.map(row => (
               <Row
-                key={virtualRow.index}
+                key={row.index}
                 style={{
-                  height: `${virtualRow.size}px`,
-                  transform: `translateY(${virtualRow.start}px)`,
-                }}
-              >
-                Row {virtualRow.index}
+                  height: `${row.size}px`,
+                  transform: `translateY(${row.start}px)`,
+                }}>
+                Row {row.index}
               </Row>
             ))}
           </Inner>
