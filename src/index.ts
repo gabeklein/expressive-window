@@ -1,6 +1,6 @@
 import observeRect from '@reach/observe-rect';
 import VC, { ref } from 'deep-state';
-import { useLayoutEffect, useRef, useState, useMemo } from 'react';
+import { useLayoutEffect, useState, useMemo } from 'react';
 
 export { useVirtual }
 
@@ -22,6 +22,7 @@ class VirtualController extends VC {
   protected start = 0;
   protected end = 0;
   protected isNowMounted = false;
+  protected initialRectSet = false;
 
   public virtualItems = [] as any[];
 
@@ -167,7 +168,6 @@ class VirtualController extends VC {
     } = this;
 
     const [ element, setElement ] = useState(parentRef.current);
-    const initialRectSet = useRef(false);
 
     useLayoutEffect(() => {
       if(parentRef.current !== element)
@@ -175,12 +175,12 @@ class VirtualController extends VC {
     })
 
     useLayoutEffect(() => {
-      if(!element || initialRectSet.current)
+      if(!element || this.initialRectSet)
         return;
 
-      initialRectSet.current = true
       const rect = element.getBoundingClientRect();
       this.outerSize = rect[sizeKey];
+      this.initialRectSet = true;
     }, [element])
 
     useLayoutEffect(() => {
