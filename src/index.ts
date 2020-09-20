@@ -2,7 +2,6 @@ import observeRect from '@reach/observe-rect';
 import VC, { ref } from 'deep-state';
 import { useLayoutEffect, useRef, useState, useMemo } from 'react';
 
-const defaultEstimateSize = (index?: any) => 50;
 export { useVirtual }
 
 function useVirtual(opts: any){
@@ -15,7 +14,6 @@ class VirtualController extends VC {
   paddingStart = 0
   paddingEnd = 0
   horizontal = false;
-  estimateSize = defaultEstimateSize;
   scrollToFn?: ((offset: any, next?: Function) => void) = undefined; 
 
   protected measuredCache: any = {};
@@ -76,6 +74,10 @@ class VirtualController extends VC {
       this.tryScrollToIndex(index, opts)
     })
   }
+
+  public estimateSize(index: any){
+    return 50;
+  };
 
   get measurements(){
     const {
