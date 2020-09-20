@@ -109,26 +109,6 @@ class VirtualController extends VC {
   get sizeKey(){ return this.horizontal ? 'width' : 'height' }
   get scrollKey(){ return this.horizontal ? 'scrollLeft' : 'scrollTop' }
 
-  useRect(){
-    const { parentRef, sizeKey } = this;
-    const [ element, setElement ] = useState(parentRef.current);
-    const initialRectSet = useRef(false);
-
-    useLayoutEffect(() => {
-      if(parentRef.current !== element)
-        setElement(parentRef.current)
-    })
-
-    useLayoutEffect(() => {
-      if(!element || initialRectSet.current)
-        return;
-
-      initialRectSet.current = true
-      const rect = element.getBoundingClientRect();
-      this.outerSize = rect[sizeKey];
-    }, [element])
-  }
-
   defaultScrollToFn = (offset: number) => {
     const { current } = this.parentRef;
 
@@ -181,7 +161,22 @@ class VirtualController extends VC {
       sizeKey
     } = this;
 
-    this.useRect();
+    const [ element, setElement ] = useState(parentRef.current);
+    const initialRectSet = useRef(false);
+
+    useLayoutEffect(() => {
+      if(parentRef.current !== element)
+        setElement(parentRef.current)
+    })
+
+    useLayoutEffect(() => {
+      if(!element || initialRectSet.current)
+        return;
+
+      initialRectSet.current = true
+      const rect = element.getBoundingClientRect();
+      this.outerSize = rect[sizeKey];
+    }, [element])
 
     useLayoutEffect(() => {
       const element = parentRef.current!;
