@@ -1,13 +1,8 @@
-import * as React from 'react'
-import VC, { ref } from 'deep-state'
-
-import { useState, useReducer, useRef, useEffect, useLayoutEffect } from 'react'
-
-import observeRect from '@reach/observe-rect'
+import observeRect from '@reach/observe-rect';
+import VC, { ref } from 'deep-state';
+import { useLayoutEffect, useRef, useState, useMemo } from 'react';
 
 const defaultEstimateSize = (index?: any) => 50;
-const useIsomorphicLayoutEffect = React.useLayoutEffect;
-
 export { useVirtual }
 
 function useVirtual(opts: any){
@@ -114,9 +109,8 @@ class VirtualController extends VC {
 
   useRect(){
     const { parentRef, sizeKey } = this;
-    const [element, setElement] = useState(parentRef.current)
-    const [rect, dispatch] = useReducer(rectReducer, null)
-    const initialRectSet = useRef(false)
+    const [ element, setElement ] = useState(parentRef.current);
+    const initialRectSet = useRef(false);
 
     useLayoutEffect(() => {
       if(parentRef.current !== element)
@@ -129,10 +123,8 @@ class VirtualController extends VC {
 
       initialRectSet.current = true
       const rect = element.getBoundingClientRect();
-      dispatch({ rect });
+      this.outerSize = rect[sizeKey];
     }, [element])
-
-    this.outerSize = rect ? rect[sizeKey] : 0;
   }
 
   defaultScrollToFn = (offset: number) => {
@@ -189,7 +181,7 @@ class VirtualController extends VC {
 
     this.useRect();
 
-    useIsomorphicLayoutEffect(() => {
+    useLayoutEffect(() => {
       const element = parentRef.current!;
 
       const onScroll = () => {
@@ -207,12 +199,11 @@ class VirtualController extends VC {
         passive: true,
       })
 
-      return () => {
+      return () =>
         element.removeEventListener('scroll', onScroll)
-      }
     }, [parentRef.current, scrollKey, size])
 
-    const virtualItems = React.useMemo(
+    const virtualItems = useMemo(
       this.getVirtualItems, [
         this.start, 
         this.end, 
@@ -222,7 +213,7 @@ class VirtualController extends VC {
       ]
     )
 
-    useIsomorphicLayoutEffect(() => {
+    useLayoutEffect(() => {
       if(!this.isNowMounted)
         this.isNowMounted = true
       else if(estimateSize || size)
@@ -288,12 +279,4 @@ class VirtualController extends VC {
     this.start = Math.max(start - overscan, 0)
     this.end = Math.min(end + overscan, total - 1)
   }
-}
-
-function rectReducer(state: any, action: any) {
-  const rect = action.rect;
-  if(!state || state.height !== rect.height || state.width !== rect.width)
-    return rect;
-  else
-    return state
 }
