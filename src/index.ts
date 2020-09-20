@@ -37,12 +37,6 @@ class VirtualController extends VC {
     return () => observer.unobserve()
   });
 
-  public get totalSize(){
-    const { measurements, size, paddingEnd } = this;
-    const offset = measurements[size - 1];
-    return (offset ? offset.end : 0) + paddingEnd;
-  }
-
   public scrollToOffset = (toOffset: number, opts: any) => {
     const { scrollOffset, outerSize } = this;
     let align = opts ? opts.align : 'start'; 
@@ -73,6 +67,12 @@ class VirtualController extends VC {
     requestAnimationFrame(() => {
       this.tryScrollToIndex(index, opts)
     })
+  }
+
+  public get totalSize(){
+    const { measurements, size, paddingEnd } = this;
+    const offset = measurements[size - 1];
+    return (offset ? offset.end : 0) + paddingEnd;
   }
 
   public estimateSize(index: any){
@@ -106,8 +106,13 @@ class VirtualController extends VC {
     return measurements;
   }
 
-  get sizeKey(){ return this.horizontal ? 'width' : 'height' }
-  get scrollKey(){ return this.horizontal ? 'scrollLeft' : 'scrollTop' }
+  private get sizeKey(){
+    return this.horizontal ? 'width' : 'height'
+  }
+  
+  private get scrollKey(){
+    return this.horizontal ? 'scrollLeft' : 'scrollTop'
+  }
 
   defaultScrollToFn = (offset: number) => {
     const { current } = this.parentRef;
