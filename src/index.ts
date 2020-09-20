@@ -184,6 +184,13 @@ class VirtualController extends VC {
     }, [element])
 
     useLayoutEffect(() => {
+      if(!this.isNowMounted)
+        this.isNowMounted = true
+      else if(estimateSize || size)
+        this.measuredCache = {};
+    }, [estimateSize, size])
+
+    useLayoutEffect(() => {
       const element = parentRef.current!;
 
       const onScroll = () => {
@@ -205,7 +212,7 @@ class VirtualController extends VC {
         element.removeEventListener('scroll', onScroll)
     }, [parentRef.current, scrollKey, size])
 
-    const virtualItems = useMemo(
+    this.virtualItems = useMemo(
       this.getVirtualItems, [
         this.start, 
         this.end, 
@@ -214,16 +221,6 @@ class VirtualController extends VC {
         defaultScrollToFn
       ]
     )
-
-    useLayoutEffect(() => {
-      if(!this.isNowMounted)
-        this.isNowMounted = true
-      else if(estimateSize || size)
-        this.measuredCache = {};
-
-    }, [estimateSize, size])
-
-    this.assign({ virtualItems } as any);
   }
 
   getVirtualItems = () => {
