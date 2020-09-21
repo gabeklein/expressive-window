@@ -1,6 +1,6 @@
 import observeRect from '@reach/observe-rect';
 import VC, { ref } from 'deep-state';
-import { useLayoutEffect, useState, useMemo } from 'react';
+import { useLayoutEffect, useState } from 'react';
 
 export { useVirtual }
 
@@ -23,8 +23,6 @@ class VirtualController extends VC {
   protected end = 0;
   protected isNowMounted = false;
   protected initialRectSet = false;
-
-  public virtualItems = [] as any[];
 
   public parentRef = ref(element => {
     if(!element)
@@ -158,13 +156,10 @@ class VirtualController extends VC {
 
   willRender(){
     let {
-      defaultScrollToFn,
       estimateSize,
-      measurements,
       parentRef,
       scrollKey,
-      size,
-      sizeKey
+      size
     } = this;
 
     const [ element, setElement ] = useState(parentRef.current);
@@ -179,7 +174,7 @@ class VirtualController extends VC {
         return;
 
       const rect = element.getBoundingClientRect();
-      this.outerSize = rect[sizeKey];
+      this.outerSize = rect[this.sizeKey];
       this.initialRectSet = true;
     }, [element])
 
@@ -210,20 +205,10 @@ class VirtualController extends VC {
 
       return () =>
         element.removeEventListener('scroll', onScroll)
-    }, [parentRef.current, scrollKey, size])
-
-    this.virtualItems = useMemo(
-      this.getVirtualItems, [
-        this.start, 
-        this.end, 
-        measurements, 
-        sizeKey, 
-        defaultScrollToFn
-      ]
-    )
+    }, [parentRef.current, scrollKey, size]);
   }
 
-  getVirtualItems = () => {
+  get virtualItems(){
     let { end, start, measurements, sizeKey, defaultScrollToFn } = this;
     end = Math.min(end, measurements.length - 1);
 
