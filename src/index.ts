@@ -82,12 +82,7 @@ class VirtualController extends VC {
   };
 
   get measurements(){
-    const {
-      estimateSize,
-      measuredCache,
-      paddingStart,
-      size
-    } = this;
+    const { estimateSize, measuredCache, paddingStart, size } = this;
 
     const measurements = [] as {
       index: number
@@ -192,13 +187,10 @@ class VirtualController extends VC {
       const element = parentRef.current!;
 
       const onScroll = () => {
-        if(element){
+        if(element)
           this.calculateRange();
-          this.scrollOffset = element[scrollKey];
-        }
       }
 
-      // Determine initially visible range
       onScroll();
 
       element.addEventListener('scroll', onScroll, {
@@ -245,25 +237,22 @@ class VirtualController extends VC {
   }
 
   calculateRange(){
-    const {
-      overscan,
-      measurements,
-      outerSize,
-      scrollOffset
-    } = this;
+    const { overscan, measurements, outerSize, parentRef, scrollKey } = this;
 
+    const offset = parentRef.current![scrollKey];
     const total = measurements.length;
     let start = total - 1;
     let end = 0;
 
-    while(start > 0 && measurements[start].end >= scrollOffset)
+    while(start > 0 && measurements[start].end >= offset)
       start -= 1;
 
-    while(end < total - 1 && measurements[end].start <= scrollOffset + outerSize)
+    while(end < total - 1 && measurements[end].start <= offset + outerSize)
       end += 1;
 
     // Always add at least one overscan item, so focus will work
     this.start = Math.max(start - overscan, 0)
     this.end = Math.min(end + overscan, total - 1)
+    this.scrollOffset = offset;
   }
 }
