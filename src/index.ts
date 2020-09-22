@@ -38,7 +38,8 @@ class VirtualController extends VC {
 
   public scrollToOffset = (toOffset: number, opts: any) => {
     const { scrollOffset, outerSize } = this;
-    let align = opts ? opts.align : 'start'; 
+    let align = opts ? opts.align : 'start';
+    let dest = 0;
 
     if(align === 'auto')
       if(toOffset <= scrollOffset)
@@ -49,11 +50,13 @@ class VirtualController extends VC {
         align = 'start'
 
     if(align === 'start')
-      this.scrollTo(toOffset)
+      dest = toOffset;
     else if(align === 'end')
-      this.scrollTo(toOffset - outerSize)
+      dest = toOffset - outerSize;
     else if(align === 'center')
-      this.scrollTo(toOffset - outerSize / 2)
+      dest = toOffset - outerSize / 2;
+
+    this.scrollTo(dest);
   }
 
   public scrollToIndex = (index: number, opts?: any) => {
