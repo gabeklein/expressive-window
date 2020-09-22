@@ -24,6 +24,14 @@ class VirtualController extends VC {
   protected isNowMounted = false;
   protected initialRectSet = false;
 
+  private get sizeKey(){
+    return this.horizontal ? 'width' : 'height'
+  }
+  
+  private get scrollKey(){
+    return this.horizontal ? 'scrollLeft' : 'scrollTop'
+  }
+
   public parentRef = ref(element => {
     if(!element)
       return;
@@ -101,14 +109,6 @@ class VirtualController extends VC {
     }
 
     return measurements;
-  }
-
-  private get sizeKey(){
-    return this.horizontal ? 'width' : 'height'
-  }
-  
-  private get scrollKey(){
-    return this.horizontal ? 'scrollLeft' : 'scrollTop'
   }
 
   defaultScrollToFn = (offset: number) => {
