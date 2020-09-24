@@ -1,6 +1,7 @@
 import VC, { ref } from 'deep-state';
 
-import observeRect from './rect';
+import { observeRect } from './rect';
+import { listenEvent } from './helpers';
 
 export { useVirtual }
 
@@ -43,27 +44,31 @@ class VirtualController extends VC {
 
     const { sizeKey, calculateRange } = this;
 
-    const observer = observeRect(element, rect => {
-      this.outerSize = rect[sizeKey];
-    });
-
     if(!this.initialRectSet){
       const rect = element.getBoundingClientRect();
       this.outerSize = rect[sizeKey];
       this.initialRectSet = true;
     }
 
+    const releaseObserver = 
+      observeRect(element, rect => {
+        this.outerSize = rect[sizeKey];
+      });
+
+    const releaseHandler =
+      listenEvent({
+        target: element,
+        event: 'scroll',
+        handler: calculateRange,
+        capture: false,
+        passive: true,
+      });
+
     calculateRange();
 
-    observer.observe()
-    element.addEventListener('scroll', calculateRange, {
-      capture: false,
-      passive: true,
-    })
-
     return () => {
-      observer.unobserve();
-      element.removeEventListener('scroll', calculateRange)
+      releaseHandler();
+      releaseObserver();
     }
   });
 
@@ -133,7 +138,7 @@ class VirtualController extends VC {
 
     for(let i = 0; i < size; i++){
       const measuredSize = measuredCache[i];
-      const start: any = measurements[i - 1] ? measurements[i - 1].end : paddingStart;
+      const start = measurements[i - 1] ? measurements[i - 1].end : paddingStart;
       const size = typeof measuredSize === 'number' ? measuredSize : estimateSize(i);
       const end = start + size;
 

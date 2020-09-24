@@ -33,27 +33,6 @@ function propogateChanges(
 		}
 }
 
-export default function createObserver(
-	node: Element, 
-	callback: (rect: DOMRect) => void){
-
-	let release: Function | undefined;
-
-	return {
-		observe(){
-			release = observeRect(node, callback);
-		},
-		unobserve(){
-			if(release){
-				release();
-				release = undefined;
-			}
-			else 
-				throw new Error("Not currently observing.");
-		}
-	}
-}
-
 export function observeRect(
 	node: Element, 
 	callback: (rect: DOMRect) => void){
