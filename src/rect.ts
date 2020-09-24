@@ -8,15 +8,13 @@ let COMPARE_KEYS = [
 ] as const;
 
 const observedNodes = new Map<Element, RectProps>();
-let ready = false;
+let ready: boolean;
 
-function observe(){
+function observeForChanges(){
 	if(ready){
 		observedNodes.forEach(propogateChanges);
-		window.requestAnimationFrame(observe);
+		window.requestAnimationFrame(observeForChanges);
 	}
-	else
-		ready = true;
 };
 
 function propogateChanges(
@@ -49,8 +47,10 @@ export function observeRect(
 
 		observedNodes.set(node, state);
 
-		if(observedNodes.size === 1)
-			observe();
+		if(!ready){
+			ready = true;
+			observeForChanges();
+		}
 	}
 
 	return function release(){
