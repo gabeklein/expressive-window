@@ -15,7 +15,7 @@ class VirtualController extends VC {
   paddingStart = 0
   paddingEnd = 0
   horizontal = false;
-  parentRef = ref(this.onSetElement);
+  parentRef = ref(this.didSetContainer);
 
   get totalSize(){
     const { measurements, size, paddingEnd } = this;
@@ -70,7 +70,7 @@ class VirtualController extends VC {
     return this.horizontal ? 'scrollLeft' : 'scrollTop'
   }
 
-  private onSetElement(element: HTMLElement){
+  private didSetContainer(element: HTMLElement){
     if(!element)
       return;
 
@@ -175,6 +175,7 @@ class VirtualController extends VC {
     if(current)
       current[this.scrollKey] = offset;
   }
+
   private tryScrollToIndex(index: number, opts: any = {}){
     const { scrollOffset, outerSize, size } = this;
     const clampedIndex = Math.max(0, Math.min(index, size - 1));
