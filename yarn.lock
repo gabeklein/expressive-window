@@ -1210,10 +1210,10 @@ deep-is@~0.1.3:
   resolved "https://registry.yarnpkg.com/deep-is/-/deep-is-0.1.3.tgz#b369d6fb5dbc13eecf524f91b070feedc357cf34"
   integrity sha1-s2nW+128E+7PUk+RsHD+7cNXzzQ=
 
-deep-state@^1.0.0-beta.4:
-  version "1.0.0-beta.4"
-  resolved "https://registry.yarnpkg.com/deep-state/-/deep-state-1.0.0-beta.4.tgz#60d6976eb1d2fbe3df8f8f16ce503f171e0d312d"
-  integrity sha512-rZpDQSz+lfIpPyV4ylL/6RxhO2IoWR4O9i/JcRf4/drqay/rOpzf/idtlYdqPSUcLoh6ycRa4cNRjaQXnNUFmg==
+deep-state@^1.0.0-beta.5:
+  version "1.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/deep-state/-/deep-state-1.0.0-beta.5.tgz#485dfef8ab014794a134336fc7a52e8045f114b9"
+  integrity sha512-BHMYwzeL+mGZHzmvC8+NKfM7tZJNvdyEOvqLd6xetBBwAVuh1qIoJC1/ll0MFPd6tgXN0n+ImPEA2hEv+E6fyg==
 
 deepmerge@^4.2.2:
   version "4.2.2"
