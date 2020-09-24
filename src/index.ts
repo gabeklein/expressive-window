@@ -15,6 +15,7 @@ class VirtualController extends VC {
   paddingStart = 0
   paddingEnd = 0
   horizontal = false;
+  parentRef = ref(this.onSetElement);
 
   protected measuredCache: any = {};
   protected scrollOffset = 0;
@@ -37,7 +38,7 @@ class VirtualController extends VC {
     return (offset ? offset.end : 0) + paddingEnd;
   }
 
-  public parentRef = ref(element => {
+  protected onSetElement(element: HTMLElement){
     if(!element)
       return;
 
@@ -69,7 +70,7 @@ class VirtualController extends VC {
       releaseHandler();
       releaseObserver();
     }
-  });
+  }
 
   protected calculateRange = () => {
     const { overscan, measurements, outerSize, parentRef, scrollKey } = this;
