@@ -1,6 +1,5 @@
 import observeRect from '@reach/observe-rect';
 import VC, { ref } from 'deep-state';
-import { useLayoutEffect, useState } from 'react';
 
 export { useVirtual }
 
@@ -21,7 +20,6 @@ class VirtualController extends VC {
   protected outerSize = 0;
   protected start = 0;
   protected end = 0;
-  protected isNowMounted = false;
   protected initialRectSet = false;
 
   private get sizeKey(){
@@ -42,12 +40,30 @@ class VirtualController extends VC {
     if(!element)
       return;
 
+    const { sizeKey, calculateRange } = this;
+
     const observer = observeRect(element, rect => {
-      this.outerSize = rect[this.sizeKey];
+      this.outerSize = rect[sizeKey];
     });
 
+    if(!this.initialRectSet){
+      const rect = element.getBoundingClientRect();
+      this.outerSize = rect[sizeKey];
+      this.initialRectSet = true;
+    }
+
+    calculateRange();
+
     observer.observe()
-    return () => observer.unobserve()
+    element.addEventListener('scroll', calculateRange, {
+      capture: false,
+      passive: true,
+    })
+
+    return () => {
+      observer.unobserve();
+      element.removeEventListener('scroll', calculateRange)
+    }
   });
 
   protected calculateRange = () => {
@@ -167,55 +183,10 @@ class VirtualController extends VC {
     scrollToOffset(toOffset, { align, ...rest })
   }
 
-  willRender(){
-    let {
-      estimateSize,
-      parentRef,
-      scrollKey,
-      size
-    } = this;
-
-    const [ element, setElement ] = useState(parentRef.current);
-
-    useLayoutEffect(() => {
-      if(parentRef.current !== element)
-        setElement(parentRef.current)
-    })
-
-    useLayoutEffect(() => {
-      if(!element || this.initialRectSet)
-        return;
-
-      const rect = element.getBoundingClientRect();
-      this.outerSize = rect[this.sizeKey];
-      this.initialRectSet = true;
-    }, [element])
-
-    useLayoutEffect(() => {
-      if(!this.isNowMounted)
-        this.isNowMounted = true
-      else if(estimateSize || size)
-        this.measuredCache = {};
-    }, [estimateSize, size])
-
-    useLayoutEffect(() => {
-      const element = parentRef.current!;
-
-      const onScroll = () => {
-        if(element)
-          this.calculateRange();
-      }
-
-      onScroll();
-
-      element.addEventListener('scroll', onScroll, {
-        capture: false,
-        passive: true,
-      })
-
-      return () =>
-        element.removeEventListener('scroll', onScroll)
-    }, [parentRef.current, scrollKey, size]);
+  didMount(){
+    this.watch(["estimateSize", "size"], () => {
+      this.measuredCache = {};
+    });
   }
 
   public get virtualItems(){
