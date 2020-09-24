@@ -1,5 +1,6 @@
-import observeRect from '@reach/observe-rect';
 import VC, { ref } from 'deep-state';
+
+import observeRect from './rect';
 
 export { useVirtual }
 
