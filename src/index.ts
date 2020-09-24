@@ -15,7 +15,6 @@ class VirtualController extends VC {
   paddingStart = 0
   paddingEnd = 0
   horizontal = false;
-  scrollToFn?: ((offset: any, next?: Function) => void) = undefined; 
 
   protected measuredCache: any = {};
   protected scrollOffset = 0;
@@ -148,19 +147,11 @@ class VirtualController extends VC {
     return measurements;
   }
 
-  defaultScrollToFn = (offset: number) => {
+  scrollTo = (offset: number) => {
     const { current } = this.parentRef;
 
     if(current)
       current[this.scrollKey] = offset;
-  }
-
-  scrollTo = (offset: number) => {
-    const { defaultScrollToFn } = this;
-    const resolvedScrollToFn: any = 
-      this.scrollToFn || defaultScrollToFn;
-
-    resolvedScrollToFn(offset, defaultScrollToFn);
   }
 
   tryScrollToIndex = (index: number, opts: any = {}) => {
@@ -196,7 +187,7 @@ class VirtualController extends VC {
   }
 
   public get virtualItems(){
-    let { end, start, measurements, sizeKey, defaultScrollToFn } = this;
+    let { end, start, measurements, sizeKey, scrollTo } = this;
     end = Math.min(end, measurements.length - 1);
 
     const virtualItems = [];
@@ -215,7 +206,7 @@ class VirtualController extends VC {
 
           if(measuredSize !== size){
             if(start < scrollOffset)
-              defaultScrollToFn(scrollOffset + measuredSize - size)
+              scrollTo(scrollOffset + measuredSize - size)
 
             this.measuredCache[i] = measuredSize;
           }
