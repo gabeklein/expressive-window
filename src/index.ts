@@ -17,6 +17,44 @@ class VirtualController extends VC {
   horizontal = false;
   parentRef = ref(this.onSetElement);
 
+  get totalSize(){
+    const { measurements, size, paddingEnd } = this;
+    const offset = measurements[size - 1];
+    return (offset ? offset.end : 0) + paddingEnd;
+  }
+
+  get virtualItems(){
+    const items = [];
+    let { start, end, measurements } = this;
+    end = Math.min(end, measurements.length - 1);
+
+    for (let i = start; i <= end; i++)
+      items.push(this.controlledPosition(i));
+
+    return items;
+  }
+
+  scrollToOffset = (toOffset: number, opts: any) => {
+    this.tryScrollToOffset(toOffset, opts.align);
+  }
+
+  scrollToIndex = (index: number, opts?: any) => {
+    this.tryScrollToIndex(index, opts)
+    requestAnimationFrame(() => {
+      this.tryScrollToIndex(index, opts)
+    })
+  }
+
+  estimateSize(forIndex: any){
+    return 50;
+  };
+
+  didMount(){
+    this.watch(["estimateSize", "size"], () => {
+      this.measuredCache = {};
+    });
+  }
+
   private measuredCache: any = {};
   private scrollOffset = 0;
   private outerSize = 0;
@@ -30,12 +68,6 @@ class VirtualController extends VC {
   
   private get scrollKey(){
     return this.horizontal ? 'scrollLeft' : 'scrollTop'
-  }
-
-  public get totalSize(){
-    const { measurements, size, paddingEnd } = this;
-    const offset = measurements[size - 1];
-    return (offset ? offset.end : 0) + paddingEnd;
   }
 
   private onSetElement(element: HTMLElement){
@@ -92,13 +124,12 @@ class VirtualController extends VC {
     this.scrollOffset = offset;
   }
 
-  public scrollToOffset = (toOffset: number, opts: any) => {
+  private tryScrollToOffset(newOffset: number, align = 'start'){
     const { scrollOffset, outerSize } = this;
-    let align = opts ? opts.align : 'start';
     let dest = 0;
 
     if(align === 'auto')
-      if(toOffset <= scrollOffset)
+      if(newOffset <= scrollOffset)
         align = 'start'
       else if(scrollOffset >= scrollOffset + outerSize)
         align = 'end'
@@ -106,25 +137,15 @@ class VirtualController extends VC {
         align = 'start'
 
     if(align === 'start')
-      dest = toOffset;
+      dest = newOffset;
     else if(align === 'end')
-      dest = toOffset - outerSize;
+      dest = newOffset - outerSize;
     else if(align === 'center')
-      dest = toOffset - outerSize / 2;
+      dest = newOffset - outerSize / 2;
 
     this.scroll(dest);
   }
 
-  public scrollToIndex = (index: number, opts?: any) => {
-    this.tryScrollToIndex(index, opts)
-    requestAnimationFrame(() => {
-      this.tryScrollToIndex(index, opts)
-    })
-  }
-
-  public estimateSize(index: any){
-    return 50;
-  };
 
   private get measurements(){
     const { estimateSize, measuredCache, paddingStart, size } = this;
@@ -154,12 +175,11 @@ class VirtualController extends VC {
     if(current)
       current[this.scrollKey] = offset;
   }
-
   private tryScrollToIndex(index: number, opts: any = {}){
-    const { scrollOffset, outerSize, scrollToOffset, size } = this;
+    const { scrollOffset, outerSize, size } = this;
     const clampedIndex = Math.max(0, Math.min(index, size - 1));
     const measurement = this.measurements[clampedIndex];
-    let { align = 'auto', ...rest } = opts;
+    let align = opts.align || 'auto';
 
     if(!measurement)
       return;
@@ -179,48 +199,33 @@ class VirtualController extends VC {
         ? measurement.end
         : measurement.start
 
-    scrollToOffset(toOffset, { align, ...rest })
+    this.tryScrollToOffset(toOffset, align)
   }
 
-  didMount(){
-    this.watch(["estimateSize", "size"], () => {
-      this.measuredCache = {};
-    });
-  }
+  private controlledPosition(forIndex: number){
+    const stats = this.measurements[forIndex];
 
-  public get virtualItems(){
-    let { end, start, measurements, sizeKey } = this;
-    end = Math.min(end, measurements.length - 1);
+    const didGetItemRef = (el: HTMLElement) => {
+      if(!el)
+        return;
 
-    const virtualItems = [];
+      const frame = el.getBoundingClientRect();
+      const measuredSize = frame[this.sizeKey];
+      const { scrollOffset } = this;
+      const { size, start } = stats;
 
-    for(let i = start; i <= end; i++){
-      const stats = measurements[i];
+      if(measuredSize === size)
+        return;
 
-      const didGetItemRef = (el: HTMLElement) => {
-        if(!el)
-          return;
+      if(start < scrollOffset)
+        this.scroll(scrollOffset + measuredSize - size)
 
-        const frame = el.getBoundingClientRect();
-        const measuredSize = frame[sizeKey];
-        const { scrollOffset } = this;
-        const { size, start } = stats;
-
-        if(measuredSize === size)
-          return;
-        
-        if(start < scrollOffset)
-          this.scroll(scrollOffset + measuredSize - size)
-
-        this.measuredCache[i] = measuredSize;
-      }
-
-      virtualItems.push({
-        measureRef: didGetItemRef,
-        ...stats
-      })
+      this.measuredCache[forIndex] = measuredSize;
     }
 
-    return virtualItems
+    return {
+      measureRef: didGetItemRef,
+      ...stats
+    }
   }
 }
