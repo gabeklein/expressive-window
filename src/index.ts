@@ -10,10 +10,10 @@ function useVirtual(opts: any){
 }
 
 class VirtualController extends VC {
-  size = 0
-  overscan = 0
-  paddingStart = 0
-  paddingEnd = 0
+  size = 0;
+  overscan = 0;
+  paddingStart = 0;
+  paddingEnd = 0;
   horizontal = false;
   parentRef = ref(this.didSetContainer);
 
