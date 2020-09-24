@@ -112,7 +112,7 @@ class VirtualController extends VC {
     else if(align === 'center')
       dest = toOffset - outerSize / 2;
 
-    this.scrollTo(dest);
+    this.scroll(dest);
   }
 
   public scrollToIndex = (index: number, opts?: any) => {
@@ -148,7 +148,7 @@ class VirtualController extends VC {
     return measurements;
   }
 
-  scrollTo = (offset: number) => {
+  private scroll(offset: number){
     const { current } = this.parentRef;
 
     if(current)
@@ -156,8 +156,9 @@ class VirtualController extends VC {
   }
 
   private tryScrollToIndex(index: number, opts: any = {}){
-    const { measurements, scrollOffset, outerSize, scrollToOffset, size } = this;
-    const measurement = measurements[Math.max(0, Math.min(index, size - 1))]
+    const { scrollOffset, outerSize, scrollToOffset, size } = this;
+    const clampedIndex = Math.max(0, Math.min(index, size - 1));
+    const measurement = this.measurements[clampedIndex];
     let { align = 'auto', ...rest } = opts;
 
     if(!measurement)
@@ -188,33 +189,36 @@ class VirtualController extends VC {
   }
 
   public get virtualItems(){
-    let { end, start, measurements, sizeKey, scrollTo } = this;
+    let { end, start, measurements, sizeKey } = this;
     end = Math.min(end, measurements.length - 1);
 
     const virtualItems = [];
 
     for(let i = start; i <= end; i++){
-      const item = {
-        ...measurements[i],
-        measureRef: (element: HTMLElement) => {
-          if(!element)
-            return;
+      const stats = measurements[i];
 
-          const rect = element.getBoundingClientRect();
-          const measuredSize = rect[sizeKey];
-          const { scrollOffset } = this;
-          const { size, start } = item;
+      const didGetItemRef = (el: HTMLElement) => {
+        if(!el)
+          return;
 
-          if(measuredSize !== size){
-            if(start < scrollOffset)
-              scrollTo(scrollOffset + measuredSize - size)
+        const frame = el.getBoundingClientRect();
+        const measuredSize = frame[sizeKey];
+        const { scrollOffset } = this;
+        const { size, start } = stats;
 
-            this.measuredCache[i] = measuredSize;
-          }
-        }
+        if(measuredSize === size)
+          return;
+        
+        if(start < scrollOffset)
+          this.scroll(scrollOffset + measuredSize - size)
+
+        this.measuredCache[i] = measuredSize;
       }
 
-      virtualItems.push(item)
+      virtualItems.push({
+        measureRef: didGetItemRef,
+        ...stats
+      })
     }
 
     return virtualItems
