@@ -17,12 +17,12 @@ class VirtualController extends VC {
   horizontal = false;
   parentRef = ref(this.onSetElement);
 
-  protected measuredCache: any = {};
-  protected scrollOffset = 0;
-  protected outerSize = 0;
-  protected start = 0;
-  protected end = 0;
-  protected initialRectSet = false;
+  private measuredCache: any = {};
+  private scrollOffset = 0;
+  private outerSize = 0;
+  private start = 0;
+  private end = 0;
+  private initialRectSet = false;
 
   private get sizeKey(){
     return this.horizontal ? 'width' : 'height'
@@ -38,7 +38,7 @@ class VirtualController extends VC {
     return (offset ? offset.end : 0) + paddingEnd;
   }
 
-  protected onSetElement(element: HTMLElement){
+  private onSetElement(element: HTMLElement){
     if(!element)
       return;
 
@@ -72,7 +72,7 @@ class VirtualController extends VC {
     }
   }
 
-  protected calculateRange = () => {
+  private calculateRange = () => {
     const { overscan, measurements, outerSize, parentRef, scrollKey } = this;
 
     const offset = parentRef.current![scrollKey];
@@ -126,7 +126,7 @@ class VirtualController extends VC {
     return 50;
   };
 
-  get measurements(){
+  private get measurements(){
     const { estimateSize, measuredCache, paddingStart, size } = this;
 
     const measurements = [] as {
@@ -155,7 +155,7 @@ class VirtualController extends VC {
       current[this.scrollKey] = offset;
   }
 
-  tryScrollToIndex = (index: number, opts: any = {}) => {
+  private tryScrollToIndex(index: number, opts: any = {}){
     const { measurements, scrollOffset, outerSize, scrollToOffset, size } = this;
     const measurement = measurements[Math.max(0, Math.min(index, size - 1))]
     let { align = 'auto', ...rest } = opts;
