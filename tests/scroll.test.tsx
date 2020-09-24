@@ -2,7 +2,7 @@ import { render, waitFor, fireEvent, act } from '@testing-library/react'
 import * as React from 'react'
 
 import { useVirtual } from '../src'
-import { Container, Inner, Row } from './components'
+import { Container, Inner, VirtualRow } from './components'
 
 const App = () => {
   const {
@@ -22,25 +22,14 @@ const App = () => {
     <>
       <button 
         data-testid="gotoRow50"
-        onClick={() => {
-          scrollToIndex(50)
-        }}>
+        onClick={() => scrollToIndex(50)}>
         Goto 50
       </button>
-      <Container
-        ref={parentRef}>
-        <Inner
-          style={{ height: `${totalSize}px` }}>
-          {virtualItems.map(row => (
-            <Row
-              key={row.index}
-              style={{
-                height: `${row.size}px`,
-                transform: `translateY(${row.start}px)`,
-              }}>
-              Row {row.index}
-            </Row>
-          ))}
+      <Container ref={parentRef}>
+        <Inner height={totalSize}>
+          {virtualItems.map(info =>
+            <VirtualRow {...info} />
+          )}
         </Inner>
       </Container>
     </>

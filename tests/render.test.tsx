@@ -2,7 +2,7 @@ import { render, waitFor } from '@testing-library/react'
 import * as React from 'react'
 
 import { useVirtual } from '../src'
-import { Container, Inner, Row } from './components'
+import { Container, Inner, VirtualRow } from './components'
 
 const App = () => {
   const {
@@ -15,21 +15,12 @@ const App = () => {
     overscan: 5,
   })
 
-  // console.log(`Render sees ${virtualItems.length} items`)
-
   return (
     <Container ref={parentRef}>
-      <Inner style={{ height: `${totalSize}px` }}>
-        {virtualItems.map(row => (
-          <Row
-            key={row.index}
-            style={{
-              height: `${row.size}px`,
-              transform: `translateY(${row.start}px)`,
-            }}>
-            Row {row.index}
-          </Row>
-        ))}
+      <Inner height={totalSize}>
+        {virtualItems.map(info =>
+          <VirtualRow key={info.index} {...info} />
+        )}
       </Inner>
     </Container>
   )
