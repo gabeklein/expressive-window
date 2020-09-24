@@ -1,7 +1,7 @@
 import { render, waitFor } from '@testing-library/react';
 import * as React from 'react';
 
-import { useVirtual } from '../src';
+import Virtual from '../src';
 import { Container, Inner, VirtualRow } from './components';
 
 const App = () => {
@@ -9,7 +9,7 @@ const App = () => {
     parentRef,
     totalSize,
     virtualItems
-  } = useVirtual({
+  } = Virtual.using({
     size: 20,
     overscan: 5,
   })

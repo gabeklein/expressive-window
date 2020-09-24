@@ -9,7 +9,7 @@ function useVirtual(opts: any){
   return VirtualController.using(opts);
 }
 
-class VirtualController extends VC {
+export default class VirtualController extends VC {
   size = 0;
   overscan = 0;
   paddingStart = 0;

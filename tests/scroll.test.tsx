@@ -1,7 +1,7 @@
 import { render, waitFor, fireEvent, act } from '@testing-library/react'
 import * as React from 'react'
 
-import { useVirtual } from '../src'
+import Virtual from '../src'
 import { Container, Inner, VirtualRow } from './components'
 
 const App = () => {
@@ -10,7 +10,7 @@ const App = () => {
     totalSize,
     virtualItems,
     scrollToIndex
-  } = useVirtual({
+  } = Virtual.using({
     size: 1000,
     overscan: 5,
     estimateSize(){
