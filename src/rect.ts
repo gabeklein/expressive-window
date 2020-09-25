@@ -8,16 +8,47 @@ let COMPARE_KEYS = [
 ] as const;
 
 const observedNodes = new Map<Element, RectProps>();
-let ready: boolean;
+let active: boolean;
 
-function observeForChanges(){
-	if(ready){
-		observedNodes.forEach(propogateChanges);
-		window.requestAnimationFrame(observeForChanges);
+export function observeRect(
+	node: Element, 
+	callback: (rect: DOMRect) => void){
+
+	let state = observedNodes.get(node)!;
+
+	if(state)
+		state.callbacks.add(callback);
+	else {
+		observedNodes.set(node, state = {
+			rect: {} as any,
+			callbacks: new Set([callback])
+		});
+
+		if(!active){
+			active = true;
+			checkForUpdates();
+		}
+	}
+
+	return function release(){
+		state.callbacks.delete(callback);
+
+		if(!state.callbacks.size)
+			observedNodes.delete(node);
+
+		if(!observedNodes.size)
+			active = false;
+	}
+}
+
+function checkForUpdates(){
+	if(active){
+		observedNodes.forEach(assertDidUpdate);
+		window.requestAnimationFrame(checkForUpdates);
 	}
 };
 
-function propogateChanges(
+function assertDidUpdate(
 	state: RectProps, node: Element){
 
 	const current = node.getBoundingClientRect();
@@ -29,37 +60,4 @@ function propogateChanges(
 				updated(current);
 			break;
 		}
-}
-
-export function observeRect(
-	node: Element, 
-	callback: (rect: DOMRect) => void){
-
-	let state = observedNodes.get(node)!;
-
-	if(state)
-		state.callbacks.add(callback);
-	else {
-		state = {
-			rect: {} as any,
-			callbacks: new Set([callback])
-		}
-
-		observedNodes.set(node, state);
-
-		if(!ready){
-			ready = true;
-			observeForChanges();
-		}
-	}
-
-	return function release(){
-		state.callbacks.delete(callback);
-
-		if(!state.callbacks.size)
-			observedNodes.delete(node);
-
-		if(!observedNodes.size)
-			ready = false;
-	}
 }
