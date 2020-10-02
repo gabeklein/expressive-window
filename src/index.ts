@@ -124,29 +124,6 @@ export default class VirtualController extends VC {
     this.scrollOffset = offset;
   }
 
-  private tryScrollToOffset(newOffset: number, align = 'start'){
-    const { scrollOffset, outerSize } = this;
-    let dest = 0;
-
-    if(align === 'auto')
-      if(newOffset <= scrollOffset)
-        align = 'start'
-      else if(scrollOffset >= scrollOffset + outerSize)
-        align = 'end'
-      else 
-        align = 'start'
-
-    if(align === 'start')
-      dest = newOffset;
-    else if(align === 'end')
-      dest = newOffset - outerSize;
-    else if(align === 'center')
-      dest = newOffset - outerSize / 2;
-
-    this.scroll(dest);
-  }
-
-
   private get measurements(){
     const { estimateSize, measuredCache, paddingStart, size } = this;
 
@@ -201,6 +178,28 @@ export default class VirtualController extends VC {
         : measurement.start
 
     this.tryScrollToOffset(toOffset, align)
+  }
+
+  private tryScrollToOffset(newOffset: number, align = 'start'){
+    const { scrollOffset, outerSize } = this;
+    let dest = 0;
+
+    if(align === 'auto')
+      if(newOffset <= scrollOffset)
+        align = 'start'
+      else if(scrollOffset >= scrollOffset + outerSize)
+        align = 'end'
+      else 
+        align = 'start'
+
+    if(align === 'start')
+      dest = newOffset;
+    else if(align === 'end')
+      dest = newOffset - outerSize;
+    else if(align === 'center')
+      dest = newOffset - outerSize / 2;
+
+    this.scroll(dest);
   }
 
   private controlledPosition(forIndex: number){
