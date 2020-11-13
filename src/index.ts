@@ -3,12 +3,6 @@ import VC, { ref } from 'react-use-controller';
 import { observeRect } from './rect';
 import { listenEvent } from './helpers';
 
-export { useVirtual }
-
-function useVirtual(opts: any){
-  return VirtualController.using(opts);
-}
-
 export default class VirtualController extends VC {
   size = 0;
   overscan = 0;
