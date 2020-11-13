@@ -1,9 +1,9 @@
 import * as React from 'react';
 
-const Transparent = React.forwardRef;
+const referable = React.forwardRef;
 
 export const Container: any =
-  Transparent((props: any, ref) => {
+  referable((props: any, ref) => {
     return (
       <div
         { ...props }
@@ -20,7 +20,7 @@ export const Container: any =
   })
 
 export const Inner: any =
-  Transparent((props: any, ref: any) => {
+  referable((props: any, ref: any) => {
     return (
       <div
         { ...props }
@@ -36,7 +36,7 @@ export const Inner: any =
   })
 
 export const VirtualRow: any = 
-  Transparent((props: any, ref: any) => {
+  referable((props: any, ref: any) => {
     const { index, size, start } = props;
 
     return (
