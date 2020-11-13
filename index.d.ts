@@ -1,6 +1,6 @@
-import { VC } from "react-use-controller";
+import VC from "react-use-controller";
 
-export abstract class VirtualController extends VC {
+export default abstract class VirtualController extends VC {
   /** Current size of virtual collection */
   abstract size?: number;
 
