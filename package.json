@@ -1,9 +1,13 @@
 {
   "name": "react-virtual-controller",
-  "version": "0.2.0",
+  "version": "0.2.3",
   "module": "src",
   "main": "lib",
   "types": "index.d.ts",
+  "files": [
+    "lib/*.js",
+    "index.d.ts"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "jest --watchAll"
