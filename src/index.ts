@@ -1,4 +1,4 @@
-import VC, { ref } from 'deep-state';
+import VC, { ref } from 'react-use-controller';
 
 import { observeRect } from './rect';
 import { listenEvent } from './helpers';
@@ -50,9 +50,9 @@ export default class VirtualController extends VC {
   };
 
   didMount(){
-    this.watch(["estimateSize", "size"], () => {
+    this.effect(() => {
       this.measuredCache = {};
-    });
+    }, ["estimateSize", "size"]);
   }
 
   private measuredCache: any = {};

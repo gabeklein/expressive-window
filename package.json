@@ -12,9 +12,9 @@
     "react": ">=16.8.0"
   },
   "dependencies": {
-    "deep-state": "^1.0.0-beta.5",
     "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
+    "react-dom": ">=16.8.0",
+    "react-use-controller": "^1.0.0-beta.29"
   },
   "devDependencies": {
     "@testing-library/react": "^11.0.4",
