@@ -3,7 +3,6 @@
       "outDir": "lib/",
       "target": "ES6",
       "jsx": "react",
-      "sourceMap": true,
       "moduleResolution": "node",
       "noUnusedLocals": true,
       "strict": true,
