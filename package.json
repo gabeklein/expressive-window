@@ -1,6 +1,6 @@
 {
   "name": "react-virtual-controller",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "module": "src",
   "main": "lib",
   "types": "index.d.ts",
