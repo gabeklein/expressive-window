@@ -4,31 +4,35 @@ import * as React from 'react';
 import Virtual from '../src';
 import { Container, Inner, VirtualRow } from './components';
 
-const App = () => {
-  const {
-    parentRef,
-    totalSize,
-    virtualItems
-  } = Virtual.using({
-    size: 20,
-    overscan: 5,
-  })
+describe("dynamic sizing", () => {
+  class Window extends Virtual {
+    size = 20;
+    overscan = 5;
+  }
 
-  return (
-    <Container ref={parentRef}>
-      <Inner height={totalSize}>
-        {virtualItems.map(info =>
-          <VirtualRow key={info.index} {...info} ref={info.measureRef} />
-        )}
-      </Inner>
-    </Container>
-  )
-}
-
-it('should render given dynamic size', async () => {
-  const rendered = render(<App />);
-
-  await waitFor(() => {
-    rendered.getByText('Row 1')
+  const App = () => {
+    const {
+      parentRef,
+      totalSize,
+      virtualItems
+    } = Window.use()
+  
+    return (
+      <Container ref={parentRef}>
+        <Inner height={totalSize}>
+          {virtualItems.map(info =>
+            <VirtualRow {...info} ref={info.measureRef} key={info.index} />
+          )}
+        </Inner>
+      </Container>
+    )
+  }
+  
+  it('allocates properly', async () => {
+    const rendered = render(<App />);
+  
+    await waitFor(() => {
+      rendered.getByText('Row 1')
+    })
   })
 })
