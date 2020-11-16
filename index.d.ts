@@ -49,9 +49,6 @@ export default abstract class VirtualController extends VC {
     measureRef: (element: HTMLElement) => void;
   }[]
 
-  /** May be overridden, but super() is required! */
-  didMount(): void;
-
   /** Programatically scroll to specific offset. */
   scrollToOffset(toOffset: number, opts: any): void;
 

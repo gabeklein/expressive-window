@@ -11,6 +11,11 @@ export default class VirtualController extends VC {
   horizontal = false;
   parentRef = ref(this.didSetContainer);
 
+  constructor(){
+    super();
+    this.effect(this.resetCache, ["estimateSize", "size"]);
+  }
+
   get totalSize(){
     const { measurements, size, paddingEnd } = this;
     const offset = measurements[size - 1];
@@ -43,12 +48,6 @@ export default class VirtualController extends VC {
     return 50;
   };
 
-  didMount(){
-    this.effect(() => {
-      this.measuredCache = {};
-    }, ["estimateSize", "size"]);
-  }
-
   private measuredCache: any = {};
   private scrollOffset = 0;
   private outerSize = 0;
@@ -62,6 +61,10 @@ export default class VirtualController extends VC {
   
   private get scrollKey(){
     return this.horizontal ? 'scrollLeft' : 'scrollTop'
+  }
+
+  private resetCache(){
+    this.measuredCache = {};
   }
 
   private didSetContainer(element: HTMLElement){
