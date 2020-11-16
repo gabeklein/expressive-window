@@ -9,7 +9,7 @@ export default class VirtualController extends VC {
   paddingStart = 0;
   paddingEnd = 0;
   horizontal = false;
-  parentRef = ref(this.didSetContainer);
+  parentRef = ref(this.attachContainer);
 
   constructor(){
     super();
@@ -67,7 +67,7 @@ export default class VirtualController extends VC {
     this.measuredCache = {};
   }
 
-  private didSetContainer(element: HTMLElement){
+  private attachContainer(element: HTMLElement){
     if(!element)
       return;
 
