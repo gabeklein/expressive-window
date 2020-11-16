@@ -48,26 +48,26 @@ export default class VirtualController extends VC {
     return 50;
   };
 
-  private measuredCache: any = {};
-  private scrollOffset = 0;
-  private outerSize = 0;
-  private start = 0;
-  private end = 0;
-  private initialRectSet = false;
+  protected measuredCache: any = {};
+  protected scrollOffset = 0;
+  protected outerSize = 0;
+  protected start = 0;
+  protected end = 0;
+  protected initialRectSet = false;
 
-  private get sizeKey(){
+  protected get sizeKey(){
     return this.horizontal ? 'width' : 'height'
   }
   
-  private get scrollKey(){
+  protected get scrollKey(){
     return this.horizontal ? 'scrollLeft' : 'scrollTop'
   }
 
-  private resetCache(){
+  protected resetCache(){
     this.measuredCache = {};
   }
 
-  private attachContainer(element: HTMLElement){
+  protected attachContainer(element: HTMLElement){
     if(!element)
       return;
 
@@ -101,7 +101,7 @@ export default class VirtualController extends VC {
     }
   }
 
-  private calculateRange = () => {
+  protected calculateRange = () => {
     const { overscan, measurements, outerSize, parentRef, scrollKey } = this;
 
     const offset = parentRef.current![scrollKey];
@@ -121,7 +121,7 @@ export default class VirtualController extends VC {
     this.scrollOffset = offset;
   }
 
-  private get measurements(){
+  protected get measurements(){
     const { estimateSize, measuredCache, paddingStart, size } = this;
 
     const measurements = [] as {
@@ -143,14 +143,14 @@ export default class VirtualController extends VC {
     return measurements;
   }
 
-  private scroll(offset: number){
+  protected scroll(offset: number){
     const { current } = this.parentRef;
 
     if(current)
       current[this.scrollKey] = offset;
   }
 
-  private tryScrollToIndex(index: number, opts: any = {}){
+  protected tryScrollToIndex(index: number, opts: any = {}){
     const { scrollOffset, outerSize, size } = this;
     const clampedIndex = Math.max(0, Math.min(index, size - 1));
     const measurement = this.measurements[clampedIndex];
@@ -177,7 +177,7 @@ export default class VirtualController extends VC {
     this.tryScrollToOffset(toOffset, align)
   }
 
-  private tryScrollToOffset(newOffset: number, align = 'start'){
+  protected tryScrollToOffset(newOffset: number, align = 'start'){
     const { scrollOffset, outerSize } = this;
     let dest = 0;
 
@@ -199,7 +199,7 @@ export default class VirtualController extends VC {
     this.scroll(dest);
   }
 
-  private controlledPosition(forIndex: number){
+  protected controlledPosition(forIndex: number){
     const stats = this.measurements[forIndex];
 
     const didGetItemRef = (el: HTMLElement) => {
