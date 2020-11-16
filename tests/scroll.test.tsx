@@ -17,7 +17,7 @@ describe.skip('scrolling', () => {
       goto50,
       parentRef,
       totalSize,
-      virtualItems
+      render
     } = Window.use();
   
     return (
@@ -27,7 +27,7 @@ describe.skip('scrolling', () => {
         </button>
         <Container ref={parentRef}>
           <Inner height={totalSize}>
-            {virtualItems.map(info =>
+            {render.map(info =>
               <VirtualRow {...info} />
             )}
           </Inner>

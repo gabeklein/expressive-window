@@ -22,7 +22,7 @@ export default class VirtualController extends VC {
     return (offset ? offset.end : 0) + paddingEnd;
   }
 
-  get virtualItems(){
+  get render(){
     const items = [];
     let { start, end, measurements } = this;
     end = Math.min(end, measurements.length - 1);

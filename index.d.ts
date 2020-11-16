@@ -41,7 +41,7 @@ export default abstract class VirtualController extends VC {
   }
 
   /** Index and computed postion of all drawn containers */
-  readonly virtualItems: {
+  readonly render: {
     index: number;
     start: number;
     size: number;
