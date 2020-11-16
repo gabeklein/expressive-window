@@ -13,7 +13,7 @@ export default class VirtualController extends VC {
 
   constructor(){
     super();
-    this.effect(this.resetCache, ["estimateSize", "size"]);
+    this.effect(this.resetCache, ["size"]);
   }
 
   get totalSize(){
