@@ -6,7 +6,7 @@ interface ListenerOptions {
   capture?: boolean;
 }
 
-export function listenEvent(opts: ListenerOptions){
+export function watchForEvent(opts: ListenerOptions){
   const { handler, target, event } = opts;
   target.addEventListener(event, handler, opts);
   return () => target.removeEventListener(event, handler);

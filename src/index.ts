@@ -1,7 +1,7 @@
 import VC, { ref } from 'react-use-controller';
 
 import { observeRect } from './rect';
-import { listenEvent } from './helpers';
+import { watchForEvent } from './helpers';
 
 export default class VirtualController extends VC {
   size = 0;
@@ -85,10 +85,10 @@ export default class VirtualController extends VC {
       });
 
     const releaseHandler =
-      listenEvent({
-        target: element,
+      watchForEvent({
         event: 'scroll',
         handler: calculateRange,
+        target: element,
         capture: false,
         passive: true,
       });
