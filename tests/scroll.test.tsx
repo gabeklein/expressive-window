@@ -4,6 +4,28 @@ import * as React from 'react';
 import Virtual from '../src';
 import { Container, Inner, VirtualRow } from './components';
 
+describe('adjustment', () => {
+  class Window extends Virtual {
+    size = 100;
+  
+    resetTimes = 0;
+    resetCache(){
+      this.resetTimes++;
+      super.resetCache();
+    }
+  }
+
+  it('will clear cache if size, estimateSize change', async () => {
+    const virtual = Window.create();
+    
+    expect(virtual.resetTimes).toBe(0);
+
+    virtual.size = 101;
+    await virtual.requestUpdate();
+    expect(virtual.resetTimes).toBe(1);
+  })
+})
+
 describe.skip('scrolling', () => {
   class Window extends Virtual {
     size = 1000;
@@ -12,7 +34,7 @@ describe.skip('scrolling', () => {
     goto50 = () => this.scrollToIndex(50);
   }
 
-  const App = () => {
+  const Test = () => {
     const {
       goto50,
       parentRef,
@@ -37,7 +59,7 @@ describe.skip('scrolling', () => {
   }
   
   it('should render new rows', async () => {
-    const rendered = render(<App />);
+    const rendered = render(<Test />);
   
     await waitFor(() => {
       rendered.getByText('Row 1');
