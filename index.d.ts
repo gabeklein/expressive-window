@@ -1,39 +1,39 @@
 import VC from "react-use-controller";
 
-export default abstract class VirtualController extends VC {
+export default class VirtualController extends VC {
   /** Current size of virtual collection */
-  abstract length: number;
+  length: number;
 
   /**
    * Number of items to render past container bounds
    * 
    * Default: 0;
    * */
-  abstract overscan?: number;
+  overscan: number;
 
   /** 
    * Amount of padding between container and first item. (In pixels)
    * 
    * Default: 0;
    * */
-  abstract paddingStart?: number;
+  paddingStart: number;
 
   /** 
    * Amount of padding between container and last item. (In pixels)
    * 
    * Default: 0;
    * */
-  abstract paddingEnd?: number;
+  paddingEnd: number;
 
   /** 
    * Flag list should scroll horizontally.
    * 
    * Default: false;
    * */
-  abstract horizontal?: boolean;
+  horizontal: boolean;
 
   /** Determines initial size to allocate before rendering a list element. */
-  abstract estimateSize?(forIndex: number): number;
+  estimateSize?(forIndex: number): number;
 
   /** Apply this reference to container element! */
   readonly containerRef: {
