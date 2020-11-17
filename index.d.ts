@@ -47,7 +47,9 @@ export default abstract class VirtualController extends VC {
     size: number;
     end: number;
     measureRef: (element: HTMLElement) => void;
-  }[]
+  }[];
+
+  readonly totalSize: number;
 
   /** Programatically scroll to specific offset. */
   scrollToOffset(toOffset: number, opts: any): void;
