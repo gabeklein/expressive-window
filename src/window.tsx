@@ -1,5 +1,5 @@
 import React from "react";
-import Control from "./index";
+import Control from "./control";
 
 interface ComponentProps {
   index: number;
