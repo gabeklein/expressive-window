@@ -1,6 +1,23 @@
+import React from "react";
 import VC from "react-use-controller";
 
-export default class VirtualController extends VC {
+declare namespace VirtualController {
+  interface ComponentProps {
+    index: number;
+    style: React.CSSProperties;
+    className?: string;
+  }
+  
+  interface ContainerProps {
+    Item: React.FunctionComponent<ComponentProps>;
+    style?: React.CSSProperties;
+    className?: string;
+  }
+}
+
+declare class VirtualController extends VC {
+  static Window: React.FunctionComponent<VirtualController.ContainerProps>;
+
   /** Current size of virtual collection */
   length: number;
 
@@ -35,6 +52,14 @@ export default class VirtualController extends VC {
   /** Determines initial size to allocate before rendering a list element. */
   estimateSize?(forIndex: number): number;
 
+  /** 
+   * Convert position index into unique key of a target list item.
+   * Useful if items have unique IDs and reshuffling may occure.
+   * 
+   * May be overridden; returns index argument by default.
+   */
+  uniqueKey(forIndex: number): string | number;
+
   /** Apply this reference to container element! */
   readonly containerRef: {
     current: HTMLElement | null;
@@ -57,3 +82,5 @@ export default class VirtualController extends VC {
   /** Programatically scroll to specific item by index. */
   scrollToIndex(index: number, opts?: any): void;
 }
+
+export default VirtualController;

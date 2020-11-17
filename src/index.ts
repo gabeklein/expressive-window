@@ -2,6 +2,7 @@ import VC, { ref } from 'react-use-controller';
 
 import { observeRect } from './rect';
 import { watchForEvent } from './helpers';
+import { createWindowComponent } from './window';
 
 interface RenderedItem {
   index: number
@@ -17,6 +18,12 @@ export default class Virtual extends VC {
   paddingEnd = 0;
   horizontal = false;
   containerRef = ref(this.attachContainer);
+
+  static get Window(){
+    const Component = createWindowComponent(this);
+    Object.defineProperty(this, "Window", { value: Component })
+    return Component;
+  };
 
   constructor(){
     super();
@@ -49,6 +56,10 @@ export default class Virtual extends VC {
     requestAnimationFrame(() => {
       this.tryScrollToIndex(index, opts)
     })
+  }
+
+  uniqueKey(forIndex: number){
+    return forIndex;
   }
 
   estimateSize(forIndex: any){
