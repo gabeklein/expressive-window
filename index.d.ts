@@ -2,7 +2,7 @@ import VC from "react-use-controller";
 
 export default abstract class VirtualController extends VC {
   /** Current size of virtual collection */
-  abstract size?: number;
+  abstract length: number;
 
   /**
    * Number of items to render past container bounds
@@ -36,7 +36,7 @@ export default abstract class VirtualController extends VC {
   abstract estimateSize?(forIndex: number): number;
 
   /** Apply this reference to container element! */
-  readonly parentRef: {
+  readonly containerRef: {
     current: HTMLElement | null;
   }
 

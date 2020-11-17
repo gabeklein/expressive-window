@@ -3,22 +3,29 @@ import VC, { ref } from 'react-use-controller';
 import { observeRect } from './rect';
 import { watchForEvent } from './helpers';
 
-export default class VirtualController extends VC {
-  size = 0;
+interface RenderedItem {
+  index: number
+  start: number
+  size: number
+  end: number
+}
+
+export default class Virtual extends VC {
+  length = 0;
   overscan = 0;
   paddingStart = 0;
   paddingEnd = 0;
   horizontal = false;
-  parentRef = ref(this.attachContainer);
+  containerRef = ref(this.attachContainer);
 
   constructor(){
     super();
-    this.effect(this.resetCache, ["size"]);
+    this.effect(this.resetCache, ["length"]);
   }
 
   get totalSize(){
-    const { measurements, size, paddingEnd } = this;
-    const offset = measurements[size - 1];
+    const { measurements, length, paddingEnd } = this;
+    const offset = measurements[length - 1];
     return (offset ? offset.end : 0) + paddingEnd;
   }
 
@@ -102,9 +109,9 @@ export default class VirtualController extends VC {
   }
 
   protected calculateRange = () => {
-    const { overscan, measurements, outerSize, parentRef, scrollKey } = this;
+    const { overscan, measurements, outerSize, containerRef, scrollKey } = this;
 
-    const offset = parentRef.current![scrollKey];
+    const offset = containerRef.current![scrollKey];
     const total = measurements.length;
     let start = total - 1;
     let end = 0;
@@ -122,37 +129,34 @@ export default class VirtualController extends VC {
   }
 
   protected get measurements(){
-    const { estimateSize, measuredCache, paddingStart, size } = this;
+    const { estimateSize, measuredCache, paddingStart, length } = this;
 
-    const measurements = [] as {
-      index: number
-      start: number
-      size: number
-      end: number
-    }[];
+    const measurements: RenderedItem[] = [];
 
-    for(let i = 0; i < size; i++){
+    for(let i = 0; i < length; i++){
       const measuredSize = measuredCache[i];
-      const start = measurements[i - 1] ? measurements[i - 1].end : paddingStart;
       const size = typeof measuredSize === 'number' ? measuredSize : estimateSize(i);
+
+      const previousItem = measurements[i - 1];
+      const start = previousItem ? previousItem.end : paddingStart;
       const end = start + size;
 
-      measurements[i] = { index: i, start, size, end }
+      measurements[i] = { index: i, start, size, end };
     }
 
     return measurements;
   }
 
   protected scroll(offset: number){
-    const { current } = this.parentRef;
+    const { current } = this.containerRef;
 
     if(current)
       current[this.scrollKey] = offset;
   }
 
   protected tryScrollToIndex(index: number, opts: any = {}){
-    const { scrollOffset, outerSize, size } = this;
-    const clampedIndex = Math.max(0, Math.min(index, size - 1));
+    const { scrollOffset, outerSize, length } = this;
+    const clampedIndex = Math.max(0, Math.min(index, length - 1));
     const measurement = this.measurements[clampedIndex];
     let align = opts.align || 'auto';
 
