@@ -13,7 +13,7 @@ interface ContainerProps {
   className?: string;
 }
 
-export function createWindowComponent(Type: typeof Control){
+export function hoc(Type: typeof Control){
   return function WindowComponent(props: ContainerProps){
     return (
       <Type.Provider>

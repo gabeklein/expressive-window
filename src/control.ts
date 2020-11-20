@@ -2,7 +2,7 @@ import VC, { ref } from 'react-use-controller';
 
 import { observeRect } from './rect';
 import { watchForEvent } from './helpers';
-import { createWindowComponent } from './window';
+import { hoc } from './window';
 
 interface RenderedItem {
   index: number
@@ -20,7 +20,7 @@ export default class Virtual extends VC {
   containerRef = ref(this.attachContainer);
 
   static get Window(){
-    const Component = createWindowComponent(this);
+    const Component = hoc(this);
     Object.defineProperty(this, "Window", { value: Component })
     return Component;
   };
@@ -48,7 +48,15 @@ export default class Virtual extends VC {
   }
 
   scrollToOffset = (toOffset: number, opts: any) => {
-    this.tryScrollToOffset(toOffset, opts.align);
+    const destination =
+      alignedOffset(
+        toOffset,
+        this.scrollOffset,
+        this.outerSize,
+        opts.align
+      );
+
+    this.scroll(destination);
   }
 
   scrollToIndex = (index: number, opts?: any) => {
@@ -183,35 +191,16 @@ export default class Virtual extends VC {
         return;
 
     const toOffset =
-      align === 'center'
-        ? measurement.start + measurement.size / 2
-        : align === 'end'
-        ? measurement.end
-        : measurement.start
+      align === 'center' ?
+        measurement.start + measurement.size / 2 :
+      align === 'end' ?
+        measurement.end :
+        measurement.start;
+      
+    const destination = 
+      alignedOffset(toOffset, scrollOffset, outerSize, align);
 
-    this.tryScrollToOffset(toOffset, align)
-  }
-
-  protected tryScrollToOffset(newOffset: number, align = 'start'){
-    const { scrollOffset, outerSize } = this;
-    let dest = 0;
-
-    if(align === 'auto')
-      if(newOffset <= scrollOffset)
-        align = 'start'
-      else if(scrollOffset >= scrollOffset + outerSize)
-        align = 'end'
-      else 
-        align = 'start'
-
-    if(align === 'start')
-      dest = newOffset;
-    else if(align === 'end')
-      dest = newOffset - outerSize;
-    else if(align === 'center')
-      dest = newOffset - outerSize / 2;
-
-    this.scroll(dest);
+    this.scroll(destination);
   }
 
   protected controlledPosition(forIndex: number){
@@ -239,5 +228,31 @@ export default class Virtual extends VC {
       measureRef: didGetItemRef,
       ...stats
     }
+  }
+}
+
+type Alignment = "center" | "start" | "end" | "auto";
+
+function alignedOffset(
+  next: number,
+  current: number,
+  maximum: number,
+  mode: Alignment = "start"){
+
+  if(mode === 'auto')
+    if(next <= current)
+      mode = 'start'
+    else if(current >= current + maximum)
+      mode = 'end'
+    else 
+      mode = 'start'
+
+  switch(mode){
+    case "start":
+      return next;
+    case "end":
+      return next - maximum;
+    case "center":
+      return next - maximum / 2;
   }
 }
