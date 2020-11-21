@@ -30,6 +30,10 @@ export default class Virtual extends VC {
     this.effect(this.resetCache, ["length"]);
   }
 
+  get didReachEnd(){
+    return this.end >= this.length - 1;
+  }
+
   get totalSize(){
     const { measurements, length, paddingEnd } = this;
     const offset = measurements[length - 1];
