@@ -8,32 +8,19 @@ interface ComponentProps {
 }
 
 interface ContainerProps {
+  control: Control;
   component: React.FunctionComponent<ComponentProps>;
   style?: React.CSSProperties;
   className?: string;
 }
 
-export function hoc(Type: typeof Control){
-  return function WindowComponent(props: ContainerProps){
-    return (
-      <Type.Provider>
-        <WindowContainer {...props}/>
-      </Type.Provider>
-    )
-  }
-}
-
-function WindowContainer(props: ContainerProps){
-  const { component: Component, className, style = {} } = props;
-  const { get, totalSize, containerRef, render } = Control.tap();
+export function WindowContainer(props: ContainerProps, context: Control){
+  const { get, totalSize, containerRef, render } = context.tap();
+  const { component: Component, ...rest } = props;
 
   return (
-    <div
-      ref={containerRef as any} 
-      className={className} 
-      style={style}>
-      <div 
-        style={{ height: totalSize }}>
+    <div ref={containerRef as any} {...rest as any}>
+      <div style={{ height: totalSize }}>
         {render.map(x => (
           <Component
             index={x.index}

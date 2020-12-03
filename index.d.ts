@@ -16,6 +16,7 @@ declare namespace VirtualController {
 }
 
 declare class VirtualController extends VC {
+  public Window: React.FunctionComponent<VirtualController.ContainerProps>;
   static Window: React.FunctionComponent<VirtualController.ContainerProps>;
 
   /** Current size of virtual collection */

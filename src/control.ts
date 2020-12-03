@@ -1,8 +1,8 @@
-import VC, { ref } from 'react-use-controller';
+import VC, { ref, wrap } from 'react-use-controller';
 
 import { observeRect } from './rect';
 import { watchForEvent } from './helpers';
-import { hoc } from './window';
+import { WindowContainer } from './window';
 
 interface RenderedItem {
   index: number
@@ -19,11 +19,11 @@ export default class Virtual extends VC {
   horizontal = false;
   containerRef = ref(this.attachContainer);
 
+  Window = wrap(WindowContainer);
+
   static get Window(){
-    const Component = hoc(this);
-    Object.defineProperty(this, "Window", { value: Component })
-    return Component;
-  };
+    return this.wrap(WindowContainer);
+  }
 
   constructor(){
     super();

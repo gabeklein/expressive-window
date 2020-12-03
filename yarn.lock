@@ -2923,10 +2923,10 @@ react-is@^16.12.0, react-is@^16.8.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
-react-use-controller@^1.0.0-beta.31:
-  version "1.0.0-beta.31"
-  resolved "https://registry.yarnpkg.com/react-use-controller/-/react-use-controller-1.0.0-beta.31.tgz#49885bbccb6d8a0ed3bd09e975df1b658f165fd6"
-  integrity sha512-7MwJJIF9B0LJLASSaNwkMgNT2jEOk7544HF0YwwcFcmU2FT5u4fm8LNZ7TxW93wRu2bTOr+mOv9B4VcgOQceoA==
+react-use-controller@^1.0.0-beta.33:
+  version "1.0.0-beta.33"
+  resolved "https://registry.yarnpkg.com/react-use-controller/-/react-use-controller-1.0.0-beta.33.tgz#3c70abe9d53a2332caccf607bb0e45f6560fb9ae"
+  integrity sha512-TSBNq8VHUzSZJ20PCAx7Gc2Fuzhim6SX7rhadsyr9treoPxOLyw5Z20Kbh3uqpZLB7Cw0I6HOcbfmNSGh1vbEA==
 
 react@^16.8.0:
   version "16.14.0"
