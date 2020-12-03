@@ -13,13 +13,13 @@ describe("rendering", () => {
 
   const App = () => {
     const {
-      parentRef,
+      containerRef,
       totalSize,
       render
     } = Window.use();
   
     return (
-      <Container ref={parentRef}>
+      <Container ref={containerRef}>
         <Inner height={totalSize}>
           {render.map(info =>
             <VirtualRow key={info.index} {...info} />

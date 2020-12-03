@@ -37,7 +37,7 @@ describe.skip('scrolling', () => {
   const Test = () => {
     const {
       goto50,
-      parentRef,
+      containerRef,
       totalSize,
       render
     } = Window.use();
@@ -47,7 +47,7 @@ describe.skip('scrolling', () => {
         <button onClick={goto50} data-testid="gotoRow50">
           Goto 50
         </button>
-        <Container ref={parentRef}>
+        <Container ref={containerRef}>
           <Inner height={totalSize}>
             {render.map(info =>
               <VirtualRow {...info} />

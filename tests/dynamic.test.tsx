@@ -12,13 +12,13 @@ describe("dynamic sizing", () => {
 
   const App = () => {
     const {
-      parentRef,
+      containerRef,
       totalSize,
       render
     } = Window.use()
   
     return (
-      <Container ref={parentRef}>
+      <Container ref={containerRef}>
         <Inner height={totalSize}>
           {render.map(info =>
             <VirtualRow {...info} ref={info.measureRef} key={info.index} />
