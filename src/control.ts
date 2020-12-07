@@ -1,7 +1,7 @@
-import VC, { ref, wrap } from 'react-use-controller';
+import VC, { is, off, ref, tuple, wrap } from 'react-use-controller';
 
-import { observeRect } from './rect';
 import { watchForEvent } from './helpers';
+import { observeRect } from './rect';
 import { WindowContainer } from './window';
 
 interface RenderedItem {
@@ -12,13 +12,19 @@ interface RenderedItem {
 }
 
 export default class Virtual extends VC {
-  length = 0;
-  overscan = 0;
-  paddingStart = 0;
-  paddingEnd = 0;
-  horizontal = false;
+  length = is(0);
+  overscan = is(0);
+  paddingStart = is(0);
+  paddingEnd = is(0);
+  horizontal = is(false);
   containerRef = ref(this.attachContainer);
   end = false;
+
+  protected windowSize = 0;
+  protected windowOffset = off(0);
+  protected currentVisible = tuple(0, 0);
+  protected measuredCache: any = {};
+  protected initialRectSet = false;
 
   Window = wrap(WindowContainer);
 
@@ -48,24 +54,25 @@ export default class Virtual extends VC {
   }
 
   get render(){
-    const items = [];
-    let { start, end, measurements } = this;
-    end = Math.min(end, measurements.length - 1);
+    const rendered = [];
+    const finalIndex = this.length - 1;
+    let [ start, end ] = this.currentVisible;
 
-    this.end = end >= this.length - 1;
+    end = Math.min(end, finalIndex);
+    this.end = end == finalIndex;
 
     for (let i = start; i <= end; i++)
-      items.push(this.controlledPosition(i));
+      rendered.push(this.controlledPosition(i));
 
-    return items;
+    return rendered;
   }
 
   scrollToOffset = (toOffset: number, opts: any) => {
     const destination =
       alignedOffset(
         toOffset,
-        this.scrollOffset,
-        this.outerSize,
+        this.windowOffset,
+        this.windowSize,
         opts.align
       );
 
@@ -87,13 +94,6 @@ export default class Virtual extends VC {
     return 50;
   };
 
-  protected measuredCache: any = {};
-  protected scrollOffset = 0;
-  protected outerSize = 0;
-  protected start = 0;
-  protected end = 0;
-  protected initialRectSet = false;
-
   protected get sizeKey(){
     return this.horizontal ? 'width' : 'height'
   }
@@ -114,13 +114,13 @@ export default class Virtual extends VC {
 
     if(!this.initialRectSet){
       const rect = element.getBoundingClientRect();
-      this.outerSize = rect[sizeKey];
+      this.windowSize = rect[sizeKey];
       this.initialRectSet = true;
     }
 
     const releaseObserver = 
       observeRect(element, rect => {
-        this.outerSize = rect[sizeKey];
+        this.windowSize = rect[sizeKey];
       });
 
     const releaseHandler =
@@ -141,7 +141,13 @@ export default class Virtual extends VC {
   }
 
   protected calculateRange = () => {
-    const { overscan, measurements, outerSize, containerRef, scrollKey } = this;
+    const {
+      overscan,
+      measurements,
+      windowSize,
+      containerRef,
+      scrollKey
+    } = this;
 
     const offset = containerRef.current![scrollKey];
     const total = measurements.length;
@@ -151,13 +157,16 @@ export default class Virtual extends VC {
     while(start > 0 && measurements[start].end >= offset)
       start -= 1;
 
-    while(end < total - 1 && measurements[end].start <= offset + outerSize)
+    while(end < total - 1 && measurements[end].start <= offset + windowSize)
       end += 1;
 
     // Always add at least one overscan item, so focus will work
-    this.start = Math.max(start - overscan, 0)
-    this.end = Math.min(end + overscan, total - 1)
-    this.scrollOffset = offset;
+    this.currentVisible = [
+      Math.max(start - overscan, 0),
+      Math.min(end + overscan, total - 1)
+    ]
+
+    this.windowOffset = offset;
   }
 
   protected get measurements(){
@@ -187,7 +196,7 @@ export default class Virtual extends VC {
   }
 
   protected tryScrollToIndex(index: number, opts: any = {}){
-    const { scrollOffset, outerSize, length } = this;
+    const { windowOffset, windowSize, length } = this;
     const clampedIndex = Math.max(0, Math.min(index, length - 1));
     const measurement = this.measurements[clampedIndex];
     let align = opts.align || 'auto';
@@ -196,9 +205,9 @@ export default class Virtual extends VC {
       return;
 
     if(align === 'auto')
-      if(measurement.end >= scrollOffset + outerSize)
+      if(measurement.end >= windowOffset + windowSize)
         align = 'end'
-      else if(measurement.start <= scrollOffset)
+      else if(measurement.start <= windowOffset)
         align = 'start'
       else
         return;
@@ -211,7 +220,7 @@ export default class Virtual extends VC {
         measurement.start;
       
     const destination = 
-      alignedOffset(toOffset, scrollOffset, outerSize, align);
+      alignedOffset(toOffset, windowOffset, windowSize, align);
 
     this.scroll(destination);
   }
@@ -223,16 +232,16 @@ export default class Virtual extends VC {
       if(!el)
         return;
 
+      const { windowOffset } = this;
+      const { size, start } = stats;
       const frame = el.getBoundingClientRect();
       const measuredSize = frame[this.sizeKey];
-      const { scrollOffset } = this;
-      const { size, start } = stats;
 
       if(measuredSize === size)
         return;
 
-      if(start < scrollOffset)
-        this.scroll(scrollOffset + measuredSize - size)
+      if(start < windowOffset)
+        this.scroll(windowOffset + measuredSize - size)
 
       this.measuredCache[forIndex] = measuredSize;
     }
