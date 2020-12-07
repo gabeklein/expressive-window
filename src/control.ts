@@ -18,6 +18,7 @@ export default class Virtual extends VC {
   paddingEnd = 0;
   horizontal = false;
   containerRef = ref(this.attachContainer);
+  end = false;
 
   Window = wrap(WindowContainer);
 
@@ -27,12 +28,18 @@ export default class Virtual extends VC {
 
   constructor(){
     super();
-    this.effect(this.resetCache, ["length"]);
+
+    this.on("length", this.resetCache);
+
+    if(this.didReachEnd)
+      this.on("end", async (y) => {
+        if(!y) return;
+        // await this.requestUpdate();
+        this.didReachEnd!();
+      });
   }
 
-  get didReachEnd(){
-    return this.end >= this.length - 1;
-  }
+  didReachEnd?(): void;
 
   get totalSize(){
     const { measurements, length, paddingEnd } = this;
@@ -44,6 +51,8 @@ export default class Virtual extends VC {
     const items = [];
     let { start, end, measurements } = this;
     end = Math.min(end, measurements.length - 1);
+
+    this.end = end >= this.length - 1;
 
     for (let i = start; i <= end; i++)
       items.push(this.controlledPosition(i));

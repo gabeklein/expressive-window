@@ -77,7 +77,9 @@ declare class VirtualController extends VC {
 
   readonly totalSize: number;
 
-  readonly didReachEnd: boolean;
+  readonly end: boolean;
+
+  didReachEnd?(): void;
 
   /** Programatically scroll to specific offset. */
   scrollToOffset(toOffset: number, opts: any): void;
