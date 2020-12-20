@@ -1,4 +1,4 @@
-import VC, { is, off, ref, tuple, wrap } from 'react-use-controller';
+import VC, { def, omit, ref, tuple, wrap } from 'react-use-controller';
 
 import { watchForEvent } from './helpers';
 import { observeRect } from './rect';
@@ -12,19 +12,19 @@ interface RenderedItem {
 }
 
 export default class Virtual extends VC {
-  length = is(0);
-  overscan = is(0);
-  paddingStart = is(0);
-  paddingEnd = is(0);
-  horizontal = is(false);
+  length = def(0);
+  overscan = def(0);
+  paddingStart = def(0);
+  paddingEnd = def(0);
+  horizontal = def(false);
   containerRef = ref(this.attachContainer);
   end = false;
 
-  protected windowSize = 0;
-  protected windowOffset = off(0);
-  protected currentVisible = tuple(0, 0);
-  protected measuredCache: any = {};
-  protected initialRectSet = false;
+  windowSize = 0;
+  windowOffset = omit(0);
+  currentVisible = tuple(0, 0);
+  measuredCache: any = {};
+  initialRectSet = false;
 
   Window = wrap(WindowContainer);
 
