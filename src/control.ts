@@ -1,4 +1,4 @@
-import VC, { def, omit, ref, tuple, wrap } from 'react-use-controller';
+import VC, { def, ref, wrap } from 'react-use-controller';
 
 import { watchForEvent } from './helpers';
 import { observeRect } from './rect';
@@ -21,8 +21,7 @@ export default class Virtual extends VC {
   end = false;
 
   windowSize = 0;
-  windowOffset = omit(0);
-  visibleRange = tuple(0, 0);
+  windowOffset = 0;
   measuredCache: any = {};
   initialRectSet = false;
 
@@ -122,6 +121,10 @@ export default class Virtual extends VC {
       this.initialRectSet = true;
     }
 
+    const updateOffset = () => {
+      this.windowOffset = element[this.scrollKey];
+    }
+
     const releaseObserver = 
       observeRect(element, rect => {
         this.windowSize = rect[sizeKey];
@@ -130,13 +133,13 @@ export default class Virtual extends VC {
     const releaseHandler =
       watchForEvent({
         event: 'scroll',
-        handler: this.calculateRange,
+        handler: updateOffset,
         target: element,
         capture: false,
         passive: true,
       });
 
-    this.calculateRange();
+    updateOffset();
 
     return () => {
       releaseHandler();
@@ -144,26 +147,24 @@ export default class Virtual extends VC {
     }
   }
 
-  protected calculateRange = () => {
+  get visibleRange(): [number, number] {
     const {
       overscan,
       measurements,
       windowSize,
-      containerRef,
-      scrollKey
+      windowOffset
     } = this;
 
-    const offset = containerRef.current![scrollKey];
     const total = measurements.length;
     const final = total - 1;
 
     let start = final;
     let end = 0;
 
-    while(start > 0 && measurements[start].end >= offset)
+    while(start > 0 && measurements[start].end >= windowOffset)
       start -= 1;
 
-    while(end < final && measurements[end].start <= offset + windowSize)
+    while(end < final && measurements[end].start <= windowOffset + windowSize)
       end += 1;
 
     // do i need this
@@ -172,12 +173,10 @@ export default class Virtual extends VC {
     this.end = end == final;
 
     // Always add at least one overscan item, so focus will work
-    this.visibleRange = [
+    return [
       Math.max(start - overscan, 0),
       Math.min(end + overscan, total - 1)
     ]
-
-    this.windowOffset = offset;
   }
 
   protected get measurements(){
