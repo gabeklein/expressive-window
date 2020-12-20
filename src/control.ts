@@ -22,7 +22,7 @@ export default class Virtual extends VC {
 
   windowSize = 0;
   windowOffset = omit(0);
-  currentVisible = tuple(0, 0);
+  visibleRange = tuple(0, 0);
   measuredCache: any = {};
   initialRectSet = false;
 
@@ -56,7 +56,7 @@ export default class Virtual extends VC {
   get render(){
     const rendered = [];
     const finalIndex = this.length - 1;
-    let [ start, end ] = this.currentVisible;
+    let [ start, end ] = this.visibleRange;
 
     end = Math.min(end, finalIndex);
     this.end = end == finalIndex;
@@ -93,6 +93,11 @@ export default class Virtual extends VC {
   estimateSize(forIndex: any){
     return 50;
   };
+
+  get itemsVisible(){
+    const r = this.visibleRange;
+    return r[1] - r[0];
+  }
 
   protected get sizeKey(){
     return this.horizontal ? 'width' : 'height'
@@ -161,7 +166,7 @@ export default class Virtual extends VC {
       end += 1;
 
     // Always add at least one overscan item, so focus will work
-    this.currentVisible = [
+    this.visibleRange = [
       Math.max(start - overscan, 0),
       Math.min(end + overscan, total - 1)
     ]

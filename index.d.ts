@@ -50,6 +50,9 @@ declare class VirtualController extends VC {
    * */
   horizontal: boolean;
 
+  readonly visibleRange: [number, number];
+  readonly itemsVisible: number;
+
   /** Determines initial size to allocate before rendering a list element. */
   estimateSize?(forIndex: number): number;
 
