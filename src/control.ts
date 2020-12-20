@@ -38,9 +38,9 @@ export default class Virtual extends VC {
     this.on("length", this.resetCache);
 
     if(this.didReachEnd)
-      this.on("end", async (y) => {
-        if(!y) return;
-        // await this.requestUpdate();
+      this.on("end", async (is) => {
+        if(!is) return;
+        await this.requestUpdate();
         this.didReachEnd!();
       });
   }
