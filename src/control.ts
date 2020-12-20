@@ -55,11 +55,10 @@ export default class Virtual extends VC {
 
   get render(){
     const rendered = [];
-    const finalIndex = this.length - 1;
     let [ start, end ] = this.visibleRange;
 
-    end = Math.min(end, finalIndex);
-    this.end = end == finalIndex;
+    if(start - end == 0)
+      return [];
 
     for (let i = start; i <= end; i++)
       rendered.push(this.controlledPosition(i));
@@ -115,7 +114,7 @@ export default class Virtual extends VC {
     if(!element)
       return;
 
-    const { sizeKey, calculateRange } = this;
+    const { sizeKey } = this;
 
     if(!this.initialRectSet){
       const rect = element.getBoundingClientRect();
@@ -131,13 +130,13 @@ export default class Virtual extends VC {
     const releaseHandler =
       watchForEvent({
         event: 'scroll',
-        handler: calculateRange,
+        handler: this.calculateRange,
         target: element,
         capture: false,
         passive: true,
       });
 
-    calculateRange();
+    this.calculateRange();
 
     return () => {
       releaseHandler();
@@ -156,14 +155,21 @@ export default class Virtual extends VC {
 
     const offset = containerRef.current![scrollKey];
     const total = measurements.length;
-    let start = total - 1;
+    const final = total - 1;
+
+    let start = final;
     let end = 0;
 
     while(start > 0 && measurements[start].end >= offset)
       start -= 1;
 
-    while(end < total - 1 && measurements[end].start <= offset + windowSize)
+    while(end < final && measurements[end].start <= offset + windowSize)
       end += 1;
+
+    // do i need this
+    end = Math.min(end, final);
+
+    this.end = end == final;
 
     // Always add at least one overscan item, so focus will work
     this.visibleRange = [
