@@ -46,25 +46,6 @@ export default class Virtual extends VC {
 
   didReachEnd?(): void;
 
-  get totalSize(){
-    const { measurements, length, paddingEnd } = this;
-    const offset = measurements[length - 1];
-    return (offset ? offset.end : 0) + paddingEnd;
-  }
-
-  get render(){
-    const rendered = [];
-    let [ start, end ] = this.visibleRange;
-
-    if(start - end == 0)
-      return [];
-
-    for (let i = start; i <= end; i++)
-      rendered.push(this.controlledPosition(i));
-
-    return rendered;
-  }
-
   scrollToOffset = (toOffset: number, opts: any) => {
     const destination =
       alignedOffset(
@@ -92,11 +73,6 @@ export default class Virtual extends VC {
     return 50;
   };
 
-  get itemsVisible(){
-    const r = this.visibleRange;
-    return r[1] - r[0];
-  }
-
   protected get sizeKey(){
     return this.horizontal ? 'width' : 'height'
   }
@@ -105,7 +81,7 @@ export default class Virtual extends VC {
     return this.horizontal ? 'scrollLeft' : 'scrollTop'
   }
 
-  protected resetCache(){
+  private resetCache(){
     this.measuredCache = {};
   }
 
@@ -145,6 +121,30 @@ export default class Virtual extends VC {
       releaseHandler();
       releaseObserver();
     }
+  }
+
+  get render(){
+    const rendered = [];
+    let [ start, end ] = this.visibleRange;
+
+    if(start - end == 0)
+      return [];
+
+    for (let i = start; i <= end; i++)
+      rendered.push(this.controlledPosition(i));
+
+    return rendered;
+  }
+
+  get totalSize(){
+    const { measurements, length, paddingEnd } = this;
+    const offset = measurements[length - 1];
+    return (offset ? offset.end : 0) + paddingEnd;
+  }
+
+  get itemsVisible(){
+    const r = this.visibleRange;
+    return r[1] - r[0];
   }
 
   get visibleRange(): [number, number] {
