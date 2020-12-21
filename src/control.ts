@@ -1,6 +1,7 @@
 import VC, { def, ref, tuple, wrap } from 'react-use-controller';
 
 import { watchForEvent } from './helpers';
+import { alignedOffset } from './measure';
 import { observeRect, Axis } from './rect';
 import { WindowContainer } from './window';
 
@@ -250,31 +251,5 @@ export default class Virtual extends VC {
       this.scroll(windowOffset + measured - current)
 
     this.measuredCache[index] = measured;
-  }
-}
-
-type Alignment = "center" | "start" | "end" | "auto";
-
-function alignedOffset(
-  next: number,
-  current: number,
-  maximum: number,
-  mode: Alignment = "start"){
-
-  if(mode === 'auto')
-    if(next <= current)
-      mode = 'start'
-    else if(current >= current + maximum)
-      mode = 'end'
-    else 
-      mode = 'start'
-
-  switch(mode){
-    case "start":
-      return next;
-    case "end":
-      return next - maximum;
-    case "center":
-      return next - maximum / 2;
   }
 }
