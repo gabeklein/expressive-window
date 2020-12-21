@@ -1,7 +1,7 @@
-import VC, { def, ref, wrap } from 'react-use-controller';
+import VC, { def, ref, tuple, wrap } from 'react-use-controller';
 
 import { watchForEvent } from './helpers';
-import { observeRect } from './rect';
+import { observeRect, Axis } from './rect';
 import { WindowContainer } from './window';
 
 interface ItemStats {
@@ -20,7 +20,7 @@ export default class Virtual extends VC {
   containerRef = ref(this.applyContainer);
   end = false;
 
-  windowSize = 0;
+  windowSize = tuple(0, 0);
   windowOffset = 0;
   measuredCache = {} as { [index: number]: number };
   initialRectSet = false;
@@ -51,7 +51,7 @@ export default class Virtual extends VC {
       alignedOffset(
         toOffset,
         this.windowOffset,
-        this.windowSize,
+        this.windowSize[0],
         opts.align
       );
 
@@ -69,10 +69,15 @@ export default class Virtual extends VC {
     return forIndex;
   }
 
-  protected get sizeKey(){
-    return this.horizontal ? 'width' : 'height'
+  protected get axis(){
+    const axis = ['width', 'height'];
+
+    if(!this.horizontal)
+      axis.reverse();
+
+    return axis as Axis;
   }
-  
+
   protected get scrollKey(){
     return this.horizontal ? 'scrollLeft' : 'scrollTop'
   }
@@ -88,15 +93,17 @@ export default class Virtual extends VC {
     this.measuredCache = {};
   }
 
+  protected applySize(rect: DOMRect){
+    this.windowSize = this.axis.map(x => rect[x]) as [number, number];
+  }
+
   protected applyContainer(element: HTMLElement){
     if(!element)
       return;
 
-    const { sizeKey } = this;
-
     if(!this.initialRectSet){
       const rect = element.getBoundingClientRect();
-      this.windowSize = rect[sizeKey];
+      this.applySize(rect);
       this.initialRectSet = true;
     }
 
@@ -105,9 +112,7 @@ export default class Virtual extends VC {
     }
 
     const releaseObserver = 
-      observeRect(element, rect => {
-        this.windowSize = rect[sizeKey];
-      });
+      observeRect(element, rect => this.applySize(rect));
 
     const releaseHandler =
       watchForEvent({
@@ -157,8 +162,7 @@ export default class Virtual extends VC {
   }
 
   public get visibleRange(): [number, number] {
-    const {overscan, measurements, windowSize, windowOffset } = this;
-
+    const { overscan, measurements, windowSize: size, windowOffset } = this;
     const total = measurements.length;
     const final = total - 1;
 
@@ -168,7 +172,7 @@ export default class Virtual extends VC {
     while(start > 0 && measurements[start].end >= windowOffset)
       start -= 1;
 
-    while(end < final && measurements[end].start <= windowOffset + windowSize)
+    while(end < final && measurements[end].start <= windowOffset + size[0])
       end += 1;
 
     // do i need this
@@ -201,7 +205,7 @@ export default class Virtual extends VC {
   }
 
   protected tryScrollToIndex(index: number, opts: any = {}){
-    const { windowOffset, windowSize, length, measurements } = this;
+    const { windowOffset, length, measurements, windowSize: [ onAxis ] } = this;
     const clampedIndex = Math.max(0, Math.min(index, length - 1));
     const measurement = measurements[clampedIndex];
     let align = opts.align || 'auto';
@@ -210,7 +214,7 @@ export default class Virtual extends VC {
       return;
 
     if(align === 'auto')
-      if(measurement.end >= windowOffset + windowSize)
+      if(measurement.end >= windowOffset + onAxis)
         align = 'end'
       else if(measurement.start <= windowOffset)
         align = 'start'
@@ -225,7 +229,7 @@ export default class Virtual extends VC {
         measurement.start;
       
     const destination = 
-      alignedOffset(toOffset, windowOffset, windowSize, align);
+      alignedOffset(toOffset, windowOffset, onAxis, align);
 
     this.scroll(destination);
   }
@@ -235,7 +239,7 @@ export default class Virtual extends VC {
   };
 
   protected renderedSize(index: number, element: HTMLElement){
-    const { windowOffset, sizeKey: direction } = this;
+    const { windowOffset, axis: [ direction ] } = this;
     const { size: current, start: position } = this.measurements[index];
     const { [direction]: measured } = element.getBoundingClientRect();
 

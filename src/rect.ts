@@ -3,8 +3,17 @@ type RectProps = {
 	callbacks: Set<Function>;
 };
 
+export type Axis =
+  | ["width", "height"]
+  | ["height", "width"]
+
 let COMPARE_KEYS = [
-	"bottom", "height", "left", "right", "top", "width",
+	"bottom",
+	"height",
+	"left",
+	"right",
+	"top",
+	"width",
 ] as const;
 
 const observedNodes = new Map<Element, RectProps>();
