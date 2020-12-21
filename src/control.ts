@@ -17,7 +17,6 @@ class Virtual extends VC {
   windowSize = tuple(0, 0);
   windowOffset = 0;
   measuredCache = {} as { [index: number]: number };
-  initialRectSet = false;
 
   Window = wrap(WindowContainer);
 
@@ -88,11 +87,9 @@ class Virtual extends VC {
     if(!element)
       return;
 
-    if(!this.initialRectSet){
-      const rect = element.getBoundingClientRect();
-      this.applySize(rect);
-      this.initialRectSet = true;
-    }
+    this.applySize(
+      element.getBoundingClientRect()
+    );
 
     const releaseObserver = 
       observeRect(element, rect => this.applySize(rect));
