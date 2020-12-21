@@ -70,21 +70,17 @@ abstract class Virtual extends VC {
     return this.horizontal ? 'scrollLeft' : 'scrollTop';
   }
 
-  protected applySize(rect: DOMRect){
-    const [ x, y ] = this.axis;
-    this.windowSize = [rect[x], rect[y]];
-  }
-
   protected applyContainer(element: HTMLElement){
     if(!element)
       return;
 
-    this.applySize(
-      element.getBoundingClientRect()
-    );
+    const applySize = (rect: DOMRect) => {
+      const [ x, y ] = this.axis;
+      this.windowSize = [rect[x], rect[y]];
+    }
 
     const releaseObserver = 
-      observeRect(element, rect => this.applySize(rect));
+      observeRect(element, applySize);
 
     const updateOffset = () =>
       this.windowOffset = element[this.scrollKey];
@@ -98,6 +94,7 @@ abstract class Virtual extends VC {
         passive: true,
       });
 
+    applySize(element.getBoundingClientRect());
     updateOffset();
 
     return () => {
