@@ -9,30 +9,42 @@ interface ComponentProps {
 
 interface ContainerProps {
   control: Control;
-  component: React.FunctionComponent<ComponentProps>;
+  component: ItemComponent;
   style?: React.CSSProperties;
   className?: string;
 }
 
-export function WindowContainer(props: ContainerProps, context: Control){
-  const { get, totalSize, containerRef, render } = context.tap();
-  const { component: Component, ...rest } = props;
+type ItemComponent =
+  React.FunctionComponent<ComponentProps>;
+
+export function WindowContainer(
+  props: ContainerProps, context: Control){
+
+  const { totalSize, containerRef, render, get: control } = context.tap();
+  const { component, ...rest } = props;
+  const Component = ItemHoc(component, control);
 
   return (
-    <div ref={containerRef as any} {...rest as any}>
+    <div ref={containerRef} {...rest as any}>
       <div style={{ height: totalSize }}>
-        {render.map(x => (
-          <Component
-            index={x.index}
-            key={get.uniqueKey(x.index)}
-            style={{
-              top: x.start,
-              position: "absolute",
-              width: "100%"
-            }} 
-          />
-        ))}
+        {render.map(Component)}
       </div>
     </div>
+  )
+}
+
+export function ItemHoc(
+  Component: ItemComponent, control: Control){
+
+  return ({ index, start }: ItemStats) => (
+    <Component
+      index={index}
+      key={control.uniqueKey(index)}
+      style={{
+        top: start,
+        position: "absolute",
+        width: "100%"
+      }} 
+    />
   )
 }
