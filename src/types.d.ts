@@ -13,4 +13,5 @@ interface ItemStats {
   start: number
   size: number
   end: number
+  ref: (element: HTMLElement) => void;
 }

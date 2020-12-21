@@ -129,17 +129,11 @@ export default class Virtual extends VC {
     const rendered = [];
     let [ start, end ] = this.visibleRange;
 
-    if(start - end == 0)
+    if(start == end)
       return [];
 
-    for(let i = start; i <= end; i++){
-      const stats = this.measurements[i];
-      const getRef = (el: HTMLElement) => {
-        if(el) this.renderedSize(i, el);
-      }
-
-      rendered.push({ ...stats, ref: getRef })
-    }
+    for(let i = start; i <= end; i++)
+      rendered.push(this.measurements[i]);
 
     return rendered;
   }
@@ -156,7 +150,7 @@ export default class Virtual extends VC {
   }
 
   public get visibleRange(): [number, number] {
-    const { overscan, measurements, windowSize: size, windowOffset } = this;
+    const { measurements, overscan, windowSize, windowOffset } = this;
     const total = measurements.length;
     const final = total - 1;
 
@@ -166,15 +160,11 @@ export default class Virtual extends VC {
     while(start > 0 && measurements[start].end >= windowOffset)
       start -= 1;
 
-    while(end < final && measurements[end].start <= windowOffset + size[0])
+    while(end < final && measurements[end].start <= windowOffset + windowSize[0])
       end += 1;
-
-    // do i need this
-    end = Math.min(end, final);
 
     this.end = end == final;
 
-    // Always add at least one overscan item, so focus will work
     return [
       Math.max(start - overscan, 0),
       Math.min(end + overscan, total - 1)
@@ -182,20 +172,35 @@ export default class Virtual extends VC {
   }
 
   protected get measurements(){
-    const { estimateSize, measuredCache, paddingStart, length } = this;
-
+    const { length } = this;
     const measurements: ItemStats[] = [];
 
     for(let i = 0; i < length; i++){
-      const size = measuredCache[i] || estimateSize(i);
-      const previousItem = measurements[i - 1];
-      const start = previousItem ? previousItem.end : paddingStart;
-      const end = start + size;
-
-      measurements[i] = { index: i, start, size, end };
+      const previous = measurements[i - 1];
+      measurements[i] = this.position(i, previous);
     }
 
     return measurements;
+  }
+
+  protected position(i: number, prev?: ItemStats): ItemStats {
+    const { estimateSize, measuredCache, paddingStart } = this;
+
+    const size = measuredCache[i] || estimateSize(i);
+    const start = prev ? prev.end : paddingStart;
+    const end = start + size;
+
+    const getRef = (el: HTMLElement) => {
+      if(el) this.renderedSize(i, el);
+    }
+
+    return {
+      ref: getRef,
+      index: i,
+      start,
+      size,
+      end
+    };
   }
 
   protected tryScrollToIndex(index: number, opts: any = {}){
