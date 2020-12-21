@@ -22,7 +22,7 @@ export default class Virtual extends VC {
 
   windowSize = 0;
   windowOffset = 0;
-  measuredCache: any = {};
+  measuredCache = {} as { [index: number]: number };
   initialRectSet = false;
 
   Window = wrap(WindowContainer);
@@ -133,8 +133,14 @@ export default class Virtual extends VC {
     if(start - end == 0)
       return [];
 
-    for (let i = start; i <= end; i++)
-      rendered.push(this.controlledPosition(i));
+    for(let i = start; i <= end; i++){
+      const stats = this.measurements[i];
+      const getRef = (el: HTMLElement) => {
+        if(el) this.renderedSize(i, el);
+      }
+
+      rendered.push({ ...stats, ref: getRef })
+    }
 
     return rendered;
   }
@@ -151,12 +157,7 @@ export default class Virtual extends VC {
   }
 
   public get visibleRange(): [number, number] {
-    const {
-      overscan,
-      measurements,
-      windowSize,
-      windowOffset
-    } = this;
+    const {overscan, measurements, windowSize, windowOffset } = this;
 
     const total = measurements.length;
     const final = total - 1;
@@ -188,9 +189,7 @@ export default class Virtual extends VC {
     const measurements: ItemStats[] = [];
 
     for(let i = 0; i < length; i++){
-      const measuredSize = measuredCache[i];
-      const size = typeof measuredSize === 'number' ? measuredSize : estimateSize(i);
-
+      const size = measuredCache[i] || estimateSize(i);
       const previousItem = measurements[i - 1];
       const start = previousItem ? previousItem.end : paddingStart;
       const end = start + size;
@@ -202,9 +201,9 @@ export default class Virtual extends VC {
   }
 
   protected tryScrollToIndex(index: number, opts: any = {}){
-    const { windowOffset, windowSize, length } = this;
+    const { windowOffset, windowSize, length, measurements } = this;
     const clampedIndex = Math.max(0, Math.min(index, length - 1));
-    const measurement = this.measurements[clampedIndex];
+    const measurement = measurements[clampedIndex];
     let align = opts.align || 'auto';
 
     if(!measurement)
@@ -235,31 +234,18 @@ export default class Virtual extends VC {
     return 50;
   };
 
-  protected controlledPosition(forIndex: number){
-    const stats = this.measurements[forIndex];
+  protected renderedSize(index: number, element: HTMLElement){
+    const { windowOffset, sizeKey: direction } = this;
+    const { size: current, start: position } = this.measurements[index];
+    const { [direction]: measured } = element.getBoundingClientRect();
 
-    const didGetItemRef = (el: HTMLElement) => {
-      if(!el)
-        return;
+    if(measured === current)
+      return;
 
-      const { windowOffset } = this;
-      const { size, start } = stats;
-      const frame = el.getBoundingClientRect();
-      const measuredSize = frame[this.sizeKey];
+    if(position < windowOffset)
+      this.scroll(windowOffset + measured - current)
 
-      if(measuredSize === size)
-        return;
-
-      if(start < windowOffset)
-        this.scroll(windowOffset + measuredSize - size)
-
-      this.measuredCache[forIndex] = measuredSize;
-    }
-
-    return {
-      measureRef: didGetItemRef,
-      ...stats
-    }
+    this.measuredCache[index] = measured;
   }
 }
 

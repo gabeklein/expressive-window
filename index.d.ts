@@ -75,7 +75,7 @@ declare class VirtualController extends VC {
     start: number;
     size: number;
     end: number;
-    measureRef: (element: HTMLElement) => void;
+    ref: (element: HTMLElement) => void;
   }[];
 
   readonly totalSize: number;
