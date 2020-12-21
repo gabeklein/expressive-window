@@ -19,6 +19,7 @@ abstract class Virtual extends VC {
 
   abstract estimateSize(index: number): number;
   abstract didReachEnd?(): void;
+  abstract uniqueKey?(forIndex: number): string | number;
 
   constructor(){
     super();
@@ -33,10 +34,6 @@ abstract class Virtual extends VC {
         await this.requestUpdate();
         this.didReachEnd!();
       });
-  }
-
-  public uniqueKey(forIndex: number){
-    return forIndex;
   }
 
   protected get axis(){
@@ -147,11 +144,12 @@ abstract class Virtual extends VC {
   protected position(index: number, prev?: ItemStats): ItemStats {
     const { estimateSize, measuredCache, paddingStart } = this;
 
+    const key = this.uniqueKey && this.uniqueKey(index);
     const size = measuredCache[index] || estimateSize(index);
     const start = prev ? prev.end : paddingStart;
     const end = start + size;
 
-    return { index, start, size, end };
+    return { index, key, start, size, end };
   }
 
   protected scrollTo(offset: number){

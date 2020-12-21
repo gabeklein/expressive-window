@@ -36,10 +36,10 @@ export function WindowContainer(
 export function ItemHoc(
   Component: ItemComponent, control: Control){
 
-  return ({ index, start }: ItemStats) => (
+  return ({ index, key, start }: ItemStats) => (
     <Component
       index={index}
-      key={control.uniqueKey(index)}
+      key={key || index}
       style={{
         top: start,
         position: "absolute",
