@@ -126,11 +126,15 @@ export default class Virtual extends VC {
   }
 
   public get render(){
-    const rendered = [];
+    const { overscan, measurements } = this;
     let [ start, end ] = this.visibleRange;
+    const rendered = [];
 
     if(start == end)
       return [];
+
+    start = Math.max(start - overscan, 0),
+    end = Math.min(end + overscan, measurements.length - 1)
 
     for(let i = start; i <= end; i++)
       rendered.push(this.measurements[i]);
@@ -150,7 +154,7 @@ export default class Virtual extends VC {
   }
 
   public get visibleRange(): [number, number] {
-    const { measurements, overscan, windowSize, windowOffset } = this;
+    const { measurements, windowSize, windowOffset } = this;
     const total = measurements.length;
     const final = total - 1;
 
@@ -165,10 +169,7 @@ export default class Virtual extends VC {
 
     this.end = end == final;
 
-    return [
-      Math.max(start - overscan, 0),
-      Math.min(end + overscan, total - 1)
-    ]
+    return [ start, end ]
   }
 
   protected get measurements(){
