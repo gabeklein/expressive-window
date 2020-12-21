@@ -169,14 +169,7 @@ abstract class Virtual extends VC {
     );
   }
 
-  public scrollToIndex(index: number, opts?: any){
-    this.tryScrollToIndex(index, opts)
-    requestAnimationFrame(() => {
-      this.tryScrollToIndex(index, opts)
-    })
-  }
-
-  protected tryScrollToIndex(index: number, opts: any = {}){
+  protected scrollToIndex(index: number, opts: any = {}){
     const align = opts.align || 'auto';
     const target = this.findItem(align, index);
 
