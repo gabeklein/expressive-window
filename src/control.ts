@@ -184,24 +184,15 @@ export default class Virtual extends VC {
     return measurements;
   }
 
-  protected position(i: number, prev?: ItemStats): ItemStats {
+  protected position(index: number, prev?: ItemStats): ItemStats {
     const { estimateSize, measuredCache, paddingStart } = this;
 
-    const size = measuredCache[i] || estimateSize(i);
+    const size = measuredCache[index] || estimateSize(index);
     const start = prev ? prev.end : paddingStart;
     const end = start + size;
+    const ref = this.measureRef(index);
 
-    const getRef = (el: HTMLElement) => {
-      if(el) this.renderedSize(i, el);
-    }
-
-    return {
-      ref: getRef,
-      index: i,
-      start,
-      size,
-      end
-    };
+    return { index, ref, start, size, end };
   }
 
   protected tryScrollToIndex(index: number, opts: any = {}){
@@ -250,17 +241,19 @@ export default class Virtual extends VC {
     return 50;
   };
 
-  protected renderedSize(index: number, element: HTMLElement){
-    const { windowOffset, axis: [ direction ] } = this;
-    const { size: current, start: position } = this.measurements[index];
-    const { [direction]: measured } = element.getBoundingClientRect();
-
-    if(measured === current)
-      return;
-
-    if(position < windowOffset)
-      this.scroll(windowOffset + measured - current)
-
-    this.measuredCache[index] = measured;
+  protected measureRef(forIndex: number){
+    return (element: HTMLElement) => {
+      const { windowOffset, axis: [ direction ] } = this;
+      const { size: current, start: position } = this.measurements[forIndex];
+      const { [direction]: measured } = element.getBoundingClientRect();
+  
+      if(measured === current)
+        return;
+  
+      if(position < windowOffset)
+        this.scroll(windowOffset + measured - current)
+  
+      this.measuredCache[forIndex] = measured;
+    }
   }
 }
