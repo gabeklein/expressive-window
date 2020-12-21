@@ -197,8 +197,9 @@ abstract class Virtual extends VC {
   }
 
   protected findItem(align: Alignment, index: number){
-    const clampedIndex = Math.max(0, Math.min(index, this.length - 1));
-    const measurement = this.measurements[clampedIndex];
+    const { windowOffset, windowSize, length, measurements } = this;
+    const clampedIndex = Math.max(0, Math.min(index, length - 1));
+    const measurement = measurements[clampedIndex];
 
     if(!measurement)
       return;
@@ -206,9 +207,9 @@ abstract class Virtual extends VC {
     const { size, start, end } = measurement;
 
     if(align == 'auto')
-      if(end >= this.windowOffset + this.windowSize[0])
+      if(end >= windowOffset + windowSize[0])
         align = 'end'
-      else if(start <= this.windowOffset)
+      else if(start <= windowOffset)
         align = 'start'
       else
         return;
