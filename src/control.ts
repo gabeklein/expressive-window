@@ -69,13 +69,10 @@ abstract class Virtual extends VC {
     }
   }
 
-  protected get axis(){
-    const axis = ['width', 'height'];
-
-    if(!this.horizontal)
-      axis.reverse();
-
-    return axis as Axis;
+  protected get axis(): Axis {
+    return this.horizontal
+      ? ['width', 'height']
+      : ['height', 'width'];
   }
 
   public get render(){
