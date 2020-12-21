@@ -35,24 +35,6 @@ abstract class Virtual extends VC {
       });
   }
 
-  public scrollToOffset = (toOffset: number, opts: any) => {
-    this.scrollTo(
-      alignedOffset(
-        toOffset,
-        this.windowOffset,
-        this.windowSize[0],
-        opts.align
-      )
-    );
-  }
-
-  public scrollToIndex = (index: number, opts?: any) => {
-    this.tryScrollToIndex(index, opts)
-    requestAnimationFrame(() => {
-      this.tryScrollToIndex(index, opts)
-    })
-  }
-
   public uniqueKey(forIndex: number){
     return forIndex;
   }
@@ -177,6 +159,24 @@ abstract class Virtual extends VC {
 
     if(current)
       current[this.scrollKey] = offset;
+  }
+
+  public scrollToOffset(toOffset: number, opts: any){
+    this.scrollTo(
+      alignedOffset(
+        toOffset,
+        this.windowOffset,
+        this.windowSize[0],
+        opts.align
+      )
+    );
+  }
+
+  public scrollToIndex(index: number, opts?: any){
+    this.tryScrollToIndex(index, opts)
+    requestAnimationFrame(() => {
+      this.tryScrollToIndex(index, opts)
+    })
   }
 
   protected tryScrollToIndex(index: number, opts: any = {}){
