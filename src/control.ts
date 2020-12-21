@@ -41,15 +41,14 @@ export default class Virtual extends VC {
   didReachEnd?(): void;
 
   scrollToOffset = (toOffset: number, opts: any) => {
-    const destination =
+    this.scrollTo(
       alignedOffset(
         toOffset,
         this.windowOffset,
         this.windowSize[0],
         opts.align
-      );
-
-    this.scroll(destination);
+      )
+    );
   }
 
   scrollToIndex = (index: number, opts?: any) => {
@@ -76,14 +75,7 @@ export default class Virtual extends VC {
     return this.horizontal ? 'scrollLeft' : 'scrollTop';
   }
 
-  protected scroll(offset: number){
-    const { current } = this.containerRef;
-
-    if(current)
-      current[this.scrollKey] = offset;
-  }
-
-  private resetCache(){
+  protected resetCache(){
     this.measuredCache = {};
   }
 
@@ -195,6 +187,13 @@ export default class Virtual extends VC {
     return { index, ref, start, size, end };
   }
 
+  protected scrollTo(offset: number){
+    const { current } = this.containerRef;
+
+    if(current)
+      current[this.scrollKey] = offset;
+  }
+
   protected tryScrollToIndex(index: number, opts: any = {}){
     const align = opts.align || 'auto';
     
@@ -202,16 +201,15 @@ export default class Virtual extends VC {
 
     if(target === undefined)
       return;
-      
-    const destination = 
+
+    this.scrollTo(
       alignedOffset(
         target,
         this.windowOffset,
         this.windowSize[0],
         align
-      );
-
-    this.scroll(destination);
+      )
+    );
   }
 
   protected findItem(align: Alignment, index: number){
@@ -251,7 +249,7 @@ export default class Virtual extends VC {
         return;
   
       if(position < windowOffset)
-        this.scroll(windowOffset + measured - current)
+        this.scrollTo(windowOffset + measured - current)
   
       this.measuredCache[forIndex] = measured;
     }
