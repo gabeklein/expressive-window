@@ -73,7 +73,7 @@ export default class Virtual extends VC {
   }
 
   protected get scrollKey(){
-    return this.horizontal ? 'scrollLeft' : 'scrollTop'
+    return this.horizontal ? 'scrollLeft' : 'scrollTop';
   }
 
   protected scroll(offset: number){
@@ -88,7 +88,8 @@ export default class Virtual extends VC {
   }
 
   protected applySize(rect: DOMRect){
-    this.windowSize = this.axis.map(x => rect[x]) as [number, number];
+    const [ x, y ] = this.axis;
+    this.windowSize = [rect[x], rect[y]];
   }
 
   protected applyContainer(element: HTMLElement){
@@ -101,12 +102,11 @@ export default class Virtual extends VC {
       this.initialRectSet = true;
     }
 
-    const updateOffset = () => {
-      this.windowOffset = element[this.scrollKey];
-    }
-
     const releaseObserver = 
       observeRect(element, rect => this.applySize(rect));
+
+    const updateOffset = () =>
+      this.windowOffset = element[this.scrollKey];
 
     const releaseHandler =
       watchForEvent({
@@ -207,11 +207,11 @@ export default class Virtual extends VC {
       return;
 
     const { size, start, end } = measurement;
-    const { windowOffset, windowSize: [ onAxis ] } = this;
+    const { windowOffset, windowSize } = this;
     let align = opts.align || 'auto';
 
     if(align === 'auto')
-      if(end >= windowOffset + onAxis)
+      if(end >= windowOffset + windowSize[0])
         align = 'end'
       else if(start <= windowOffset)
         align = 'start'
@@ -223,12 +223,12 @@ export default class Virtual extends VC {
       align === 'end' ? end : start;
       
     const dest =
-      alignedOffset(toOffset, windowOffset, onAxis, align);
+      alignedOffset(toOffset, windowOffset, windowSize[0], align);
 
     this.scroll(dest);
   }
 
-  protected estimateSize(forIndex: any){
+  protected estimateSize(index: number){
     return 50;
   };
 
