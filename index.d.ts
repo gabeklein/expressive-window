@@ -70,7 +70,7 @@ declare class VirtualController extends VC {
   uniqueKey(forIndex: number): string | number;
 
   /** Apply this reference to container element! */
-  readonly containerRef: {
+  readonly container: {
     current: HTMLElement | null;
   }
 
@@ -90,10 +90,10 @@ declare class VirtualController extends VC {
   didReachEnd?(): void;
 
   /** Programatically scroll to specific offset. */
-  scrollToOffset(toOffset: number, opts: any): void;
+  gotoOffset(toOffset: number, opts: any): void;
 
   /** Programatically scroll to specific item by index. */
-  scrollToIndex(index: number, opts?: any): void;
+  gotoIndex(index: number, opts?: any): void;
 }
 
 export default VirtualController;

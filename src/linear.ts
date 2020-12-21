@@ -28,17 +28,17 @@ abstract class Linear extends Base {
 
   protected measureRef(forIndex: number){
     return (element: HTMLElement) => {
-      const { windowOffset, axis: [ direction ] } = this;
+      const { offset, axis: [ direction ] } = this;
       const { size: current, start: position } = this.measurements[forIndex];
       const { [direction]: measured } = element.getBoundingClientRect();
   
       if(measured === current)
         return;
   
-      if(position < windowOffset)
-        this.scrollTo(windowOffset + measured - current)
+      if(position < offset)
+        this.scrollTo(offset + measured - current)
   
-      this.measuredCache[forIndex] = measured;
+      this.cache[forIndex] = measured;
     }
   }
 }

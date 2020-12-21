@@ -10,12 +10,12 @@ abstract class Virtual extends VC {
   paddingStart = def(0);
   paddingEnd = def(0);
   horizontal = def(false);
-  containerRef = ref(this.applyContainer);
+  container = ref(this.applyContainer);
   end = false;
 
-  windowSize = tuple(0, 0);
-  windowOffset = 0;
-  measuredCache = {} as { [index: number]: number };
+  size = tuple(0, 0);
+  offset = 0;
+  cache = {} as { [index: number]: number };
 
   abstract estimateSize(index: number): number;
   abstract didReachEnd?(): void;
@@ -25,7 +25,7 @@ abstract class Virtual extends VC {
     super();
 
     this.on("length", () => {
-      this.measuredCache = {};
+      this.cache = {};
     });
 
     if(this.didReachEnd)
@@ -43,11 +43,11 @@ abstract class Virtual extends VC {
       return;
 
     const applySize = (rect: DOMRect) => {
-      this.windowSize = [rect[x], rect[y]];
+      this.size = [rect[x], rect[y]];
     }
 
     const updateOffset = () => {
-      this.windowOffset = element[this.scrollKey];
+      this.offset = element[this.scrollKey];
     }
 
     const releaseObserver = 
@@ -106,17 +106,17 @@ abstract class Virtual extends VC {
   }
 
   public get visibleRange(): [number, number] {
-    const { measurements, windowSize, windowOffset } = this;
+    const { measurements, size, offset } = this;
     const total = measurements.length;
     const final = total - 1;
 
     let start = final;
     let end = 0;
 
-    while(start > 0 && measurements[start].end >= windowOffset)
+    while(start > 0 && measurements[start].end >= offset)
       start -= 1;
 
-    while(end < final && measurements[end].start <= windowOffset + windowSize[0])
+    while(end < final && measurements[end].start <= offset + size[0])
       end += 1;
 
     this.end = end == final;
@@ -137,10 +137,10 @@ abstract class Virtual extends VC {
   }
 
   protected position(index: number, prev?: ItemStats): ItemStats {
-    const { estimateSize, measuredCache, paddingStart } = this;
+    const { estimateSize, cache, paddingStart } = this;
 
     const key = this.uniqueKey && this.uniqueKey(index);
-    const size = measuredCache[index] || estimateSize(index);
+    const size = cache[index] || estimateSize(index);
     const start = prev ? prev.end : paddingStart;
     const end = start + size;
 
@@ -152,24 +152,24 @@ abstract class Virtual extends VC {
   }
 
   protected scrollTo(offset: number){
-    const { current } = this.containerRef;
+    const { current } = this.container;
 
     if(current)
       current[this.scrollKey] = offset;
   }
 
-  public scrollToOffset(toOffset: number, opts: any){
+  public gotoOffset(toOffset: number, opts: any){
     this.scrollTo(
       alignedOffset(
         toOffset,
-        this.windowOffset,
-        this.windowSize[0],
+        this.offset,
+        this.size[0],
         opts.align
       )
     );
   }
 
-  protected scrollToIndex(index: number, opts: any = {}){
+  protected gotoIndex(index: number, opts: any = {}){
     const align = opts.align || 'auto';
     const target = this.findItem(align, index);
 
@@ -179,15 +179,15 @@ abstract class Virtual extends VC {
     this.scrollTo(
       alignedOffset(
         target,
-        this.windowOffset,
-        this.windowSize[0],
+        this.offset,
+        this.size[0],
         align
       )
     );
   }
 
   protected findItem(align: Alignment, index: number){
-    const { windowOffset, windowSize, length, measurements } = this;
+    const { offset, length, measurements, size: [ available ] } = this;
     const clampedIndex = Math.max(0, Math.min(index, length - 1));
     const measurement = measurements[clampedIndex];
 
@@ -197,9 +197,9 @@ abstract class Virtual extends VC {
     const { size, start, end } = measurement;
 
     if(align == 'auto')
-      if(end >= windowOffset + windowSize[0])
+      if(end >= offset + available)
         align = 'end'
-      else if(start <= windowOffset)
+      else if(start <= offset)
         align = 'start'
       else
         return;

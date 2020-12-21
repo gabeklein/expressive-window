@@ -20,12 +20,12 @@ type ItemComponent =
 export function WindowContainer(
   props: ContainerProps, context: Control){
 
-  const { totalSize, containerRef, render, get: control } = context.tap();
+  const { totalSize, container, render, get: control } = context.tap();
   const { component, ...rest } = props;
   const Component = ItemHoc(component, control);
 
   return (
-    <div ref={containerRef} {...rest as any}>
+    <div ref={container} {...rest as any}>
       <div style={{ height: totalSize }}>
         {render.map(Component)}
       </div>
