@@ -5,7 +5,7 @@ import { alignedOffset } from './measure';
 import { observeRect } from './rect';
 import { WindowContainer } from './window';
 
-export default class Virtual extends VC {
+class Virtual extends VC {
   length = def(0);
   overscan = def(0);
   paddingStart = def(0);
@@ -125,8 +125,8 @@ export default class Virtual extends VC {
     if(start == end)
       return [];
 
-    start = Math.max(start - overscan, 0),
-    end = Math.min(end + overscan, measurements.length - 1)
+    start = Math.max(start - overscan, 0);
+    end = Math.min(end + overscan, measurements.length - 1);
 
     for(let i = start; i <= end; i++)
       rendered.push(this.measurements[i]);
@@ -196,7 +196,6 @@ export default class Virtual extends VC {
 
   protected tryScrollToIndex(index: number, opts: any = {}){
     const align = opts.align || 'auto';
-    
     const target = this.findItem(align, index);
 
     if(target === undefined)
@@ -221,7 +220,7 @@ export default class Virtual extends VC {
 
     const { size, start, end } = measurement;
 
-    if(align === 'auto')
+    if(align == 'auto')
       if(end >= this.windowOffset + this.windowSize[0])
         align = 'end'
       else if(start <= this.windowOffset)
@@ -230,8 +229,8 @@ export default class Virtual extends VC {
         return;
 
     return (
-      align === 'center' ? start + size / 2 :
-      align === 'end' ? end : start
+      align == 'center' ? start + size / 2 :
+      align == 'end' ? end : start
     )
   }
 
@@ -255,3 +254,5 @@ export default class Virtual extends VC {
     }
   }
 }
+
+export default Virtual;

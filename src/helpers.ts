@@ -1,7 +1,7 @@
 interface ListenerOptions {
   event: string;
   target: HTMLElement;
-  handler: (this: HTMLElement, ev: Event) => any;
+  handler: (this: HTMLElement, event: Event) => any;
   passive?: boolean;
   capture?: boolean;
 }
