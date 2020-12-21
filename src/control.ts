@@ -37,25 +37,27 @@ abstract class Virtual extends VC {
   }
 
   protected applyContainer(element: HTMLElement){
+    const [ x, y ] = this.axis;
+
     if(!element)
       return;
 
     const applySize = (rect: DOMRect) => {
-      const [ x, y ] = this.axis;
       this.windowSize = [rect[x], rect[y]];
+    }
+
+    const updateOffset = () => {
+      this.windowOffset = element[this.scrollKey];
     }
 
     const releaseObserver = 
       observeRect(element, applySize);
 
-    const updateOffset = () =>
-      this.windowOffset = element[this.scrollKey];
-
     const releaseHandler =
       watchForEvent({
         event: 'scroll',
-        handler: updateOffset,
         target: element,
+        handler: updateOffset,
         capture: false,
         passive: true,
       });
