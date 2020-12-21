@@ -36,19 +36,6 @@ abstract class Virtual extends VC {
       });
   }
 
-  protected get axis(){
-    const axis = ['width', 'height'];
-
-    if(!this.horizontal)
-      axis.reverse();
-
-    return axis as Axis;
-  }
-
-  protected get scrollKey(){
-    return this.horizontal ? 'scrollLeft' : 'scrollTop';
-  }
-
   protected applyContainer(element: HTMLElement){
     if(!element)
       return;
@@ -80,6 +67,15 @@ abstract class Virtual extends VC {
       releaseHandler();
       releaseObserver();
     }
+  }
+
+  protected get axis(){
+    const axis = ['width', 'height'];
+
+    if(!this.horizontal)
+      axis.reverse();
+
+    return axis as Axis;
   }
 
   public get render(){
@@ -150,6 +146,10 @@ abstract class Virtual extends VC {
     const end = start + size;
 
     return { index, key, start, size, end };
+  }
+
+  protected get scrollKey(){
+    return this.horizontal ? 'scrollLeft' : 'scrollTop';
   }
 
   protected scrollTo(offset: number){
