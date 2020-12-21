@@ -4,7 +4,7 @@ import { watchForEvent } from './helpers';
 import { observeRect } from './rect';
 import { WindowContainer } from './window';
 
-interface RenderedItem {
+interface ItemStats {
   index: number
   start: number
   size: number
@@ -17,7 +17,7 @@ export default class Virtual extends VC {
   paddingStart = def(0);
   paddingEnd = def(0);
   horizontal = def(false);
-  containerRef = ref(this.attachContainer);
+  containerRef = ref(this.applyContainer);
   end = false;
 
   windowSize = 0;
@@ -69,10 +69,6 @@ export default class Virtual extends VC {
     return forIndex;
   }
 
-  estimateSize(forIndex: any){
-    return 50;
-  };
-
   protected get sizeKey(){
     return this.horizontal ? 'width' : 'height'
   }
@@ -81,11 +77,18 @@ export default class Virtual extends VC {
     return this.horizontal ? 'scrollLeft' : 'scrollTop'
   }
 
+  protected scroll(offset: number){
+    const { current } = this.containerRef;
+
+    if(current)
+      current[this.scrollKey] = offset;
+  }
+
   private resetCache(){
     this.measuredCache = {};
   }
 
-  protected attachContainer(element: HTMLElement){
+  protected applyContainer(element: HTMLElement){
     if(!element)
       return;
 
@@ -123,7 +126,7 @@ export default class Virtual extends VC {
     }
   }
 
-  get render(){
+  public get render(){
     const rendered = [];
     let [ start, end ] = this.visibleRange;
 
@@ -136,18 +139,18 @@ export default class Virtual extends VC {
     return rendered;
   }
 
-  get totalSize(){
+  public get totalSize(){
     const { measurements, length, paddingEnd } = this;
     const offset = measurements[length - 1];
     return (offset ? offset.end : 0) + paddingEnd;
   }
 
-  get itemsVisible(){
+  public get itemsVisible(){
     const r = this.visibleRange;
     return r[1] - r[0];
   }
 
-  get visibleRange(): [number, number] {
+  public get visibleRange(): [number, number] {
     const {
       overscan,
       measurements,
@@ -182,7 +185,7 @@ export default class Virtual extends VC {
   protected get measurements(){
     const { estimateSize, measuredCache, paddingStart, length } = this;
 
-    const measurements: RenderedItem[] = [];
+    const measurements: ItemStats[] = [];
 
     for(let i = 0; i < length; i++){
       const measuredSize = measuredCache[i];
@@ -196,13 +199,6 @@ export default class Virtual extends VC {
     }
 
     return measurements;
-  }
-
-  protected scroll(offset: number){
-    const { current } = this.containerRef;
-
-    if(current)
-      current[this.scrollKey] = offset;
   }
 
   protected tryScrollToIndex(index: number, opts: any = {}){
@@ -234,6 +230,10 @@ export default class Virtual extends VC {
 
     this.scroll(destination);
   }
+
+  protected estimateSize(forIndex: any){
+    return 50;
+  };
 
   protected controlledPosition(forIndex: number){
     const stats = this.measurements[forIndex];
