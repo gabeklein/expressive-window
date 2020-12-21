@@ -1,6 +1,10 @@
 import React from "react";
 import VC from "react-use-controller";
 
+type Axis =
+  | ["width", "height"]
+  | ["height", "width"]
+
 declare namespace VirtualController {
   interface ComponentProps {
     index: number;
@@ -50,6 +54,7 @@ declare class VirtualController extends VC {
    * */
   horizontal: boolean;
 
+  readonly axis: Axis;
   readonly visibleRange: [number, number];
   readonly itemsVisible: number;
 
