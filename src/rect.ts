@@ -3,10 +3,6 @@ type RectProps = {
 	callbacks: Set<Function>;
 };
 
-export type Axis =
-  | ["width", "height"]
-  | ["height", "width"]
-
 let COMPARE_KEYS = [
 	"bottom",
 	"height",

@@ -2,15 +2,8 @@ import VC, { def, ref, tuple, wrap } from 'react-use-controller';
 
 import { watchForEvent } from './helpers';
 import { alignedOffset } from './measure';
-import { observeRect, Axis } from './rect';
+import { observeRect } from './rect';
 import { WindowContainer } from './window';
-
-interface ItemStats {
-  index: number
-  start: number
-  size: number
-  end: number
-}
 
 export default class Virtual extends VC {
   length = def(0);
