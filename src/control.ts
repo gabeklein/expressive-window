@@ -1,11 +1,10 @@
-import VC, { def, ref, tuple, wrap } from 'react-use-controller';
+import VC, { def, ref, tuple } from 'react-use-controller';
 
 import { watchForEvent } from './helpers';
 import { alignedOffset } from './measure';
 import { observeRect } from './rect';
-import { WindowContainer } from './window';
 
-class Virtual extends VC {
+abstract class Virtual extends VC {
   length = def(0);
   overscan = def(0);
   paddingStart = def(0);
@@ -18,11 +17,8 @@ class Virtual extends VC {
   windowOffset = 0;
   measuredCache = {} as { [index: number]: number };
 
-  Window = wrap(WindowContainer);
-
-  static get Window(){
-    return this.wrap(WindowContainer);
-  }
+  abstract estimateSize(index: number): number;
+  abstract didReachEnd?(): void;
 
   constructor(){
     super();
@@ -39,9 +35,7 @@ class Virtual extends VC {
       });
   }
 
-  didReachEnd?(): void;
-
-  scrollToOffset = (toOffset: number, opts: any) => {
+  public scrollToOffset = (toOffset: number, opts: any) => {
     this.scrollTo(
       alignedOffset(
         toOffset,
@@ -52,14 +46,14 @@ class Virtual extends VC {
     );
   }
 
-  scrollToIndex = (index: number, opts?: any) => {
+  public scrollToIndex = (index: number, opts?: any) => {
     this.tryScrollToIndex(index, opts)
     requestAnimationFrame(() => {
       this.tryScrollToIndex(index, opts)
     })
   }
 
-  uniqueKey(forIndex: number){
+  public uniqueKey(forIndex: number){
     return forIndex;
   }
 
@@ -177,9 +171,8 @@ class Virtual extends VC {
     const size = measuredCache[index] || estimateSize(index);
     const start = prev ? prev.end : paddingStart;
     const end = start + size;
-    const ref = this.measureRef(index);
 
-    return { index, ref, start, size, end };
+    return { index, start, size, end };
   }
 
   protected scrollTo(offset: number){
@@ -227,26 +220,6 @@ class Virtual extends VC {
       align == 'center' ? start + size / 2 :
       align == 'end' ? end : start
     )
-  }
-
-  protected estimateSize(index: number){
-    return 50;
-  };
-
-  protected measureRef(forIndex: number){
-    return (element: HTMLElement) => {
-      const { windowOffset, axis: [ direction ] } = this;
-      const { size: current, start: position } = this.measurements[forIndex];
-      const { [direction]: measured } = element.getBoundingClientRect();
-  
-      if(measured === current)
-        return;
-  
-      if(position < windowOffset)
-        this.scrollTo(windowOffset + measured - current)
-  
-      this.measuredCache[forIndex] = measured;
-    }
   }
 }
 

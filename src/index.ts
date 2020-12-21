@@ -1,1 +1,1 @@
-export { default } from './control'
+export { default } from './linear'
