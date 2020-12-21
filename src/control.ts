@@ -206,33 +206,33 @@ export default class Virtual extends VC {
   }
 
   protected tryScrollToIndex(index: number, opts: any = {}){
-    const { windowOffset, length, measurements, windowSize: [ onAxis ] } = this;
+    const { measurements, length } = this;
     const clampedIndex = Math.max(0, Math.min(index, length - 1));
     const measurement = measurements[clampedIndex];
-    let align = opts.align || 'auto';
 
     if(!measurement)
       return;
 
+    const { size, start, end } = measurement;
+    const { windowOffset, windowSize: [ onAxis ] } = this;
+    let align = opts.align || 'auto';
+
     if(align === 'auto')
-      if(measurement.end >= windowOffset + onAxis)
+      if(end >= windowOffset + onAxis)
         align = 'end'
-      else if(measurement.start <= windowOffset)
+      else if(start <= windowOffset)
         align = 'start'
       else
         return;
 
     const toOffset =
-      align === 'center' ?
-        measurement.start + measurement.size / 2 :
-      align === 'end' ?
-        measurement.end :
-        measurement.start;
+      align === 'center' ? start + size / 2 :
+      align === 'end' ? end : start;
       
-    const destination = 
+    const dest =
       alignedOffset(toOffset, windowOffset, onAxis, align);
 
-    this.scroll(destination);
+    this.scroll(dest);
   }
 
   protected estimateSize(forIndex: any){
