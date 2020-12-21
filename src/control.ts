@@ -27,7 +27,9 @@ class Virtual extends VC {
   constructor(){
     super();
 
-    this.on("length", this.resetCache);
+    this.on("length", () => {
+      this.measuredCache = {};
+    });
 
     if(this.didReachEnd)
       this.on("end", async (is) => {
@@ -72,10 +74,6 @@ class Virtual extends VC {
 
   protected get scrollKey(){
     return this.horizontal ? 'scrollLeft' : 'scrollTop';
-  }
-
-  protected resetCache(){
-    this.measuredCache = {};
   }
 
   protected applySize(rect: DOMRect){
