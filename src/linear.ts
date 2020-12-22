@@ -16,7 +16,7 @@ abstract class Linear extends Base {
 
   estimateSize(index: number){
     return 50;
-  };
+  }
 
   protected position(
     index: number, prev?: ItemStats): DynamicItemStats {
