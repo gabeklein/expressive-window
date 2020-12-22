@@ -20,9 +20,9 @@ type ItemComponent =
 export function WindowContainer(
   props: ContainerProps, context: Control){
 
-  const { totalSize, container, render, get: control } = context.tap();
+  const { totalSize, container, render } = context.tap();
   const { component, ...rest } = props;
-  const Component = ItemHoc(component, control);
+  const Component = ItemHoc(component);
 
   return (
     <div ref={container} {...rest as any}>
@@ -33,9 +33,7 @@ export function WindowContainer(
   )
 }
 
-export function ItemHoc(
-  Component: ItemComponent, control: Control){
-
+export function ItemHoc(Component: ItemComponent){
   return ({ index, key, start }: ItemStats) => (
     <Component
       index={index}
