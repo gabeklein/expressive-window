@@ -9,7 +9,7 @@ abstract class Virtual extends VC {
   paddingStart = def(0);
   paddingEnd = def(0);
   horizontal = def(false);
-  container = ref(this.applyContainer);
+  container = ref(this.observeContainer);
   end = false;
 
   size = tuple(0, 0);
@@ -35,7 +35,7 @@ abstract class Virtual extends VC {
       });
   }
 
-  protected applyContainer(element: HTMLElement){
+  protected observeContainer(element: HTMLElement){
     const [ x, y ] = this.axis;
 
     if(!element)
