@@ -131,7 +131,7 @@ abstract class Virtual extends VC {
   protected position(index: number, prev?: ItemStats): ItemStats {
     const { estimateSize, cache, paddingStart } = this;
 
-    const key = this.uniqueKey && this.uniqueKey(index);
+    const key = this.uniqueKey ? this.uniqueKey(index) : index;
     const size = cache[index] || estimateSize(index);
     const start = prev ? prev.end : paddingStart;
     const end = start + size;
