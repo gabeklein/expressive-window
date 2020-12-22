@@ -10,8 +10,8 @@ abstract class Virtual extends VC {
   paddingEnd = def(0);
   horizontal = def(false);
   container = ref(this.observeContainer);
+  
   end = false;
-
   size = tuple(0, 0);
   offset = 0;
   cache = {} as { [index: number]: number };
