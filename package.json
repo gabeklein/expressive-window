@@ -10,7 +10,11 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "prebuild": "rm -rf lib/",
+    "preversion": "jest",
+    "postversion": "npm run build; npm publish",
+    "postpublish": "git push; git push --tags; rm -rf lib"
   },
   "peerDependencies": {
     "react": ">=16.8.0"
