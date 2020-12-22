@@ -39,7 +39,10 @@ abstract class Linear extends Base {
   }
 
   protected measureRef(forIndex: number){
-    return (element: HTMLElement) => {
+    return (element: HTMLElement | null) => {
+      if(!element)
+        return;
+
       const { offset, axis: [ direction ] } = this;
       const { size: current, start: position } = this.measurements[forIndex];
       const { [direction]: measured } = element.getBoundingClientRect();
