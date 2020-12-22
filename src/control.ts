@@ -80,10 +80,7 @@ abstract class Virtual extends VC {
     const [ start, end ] = this.visibleRange;
     const rendered = [];
 
-    if(start == end)
-      return [];
-
-    for(let i = start; i <= end; i++)
+    for(let i = start; i < end; i++)
       rendered.push(this.measurements[i]);
 
     return rendered;
