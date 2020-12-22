@@ -18,13 +18,11 @@ abstract class Linear extends Base {
     return 50;
   }
 
-  protected position(
-    index: number, prev?: ItemStats): DynamicItemStats {
-
-    const stats = super.position(index, prev);
-    const ref = this.measureRef(index);
-
-    return { ...stats, ref };
+  get render(): DynamicItemStats[] {
+    return super.render.map((stats, index) => ({
+       ref: this.measureRef(index),
+       ...stats
+    }))
   }
 
   get visibleRange(): [number, number] {
