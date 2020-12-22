@@ -6,38 +6,31 @@ import { Container, Inner, VirtualRow } from './components';
 
 describe('adjustment', () => {
   class Window extends Virtual {
-    size = 100;
-  
-    resetTimes = 0;
-    resetCache(){
-      this.resetTimes++;
-      super.resetCache();
-    }
+    length = 100;
   }
 
-  it('will clear cache if size, estimateSize change', async () => {
+  it('will reset cache if size, estimateSize change', async () => {
     const virtual = Window.create();
-    
-    expect(virtual.resetTimes).toBe(0);
 
-    virtual.size = 101;
-    await virtual.requestUpdate();
-    expect(virtual.resetTimes).toBe(1);
+    virtual.length = 101;
+    const keys = await virtual.requestUpdate();
+
+    expect(keys).toMatchObject(["length", "cache"]);
   })
 })
 
 describe.skip('scrolling', () => {
   class Window extends Virtual {
-    size = 1000;
+    length = 1000;
     overscan = 5;
     estimateSize = () => 35;
-    goto50 = () => this.scrollToIndex(50);
+    goto50 = () => this.gotoIndex(50);
   }
 
   const Test = () => {
     const {
       goto50,
-      containerRef,
+      container,
       totalSize,
       render
     } = Window.use();
@@ -47,7 +40,7 @@ describe.skip('scrolling', () => {
         <button onClick={goto50} data-testid="gotoRow50">
           Goto 50
         </button>
-        <Container ref={containerRef}>
+        <Container ref={container}>
           <Inner height={totalSize}>
             {render.map(info =>
               <VirtualRow {...info} />

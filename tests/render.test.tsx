@@ -6,23 +6,23 @@ import { Container, Inner, VirtualRow } from './components'
 
 describe("rendering", () => {
   class Window extends Virtual {
-    size = 10000;
+    length = 10000;
     estimateSize = () => 35;
     overscan = 5;
   }
 
   const App = () => {
     const {
-      containerRef,
+      container,
       totalSize,
       render
     } = Window.use();
   
     return (
-      <Container ref={containerRef}>
+      <Container ref={container}>
         <Inner height={totalSize}>
           {render.map(info =>
-            <VirtualRow key={info.index} {...info} />
+            <VirtualRow {...info} />
           )}
         </Inner>
       </Container>

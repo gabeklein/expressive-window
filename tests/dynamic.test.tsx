@@ -6,22 +6,22 @@ import { Container, Inner, VirtualRow } from './components';
 
 describe("dynamic sizing", () => {
   class Window extends Virtual {
-    size = 20;
+    length = 20;
     overscan = 5;
   }
 
   const App = () => {
     const {
-      containerRef,
+      container,
       totalSize,
       render
     } = Window.use()
   
     return (
-      <Container ref={containerRef}>
+      <Container ref={container}>
         <Inner height={totalSize}>
           {render.map(info =>
-            <VirtualRow {...info} ref={info.measureRef} key={info.index} />
+            <VirtualRow {...info} />
           )}
         </Inner>
       </Container>
