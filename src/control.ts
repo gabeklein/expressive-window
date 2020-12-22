@@ -6,7 +6,6 @@ import { observeRect } from './rect';
 
 abstract class Virtual extends VC {
   length = def(0);
-  overscan = def(0);
   paddingStart = def(0);
   paddingEnd = def(0);
   horizontal = def(false);
@@ -78,15 +77,11 @@ abstract class Virtual extends VC {
   }
 
   public get render(){
-    const { overscan, measurements } = this;
-    let [ start, end ] = this.visibleRange;
+    const [ start, end ] = this.visibleRange;
     const rendered = [];
 
     if(start == end)
       return [];
-
-    start = Math.max(start - overscan, 0);
-    end = Math.min(end + overscan, measurements.length - 1);
 
     for(let i = start; i <= end; i++)
       rendered.push(this.measurements[i]);

@@ -1,4 +1,4 @@
-import { wrap } from 'react-use-controller';
+import { def, wrap } from 'react-use-controller';
 import { WindowContainer } from './window';
 import Base from "./control";
 
@@ -7,6 +7,7 @@ interface DynamicItemStats extends ItemStats {
 }
 
 abstract class Linear extends Base {
+  overscan = def(0);
   Window = wrap(WindowContainer);
 
   static get Window(){
@@ -24,6 +25,17 @@ abstract class Linear extends Base {
     const ref = this.measureRef(index);
 
     return { ...stats, ref };
+  }
+
+  get visibleRange(): [number, number] {
+    let [ start, end ] = super.visibleRange;
+    const extra = this.overscan;
+    const final = Math.max(0, this.length - 1);
+
+    start = Math.max(start - extra, 0);
+    end = Math.min(end + extra, final);
+
+    return [start, end];
   }
 
   protected measureRef(forIndex: number){
