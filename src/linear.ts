@@ -1,6 +1,6 @@
 import { def, wrap } from 'react-use-controller';
 import { WindowContainer } from './window';
-import Base from "./control";
+import Base from "./base";
 
 interface DynamicItemStats extends ItemStats {
   ref: (element: HTMLElement) => void;

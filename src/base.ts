@@ -16,9 +16,10 @@ abstract class Virtual extends VC {
   offset = 0;
   cache = {} as { [index: number]: number };
 
-  abstract estimateSize(index: number): number;
   didReachEnd?(): void;
   uniqueKey?(forIndex: number): string | number;
+
+  abstract estimateSize(index: number): number;
 
   constructor(){
     super();
