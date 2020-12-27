@@ -4,7 +4,7 @@ import { watchForEvent } from './helpers';
 import { alignedOffset } from './measure';
 import { observeRect } from './rect';
 
-abstract class Virtual extends VC {
+abstract class Virtual<P extends Position> extends VC {
   length = def(0);
   paddingStart = def(0);
   paddingEnd = def(0);
@@ -19,7 +19,7 @@ abstract class Virtual extends VC {
   didReachEnd?(): void;
   uniqueKey?(forIndex: number): string | number;
 
-  abstract estimateSize(index: number): number;
+  protected abstract position(i: number, prev?: P): P;
 
   constructor(){
     super();
@@ -28,6 +28,7 @@ abstract class Virtual extends VC {
       this.cache = {};
     });
 
+    debugger
     if(this.didReachEnd)
       this.on("end", this.toggleEnd);
   }
@@ -85,11 +86,11 @@ abstract class Virtual extends VC {
     }
   }
 
-  public get render(){
+  public get render(): P[] {
     const [ start, end ] = this.visibleRange;
     const rendered = [];
 
-    for(let i = start; i < end; i++)
+    for(let i = start; i <= end; i++)
       rendered.push(this.measurements[i]);
 
     return rendered;
@@ -117,6 +118,7 @@ abstract class Virtual extends VC {
     while(start > 0 && measurements[start].end >= offset)
       start -= 1;
 
+    if(final > 0)
     while(end < final && measurements[end].start <= offset + size[0])
       end += 1;
 
@@ -127,7 +129,7 @@ abstract class Virtual extends VC {
 
   protected get measurements(){
     const { length } = this;
-    const measurements: ItemStats[] = [];
+    const measurements: P[] = [];
 
     for(let i = 0; i < length; i++){
       const previous = measurements[i - 1];
@@ -135,17 +137,6 @@ abstract class Virtual extends VC {
     }
 
     return measurements;
-  }
-
-  protected position(index: number, prev?: ItemStats): ItemStats {
-    const { estimateSize, cache, paddingStart } = this;
-
-    const key = this.uniqueKey ? this.uniqueKey(index) : index;
-    const size = cache[index] || estimateSize(index);
-    const start = prev ? prev.end : paddingStart;
-    const end = start + size;
-
-    return { index, key, start, size, end };
   }
 
   protected scrollTo(offset: number){
@@ -191,7 +182,8 @@ abstract class Virtual extends VC {
     if(!measurement)
       return;
 
-    const { size, start, end } = measurement;
+    const { start, end } = measurement;
+    const size = end - start;
 
     if(align == 'auto')
       if(end >= offset + available)

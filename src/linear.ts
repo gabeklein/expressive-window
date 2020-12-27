@@ -2,11 +2,13 @@ import { def, wrap } from 'react-use-controller';
 import { WindowContainer } from './window';
 import Base from "./base";
 
-interface DynamicItemStats extends ItemStats {
+interface Row extends Position {
   ref: (element: HTMLElement) => void;
+  size: number;
 }
 
-abstract class Linear extends Base {
+
+abstract class Linear extends Base<Row> {
   overscan = def(0);
   Window = wrap(WindowContainer);
 
@@ -18,11 +20,16 @@ abstract class Linear extends Base {
     return 50;
   }
 
-  get render(): DynamicItemStats[] {
-    return super.render.map((stats, index) => ({
-       ref: this.measureRef(index),
-       ...stats
-    }))
+  protected position(index: number, prev?: Row): Row {
+    const { estimateSize, cache, paddingStart } = this;
+
+    const key = this.uniqueKey ? this.uniqueKey(index) : index;
+    const size = cache[index] || estimateSize(index);
+    const start = prev ? prev.end : paddingStart;
+    const end = start + size;
+    const ref = this.measureRef(index);
+
+    return { index, key, start, size, end, ref };
   }
 
   get visibleRange(): [number, number] {

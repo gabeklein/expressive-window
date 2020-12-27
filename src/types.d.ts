@@ -8,10 +8,9 @@ type Axis =
   | ["width", "height"]
   | ["height", "width"]
 
-interface ItemStats {
-  index: number
+interface Position {
+  index: number;
   key?: number | string;
   start: number
-  size: number
   end: number
 }
