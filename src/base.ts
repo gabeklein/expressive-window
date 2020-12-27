@@ -29,11 +29,25 @@ abstract class Virtual extends VC {
     });
 
     if(this.didReachEnd)
-      this.on("end", async (is) => {
-        if(!is) return;
-        await this.requestUpdate();
-        this.didReachEnd!();
-      });
+      this.on("end", this.toggleEnd);
+  }
+
+  private toggleEnd(is: boolean){
+    if(is) this.requestUpdate(() => {
+      this.didReachEnd!();
+    });
+  }
+
+  protected get scrollKey(){
+    return this.horizontal
+      ? 'scrollLeft'
+      : 'scrollTop';
+  }
+
+  protected get axis(): Axis {
+    return this.horizontal
+      ? ['width', 'height']
+      : ['height', 'width'];
   }
 
   protected observeContainer(element: HTMLElement){
@@ -69,12 +83,6 @@ abstract class Virtual extends VC {
       releaseHandler();
       releaseObserver();
     }
-  }
-
-  protected get axis(): Axis {
-    return this.horizontal
-      ? ['width', 'height']
-      : ['height', 'width'];
   }
 
   public get render(){
@@ -138,10 +146,6 @@ abstract class Virtual extends VC {
     const end = start + size;
 
     return { index, key, start, size, end };
-  }
-
-  protected get scrollKey(){
-    return this.horizontal ? 'scrollLeft' : 'scrollTop';
   }
 
   protected scrollTo(offset: number){
