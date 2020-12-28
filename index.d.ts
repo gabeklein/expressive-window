@@ -107,7 +107,24 @@ declare class Linear extends Virtual<Linear.Row> {
   readonly render: Linear.Row[];
 }
 
+declare namespace Grid {
+  interface Item extends Virtual.Item {
+    start: number;
+    end: number;
+    column: number;
+    offset: number;
+    size: [number, number];
+  }
+}
+
+declare class Grid extends Virtual<Grid.Item> {
+  columns: number;
+  itemWidth: number;
+  itemHeight: number;
+}
+
 export {
   Virtual,
-  Linear
+  Linear,
+  Grid
 }
