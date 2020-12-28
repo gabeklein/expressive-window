@@ -25,7 +25,7 @@ declare namespace Virtual {
   } 
 }
 
-declare class Virtual<P extends Virtual.Item> extends VC {
+declare abstract class Virtual<P extends Virtual.Item> extends VC {
   public Window: FC<Virtual.ContainerProps>;
   static Window: FC<Virtual.ContainerProps>;
 
