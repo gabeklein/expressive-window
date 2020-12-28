@@ -43,12 +43,10 @@ abstract class Virtual<P extends Item> extends VC {
   constructor(){
     super();
 
-    this.on("length", () => {
-      this.cache = {};
-    });
+    this.on($ => $.length, () => this.cache = {});
 
     if(this.didReachEnd)
-      this.on("end", this.toggleEnd);
+      this.on($ => $.end, this.toggleEnd);
   }
 
   private toggleEnd(is: boolean){
