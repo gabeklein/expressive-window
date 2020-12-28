@@ -1,11 +1,11 @@
 import { render, waitFor } from '@testing-library/react'
 import * as React from 'react'
 
-import Virtual from '../src'
+import { Linear } from '../src'
 import { Container, Inner, VirtualRow } from './components'
 
 describe("rendering", () => {
-  class Window extends Virtual {
+  class Window extends Linear {
     length = 10000;
     estimateSize = () => 35;
     overscan = 5;

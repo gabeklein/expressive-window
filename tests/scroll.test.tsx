@@ -1,11 +1,11 @@
 import { act, fireEvent, render, waitFor } from '@testing-library/react';
 import * as React from 'react';
 
-import Virtual from '../src';
+import { Linear } from '../src';
 import { Container, Inner, VirtualRow } from './components';
 
 describe('adjustment', () => {
-  class Window extends Virtual {
+  class Window extends Linear {
     length = 100;
   }
 
@@ -20,7 +20,7 @@ describe('adjustment', () => {
 })
 
 describe.skip('scrolling', () => {
-  class Window extends Virtual {
+  class Window extends Linear {
     length = 1000;
     overscan = 5;
     estimateSize = () => 35;
