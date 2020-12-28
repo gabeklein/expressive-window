@@ -1,6 +1,5 @@
 import { CSSProperties } from 'react';
-import { def, wrap } from 'react-use-controller';
-import { WindowContainer } from './window';
+import { def } from 'react-use-controller';
 import Virtual, { Item } from "./base";
 
 interface Row extends Item {
@@ -10,11 +9,6 @@ interface Row extends Item {
 
 abstract class Linear extends Virtual<Row> {
   overscan = def(0);
-  Window = wrap(WindowContainer);
-
-  static get Window(){
-    return this.wrap(WindowContainer);
-  }
 
   estimateSize(index: number){
     return 50;

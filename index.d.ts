@@ -1,4 +1,4 @@
-import React from "react";
+import { FC, CSSProperties } from "react";
 import VC from "react-use-controller";
 
 declare namespace Virtual {
@@ -12,9 +12,23 @@ declare namespace Virtual {
   type Axis =
   | ["width", "height"]
   | ["height", "width"]
+
+  interface ComponentProps {
+    index: number;
+    style: CSSProperties;
+  }
+  
+  interface ContainerProps {
+    component: FC<ComponentProps>;
+    style?: CSSProperties;
+    className?: string;
+  } 
 }
 
 declare class Virtual<P extends Virtual.Item> extends VC {
+  public Window: FC<Virtual.ContainerProps>;
+  static Window: FC<Virtual.ContainerProps>;
+
   /** Current size of virtual collection */
   length: number;
 
@@ -73,18 +87,6 @@ declare class Virtual<P extends Virtual.Item> extends VC {
 }
 
 declare namespace Linear {
-  interface ComponentProps {
-    index: number;
-    style: React.CSSProperties;
-    className?: string;
-  }
-  
-  interface ContainerProps {
-    Item: React.FunctionComponent<ComponentProps>;
-    style?: React.CSSProperties;
-    className?: string;
-  } 
-
   interface Row extends Virtual.Item {
     ref: (element: HTMLElement) => void;
     size: number;
@@ -92,9 +94,6 @@ declare namespace Linear {
 }
 
 declare class Linear extends Virtual<Linear.Row> {
-  public Window: React.FunctionComponent<Linear.ContainerProps>;
-  static Window: React.FunctionComponent<Linear.ContainerProps>;
-
   /**
    * Number of items to render past container bounds
    * 

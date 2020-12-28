@@ -1,8 +1,9 @@
-import VC, { def, ref, tuple } from 'react-use-controller';
+import VC, { def, ref, tuple, wrap } from 'react-use-controller';
 
 import { watchForEvent } from './helpers';
 import { alignedOffset, Alignment } from './measure';
 import { observeRect } from './rect';
+import { WindowContainer } from "./window";
 
 type Axis =
   | ["width", "height"]
@@ -30,6 +31,12 @@ abstract class Virtual<P extends Item> extends VC {
 
   didReachEnd?(): void;
   uniqueKey?(forIndex: number): string | number;
+
+  Window = wrap(WindowContainer);
+
+  static get Window(){
+    return this.wrap(WindowContainer);
+  }
 
   protected abstract position(i: number, prev?: P): P;
 
