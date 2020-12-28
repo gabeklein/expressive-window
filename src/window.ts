@@ -1,4 +1,4 @@
-import React, { FC, CSSProperties } from "react";
+import { FC, CSSProperties, createElement as create } from "react";
 import Control, { Item } from "./base";
 
 interface ComponentProps {
@@ -19,13 +19,11 @@ export function WindowContainer(
   const { component, ...rest } = props;
 
   const Item = ({ style, index, key = index }: Item) =>
-    React.createElement(component, { style, key, index })
+    create(component, { style, key, index })
 
   return (
-    <div ref={container} {...rest as any}>
-      <div style={{ height: totalSize }}>
-        {render.map(Item)}
-      </div>
-    </div>
+    create("div", { ref: container, ...rest },
+      create("div", { style: { height: totalSize }},
+        render.map(Item)))
   )
 }
