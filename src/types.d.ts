@@ -10,7 +10,7 @@ type Axis =
 
 interface Position {
   index: number;
-  key?: number | string;
+  key: number | string;
   start: number
   end: number
 }
