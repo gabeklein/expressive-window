@@ -1,3 +1,4 @@
+import { CSSProperties } from 'react';
 import { def, wrap } from 'react-use-controller';
 import { WindowContainer } from './window';
 import Virtual, { Item } from "./base";
@@ -20,15 +21,24 @@ abstract class Linear extends Virtual<Row> {
   }
 
   protected position(index: number, prev?: Row): Row {
-    const { estimateSize, cache, paddingStart } = this;
+    const { estimateSize, cache, paddingStart, horizontal } = this;
 
-    const key = this.uniqueKey ? this.uniqueKey(index) : index;
     const size = cache[index] || estimateSize(index);
     const start = prev ? prev.end : paddingStart;
     const end = start + size;
+
+    const key = this.uniqueKey ? this.uniqueKey(index) : index;
     const ref = this.measureRef(index);
 
-    return { index, key, start, size, end, ref };
+    const placement = horizontal
+      ? { left: start, height: "100%" }
+      : { top: start, width: "100%" };
+
+    const style: CSSProperties = {
+      position: "absolute", ...placement
+    };
+
+    return { index, key, start, end, size, ref, style };
   }
 
   get visibleRange(): [number, number] {

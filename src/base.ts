@@ -11,8 +11,9 @@ type Axis =
 export interface Item {
   index: number;
   key: number | string;
-  start: number
-  end: number
+  start: number;
+  end: number;
+  style: {};
 }
 
 abstract class Virtual<P extends Item> extends VC {
