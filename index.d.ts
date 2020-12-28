@@ -1,37 +1,22 @@
 import React from "react";
 import VC from "react-use-controller";
 
-type Axis =
+declare namespace Virtual {
+  interface Item {
+    index: number;
+    key: number | string;
+    start: number
+    end: number
+  }
+
+  type Axis =
   | ["width", "height"]
   | ["height", "width"]
-
-declare namespace VirtualController {
-  interface ComponentProps {
-    index: number;
-    style: React.CSSProperties;
-    className?: string;
-  }
-  
-  interface ContainerProps {
-    Item: React.FunctionComponent<ComponentProps>;
-    style?: React.CSSProperties;
-    className?: string;
-  }
 }
 
-declare class VirtualController extends VC {
-  public Window: React.FunctionComponent<VirtualController.ContainerProps>;
-  static Window: React.FunctionComponent<VirtualController.ContainerProps>;
-
+declare class Virtual<P extends Virtual.Item> extends VC {
   /** Current size of virtual collection */
   length: number;
-
-  /**
-   * Number of items to render past container bounds
-   * 
-   * Default: 0;
-   * */
-  overscan: number;
 
   /** 
    * Amount of padding between container and first item. (In pixels)
@@ -48,18 +33,29 @@ declare class VirtualController extends VC {
   paddingEnd: number;
 
   /** 
-   * Flag list should scroll horizontally.
+   * List should scroll horizontally.
    * 
    * Default: false;
    * */
   horizontal: boolean;
 
-  readonly axis: Axis;
+  readonly axis: Virtual.Axis;
   readonly visibleRange: [number, number];
   readonly itemsVisible: number;
 
-  /** Determines initial size to allocate before rendering a list element. */
-  estimateSize?(forIndex: number): number;
+  /** Apply this reference to container element! */
+  readonly container: {
+    current: HTMLElement | null;
+  }
+
+  /** Index and computed postion of all drawn containers */
+  readonly render: P[];
+
+  readonly totalSize: number;
+
+  readonly end: boolean;
+
+  didReachEnd?(): void;
 
   /** 
    * Convert position index into unique key of a target list item.
@@ -69,26 +65,6 @@ declare class VirtualController extends VC {
    */
   uniqueKey(forIndex: number): string | number;
 
-  /** Apply this reference to container element! */
-  readonly container: {
-    current: HTMLElement | null;
-  }
-
-  /** Index and computed postion of all drawn containers */
-  readonly render: {
-    index: number;
-    start: number;
-    size: number;
-    end: number;
-    ref: (element: HTMLElement) => void;
-  }[];
-
-  readonly totalSize: number;
-
-  readonly end: boolean;
-
-  didReachEnd?(): void;
-
   /** Programatically scroll to specific offset. */
   gotoOffset(toOffset: number, opts: any): void;
 
@@ -96,4 +72,43 @@ declare class VirtualController extends VC {
   gotoIndex(index: number, opts?: any): void;
 }
 
-export default VirtualController;
+declare namespace Linear {
+  interface ComponentProps {
+    index: number;
+    style: React.CSSProperties;
+    className?: string;
+  }
+  
+  interface ContainerProps {
+    Item: React.FunctionComponent<ComponentProps>;
+    style?: React.CSSProperties;
+    className?: string;
+  } 
+
+  interface Row extends Virtual.Item {
+    ref: (element: HTMLElement) => void;
+    size: number;
+  } 
+}
+
+declare class Linear extends Virtual<Linear.Row> {
+  public Window: React.FunctionComponent<Linear.ContainerProps>;
+  static Window: React.FunctionComponent<Linear.ContainerProps>;
+
+  /**
+   * Number of items to render past container bounds
+   * 
+   * Default: 0;
+   * */
+  overscan: number;
+
+  /** Determines initial size to allocate before rendering a list element. */
+  estimateSize?(forIndex: number): number;
+
+  readonly render: Linear.Row[];
+}
+
+export {
+  Virtual,
+  Linear
+}

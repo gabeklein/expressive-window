@@ -1,10 +1,21 @@
 import VC, { def, ref, tuple } from 'react-use-controller';
 
 import { watchForEvent } from './helpers';
-import { alignedOffset } from './measure';
+import { alignedOffset, Alignment } from './measure';
 import { observeRect } from './rect';
 
-abstract class Virtual<P extends Position> extends VC {
+type Axis =
+  | ["width", "height"]
+  | ["height", "width"]
+
+export interface Item {
+  index: number;
+  key: number | string;
+  start: number
+  end: number
+}
+
+abstract class Virtual<P extends Item> extends VC {
   length = def(0);
   paddingStart = def(0);
   paddingEnd = def(0);
@@ -28,7 +39,6 @@ abstract class Virtual<P extends Position> extends VC {
       this.cache = {};
     });
 
-    debugger
     if(this.didReachEnd)
       this.on("end", this.toggleEnd);
   }

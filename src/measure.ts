@@ -1,3 +1,9 @@
+export type Alignment = 
+  | "center" 
+  | "start" 
+  | "end" 
+  | "auto";
+
 export function alignedOffset(
   next: number,
   current: number,

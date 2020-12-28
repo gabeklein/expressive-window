@@ -1,24 +1,23 @@
-import React from "react";
-import Control from "./base";
+import React, { FC, CSSProperties } from "react";
+import Control, { Item } from "./base";
 
 interface ComponentProps {
   index: number;
-  style: React.CSSProperties;
+  style: CSSProperties;
   className?: string;
 }
 
 interface ContainerProps {
-  control: Control;
+  control: Control<any>;
   component: ItemComponent;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   className?: string;
 }
 
-type ItemComponent =
-  React.FunctionComponent<ComponentProps>;
+type ItemComponent = FC<ComponentProps>;
 
 export function WindowContainer(
-  props: ContainerProps, context: Control){
+  props: ContainerProps, context: Control<any>){
 
   const { totalSize, container, render } = context.tap();
   const { component, ...rest } = props;
@@ -34,7 +33,7 @@ export function WindowContainer(
 }
 
 export function ItemHoc(Component: ItemComponent){
-  return ({ index, key, start }: ItemStats) => (
+  return ({ index, key, start }: Item) => (
     <Component
       index={index}
       key={key || index}

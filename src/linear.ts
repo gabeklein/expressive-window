@@ -1,14 +1,13 @@
 import { def, wrap } from 'react-use-controller';
 import { WindowContainer } from './window';
-import Base from "./base";
+import Virtual, { Item } from "./base";
 
-interface Row extends Position {
+interface Row extends Item {
   ref: (element: HTMLElement) => void;
   size: number;
 }
 
-
-abstract class Linear extends Base<Row> {
+abstract class Linear extends Virtual<Row> {
   overscan = def(0);
   Window = wrap(WindowContainer);
 
