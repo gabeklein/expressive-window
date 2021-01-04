@@ -7,13 +7,17 @@ interface Row extends Item {
   size: number;
 }
 
-abstract class Linear extends Virtual<Row> {
+class Linear extends Virtual<Row> {
   overscan = def(0);
   cache = {} as { [index: number]: number };
 
   constructor(){
     super();
     this.on($ => $.length, () => this.cache = {});
+  }
+
+  uniqueKey(index: number){
+    return index;
   }
 
   estimateSize(index: number){
