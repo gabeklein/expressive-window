@@ -1,4 +1,4 @@
-import Core, { Item } from "./base";
+import Core, { Item } from "./controller";
 import { absolute } from "./measure";
 
 export interface Cell extends Item {

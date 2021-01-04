@@ -1,6 +1,6 @@
 import { CSSProperties } from 'react';
 import { def } from 'react-use-controller';
-import Core, { Item } from "./base";
+import Core, { Item } from "./controller";
 
 interface Row extends Item {
   ref: (element: HTMLElement) => void;

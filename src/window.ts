@@ -1,5 +1,5 @@
 import { FC, CSSProperties, createElement as create } from "react";
-import Control, { Item } from "./base";
+import Control, { Item } from "./controller";
 
 interface ComponentProps {
   index: number;
