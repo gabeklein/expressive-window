@@ -103,6 +103,9 @@ abstract class Virtual<P extends Item> extends VC {
     const [ start, end ] = this.visibleRange;
     const rendered = [];
 
+    if(end == 0)
+      return [];
+
     for(let i = start; i <= end; i++)
       rendered.push(this.measurements[i]);
 
