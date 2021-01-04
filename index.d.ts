@@ -123,8 +123,29 @@ declare class Grid extends Virtual<Grid.Item> {
   itemHeight: number;
 }
 
+declare namespace Justified {
+  interface Item extends Virtual.Item {
+    offset: number;
+    row: number;
+    column: number;
+    size: [number, number];
+  }
+
+  type Input =
+  | { aspect: number; }
+  | { width: number; height: number; };
+}
+
+declare class Justified extends Virtual<Justified.Item> {
+  items: Justified.Input;
+  rowSize: number;
+  gridGap: number;
+  chop: boolean;
+}
+
 export {
   Virtual,
   Linear,
-  Grid
+  Grid,
+  Justified
 }
