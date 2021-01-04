@@ -1,5 +1,5 @@
-import { CSSProperties } from "react";
 import Virtual, { Item } from "./base";
+import { absolute } from "./measure";
 
 export interface Cell extends Item {
   start: number;
@@ -37,14 +37,11 @@ class Grid extends Virtual<Cell> {
   
       const start = !previous ? this.paddingStart : column == 0 ? previous.end : previous.start;
       const end = start + itemHeight;
-  
-      const placement = this.horizontal
-        ? { height: itemWidth, width: itemHeight, left: start, top: offset }
-        : { width: itemWidth, height: itemHeight, top: start, left: offset };
-  
-      const style: CSSProperties = {
-        position: "absolute", ...placement
-      }
+      const style = absolute(
+        this.horizontal,
+        [itemWidth, itemHeight],
+        [start, offset]
+      );
   
       measurements.push({
         index: i,

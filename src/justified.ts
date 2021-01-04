@@ -1,6 +1,5 @@
-import { CSSProperties } from 'react';
-
 import Virtual, { Item } from './base';
+import { absolute } from './measure';
 
 export type Sizable =
   | { aspect: number; }
@@ -47,13 +46,11 @@ export default class Justified extends Virtual<Inline> {
         const start = totalHeight;
         const end = start + height + gridGap;
 
-        const placement = this.horizontal
-          ? { height: itemWidth, width: height, left: start, top: indexOffset }
-          : { width: itemWidth, height: height, top: start, left: indexOffset };
-
-        const style: CSSProperties = {
-          position: "absolute", ...placement
-        }
+        const style = absolute(
+          this.horizontal,
+          [itemWidth, height],
+          [start, offset]
+        );
 
         output.push({
           index,

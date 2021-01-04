@@ -27,3 +27,20 @@ export function alignedOffset(
       return next - maximum / 2;
   }
 }
+
+export function absolute(
+  horizontal: boolean,
+  size: [x: number, y: number],
+  offset: [x: number, y: number]){
+
+  const [[width, height], [top, left]] = 
+    [size, offset].map(a => 
+      horizontal ? [...a].reverse() : a
+    );
+
+  return {
+    position: "absolute",
+    width, height,
+    left, top
+  } as const;
+}
