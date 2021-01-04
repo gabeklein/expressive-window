@@ -9,30 +9,52 @@ interface Row extends Item {
 
 abstract class Linear extends Virtual<Row> {
   overscan = def(0);
+  cache = {} as { [index: number]: number };
+
+  constructor(){
+    super();
+    this.on($ => $.length, () => this.cache = {});
+  }
 
   estimateSize(index: number){
     return 50;
   }
 
-  protected position(index: number, prev?: Row): Row {
-    const { estimateSize, cache, paddingStart, horizontal } = this;
+  get measurements(){
+    const { length } = this;
+    const measurements: Row[] = [];
 
-    const size = cache[index] || estimateSize(index);
-    const start = prev ? prev.end : paddingStart;
-    const end = start + size;
+    for(let i = 0; i < length; i++){
+      const { estimateSize, cache, paddingStart, horizontal } = this;
+      const previous = measurements[i - 1];
+  
+      const size = cache[i] || estimateSize(i);
+      const start = previous ? previous.end : paddingStart;
+      const end = start + size;
+  
+      const key = this.uniqueKey ? this.uniqueKey(i) : i;
+      const ref = this.measureRef(i);
+  
+      const placement = horizontal
+        ? { left: start, height: "100%" }
+        : { top: start, width: "100%" };
+  
+      const style: CSSProperties = {
+        position: "absolute", ...placement
+      };
+  
+      measurements.push({
+        index: i,
+        key,
+        start,
+        end,
+        size,
+        ref,
+        style
+      });
+    }
 
-    const key = this.uniqueKey ? this.uniqueKey(index) : index;
-    const ref = this.measureRef(index);
-
-    const placement = horizontal
-      ? { left: start, height: "100%" }
-      : { top: start, width: "100%" };
-
-    const style: CSSProperties = {
-      position: "absolute", ...placement
-    };
-
-    return { index, key, start, end, size, ref, style };
+    return measurements;
   }
 
   get visibleRange(): [number, number] {

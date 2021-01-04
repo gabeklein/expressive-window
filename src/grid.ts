@@ -20,35 +20,45 @@ class Grid extends Virtual<Cell> {
     return this.itemWidth;
   }
 
-  position(index: number, prev: Cell){
-    const key = this.uniqueKey ? this.uniqueKey(index) : index;
-    const column = index % this.columns;
+  uniqueKey?(forIndex: number): string | number;
 
-    const { itemWidth, itemHeight } = this;
-    const size = [itemHeight, itemWidth] as [number, number];
-    const offset = column * itemWidth;
+  get measurements(){
+    const { length } = this;
+    const measurements: Cell[] = [];
 
-    const start = !prev ? this.paddingStart : column == 0 ? prev.end : prev.start;
-    const end = start + itemHeight;
-
-    const placement = this.horizontal
-      ? { height: itemWidth, width: itemHeight, left: start, top: offset }
-      : { width: itemWidth, height: itemHeight, top: start, left: offset };
-
-    const style: CSSProperties = {
-      position: "absolute", ...placement
+    for(let i = 0; i < length; i++){
+      const previous = measurements[i - 1];
+      const key = this.uniqueKey ? this.uniqueKey(i) : i;
+      const column = i % this.columns;
+  
+      const { itemWidth, itemHeight } = this;
+      const size = [itemHeight, itemWidth] as [number, number];
+      const offset = column * itemWidth;
+  
+      const start = !previous ? this.paddingStart : column == 0 ? previous.end : previous.start;
+      const end = start + itemHeight;
+  
+      const placement = this.horizontal
+        ? { height: itemWidth, width: itemHeight, left: start, top: offset }
+        : { width: itemWidth, height: itemHeight, top: start, left: offset };
+  
+      const style: CSSProperties = {
+        position: "absolute", ...placement
+      }
+  
+      measurements.push({
+        index: i,
+        key,
+        start,
+        offset,
+        end,
+        size,
+        column,
+        style
+      });
     }
 
-    return {
-      key,
-      index,
-      column,
-      size,
-      start,
-      end,
-      offset,
-      style
-    };
+    return measurements;
   }
 }
 

@@ -28,10 +28,10 @@ abstract class Virtual<P extends Item> extends VC {
   horizontal = def(false);
 
   end = false;
-  cache = {} as { [index: number]: number };
 
   didReachEnd?(): void;
-  uniqueKey?(forIndex: number): string | number;
+
+  abstract measurements: P[];
 
   Window = wrap(WindowContainer);
 
@@ -39,12 +39,8 @@ abstract class Virtual<P extends Item> extends VC {
     return this.wrap(WindowContainer);
   }
 
-  protected abstract position(i: number, prev?: P): P;
-
   constructor(){
     super();
-
-    this.on($ => $.length, () => this.cache = {});
 
     if(this.didReachEnd)
       this.on($ => $.end, this.toggleEnd);
@@ -142,18 +138,6 @@ abstract class Virtual<P extends Item> extends VC {
     this.end = end == final;
 
     return [ start, end ]
-  }
-
-  protected get measurements(){
-    const { length } = this;
-    const measurements: P[] = [];
-
-    for(let i = 0; i < length; i++){
-      const previous = measurements[i - 1];
-      measurements[i] = this.position(i, previous);
-    }
-
-    return measurements;
   }
 
   protected scrollTo(offset: number){
