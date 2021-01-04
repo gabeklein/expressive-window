@@ -113,8 +113,8 @@ abstract class Virtual<P extends Item> extends VC {
   }
 
   public get totalSize(){
-    const { measurements, length, paddingEnd } = this;
-    const offset = measurements[length - 1];
+    const { measurements, paddingEnd } = this;
+    const offset = measurements[measurements.length - 1];
     return (offset ? offset.end : 0) + paddingEnd;
   }
 
