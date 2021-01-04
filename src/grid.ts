@@ -10,7 +10,7 @@ export interface Cell extends Item {
 }
 
 class Grid extends Virtual<Cell> {
-  columns = 3;
+  columns = 1;
 
   get itemWidth(){
     return Math.floor(this.size[1] / this.columns);
