@@ -1,4 +1,4 @@
-import Virtual, { Item } from './base';
+import Core, { Item } from './base';
 import { absolute } from './measure';
 
 export type Sizable =
@@ -12,7 +12,7 @@ export interface Inline extends Item {
   size: [number, number];
 }
 
-export default class Justified extends Virtual<Inline> {
+export default class Justified extends Core<Inline> {
   items = [] as Sizable[];
   rowSize = 150;
   gridGap = 1;

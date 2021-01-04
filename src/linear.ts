@@ -1,13 +1,13 @@
 import { CSSProperties } from 'react';
 import { def } from 'react-use-controller';
-import Virtual, { Item } from "./base";
+import Core, { Item } from "./base";
 
 interface Row extends Item {
   ref: (element: HTMLElement) => void;
   size: number;
 }
 
-class Linear extends Virtual<Row> {
+class Dynamic extends Core<Row> {
   overscan = def(0);
   cache = {} as { [index: number]: number };
 
@@ -92,4 +92,4 @@ class Linear extends Virtual<Row> {
   }
 }
 
-export default Linear;
+export default Dynamic;

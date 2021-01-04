@@ -17,7 +17,7 @@ export interface Item {
   style: {};
 }
 
-abstract class Virtual<P extends Item> extends VC {
+abstract class Core<P extends Item> extends VC {
   container = ref(this.observeContainer);
   size = tuple(0, 0);
   offset = 0;
@@ -204,4 +204,4 @@ abstract class Virtual<P extends Item> extends VC {
   }
 }
 
-export default Virtual;
+export default Core;

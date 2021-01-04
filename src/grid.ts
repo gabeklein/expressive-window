@@ -1,4 +1,4 @@
-import Virtual, { Item } from "./base";
+import Core, { Item } from "./base";
 import { absolute } from "./measure";
 
 export interface Cell extends Item {
@@ -9,7 +9,7 @@ export interface Cell extends Item {
   size: [number, number];
 }
 
-class Grid extends Virtual<Cell> {
+class Virtual extends Core<Cell> {
   columns = 1;
 
   get itemWidth(){
@@ -59,4 +59,4 @@ class Grid extends Virtual<Cell> {
   }
 }
 
-export default Grid;
+export default Virtual;

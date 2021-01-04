@@ -1,4 +1,4 @@
-export { default as Virtual } from './base';
-export { default as Linear } from './linear';
-export { default as Grid } from './grid';
+export { default as Core } from './base';
+export { default as Virtual } from './grid';
+export { default as Dynamic } from './linear';
 export { default as Justified } from './justified';
