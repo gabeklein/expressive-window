@@ -19,10 +19,10 @@ export default class Justified extends Virtual<Inline> {
   chop = false;
 
   get measurements(){
-    const { items, gridGap, rowSize, size } = this;
-    const width = size[1];
+    const { items, gridGap, rowSize, size, horizontal: rotate } = this;
+    const available = size[1];
 
-    if(!width)
+    if(!available)
       return [];
   
     let remaining = Array.from(items);
@@ -32,8 +32,8 @@ export default class Justified extends Virtual<Inline> {
     let indexOffset = 0;
   
     while(remaining.length){
-      const { items, height, filled } =
-        fitItems(remaining, width, rowSize, gridGap);
+      const { items, size, filled } =
+        fitItems(remaining, available, rowSize, gridGap, rotate);
 
       if(!filled && this.chop)
         break;
@@ -42,13 +42,13 @@ export default class Justified extends Virtual<Inline> {
 
       items.forEach((item, column) => {
         const index = indexOffset + column;
-        const itemWidth = adjusted(height, item);
+        const itemWidth = size * getAspectRatio(item, rotate);
         const start = totalHeight;
-        const end = start + height + gridGap;
+        const end = start + size + gridGap;
 
         const style = absolute(
           this.horizontal,
-          [itemWidth, height],
+          [itemWidth, size],
           [start, offset]
         );
 
@@ -60,7 +60,7 @@ export default class Justified extends Virtual<Inline> {
           start,
           offset,
           end,
-          size: [itemWidth, height],
+          size: [itemWidth, size],
           style
         });
 
@@ -69,7 +69,7 @@ export default class Justified extends Virtual<Inline> {
   
       indexOffset += items.length;
       remaining = remaining.slice(items.length);
-      totalHeight += height + gridGap;
+      totalHeight += size + gridGap;
       currentRow += 1;
     }
 
@@ -79,9 +79,10 @@ export default class Justified extends Virtual<Inline> {
 
 function fitItems<T extends Sizable>(
   source: T[],
-  width: number,
-  height: number,
-  gap: number){
+  space: number,
+  size: number,
+  gap: number,
+  horizontal: boolean){
 
   const items: T[] = [];
   let filled = false;
@@ -89,31 +90,29 @@ function fitItems<T extends Sizable>(
   for(const item of source){
     items.push(item);
 
-    const combinedAR = items.reduce(combineAspectRatio, 0);
+    const combinedAR = items.reduce((total, item) => {
+      return total + getAspectRatio(item, horizontal);
+    }, 0);
     const whiteSpace = (items.length - 1) * gap;
-    const actualWidth = width - whiteSpace;
-    const rowHeight = actualWidth / combinedAR;
+    const totalSize = space - whiteSpace;
+    const idealSize = totalSize / combinedAR;
 
-    if(rowHeight <= height){
-      height = rowHeight;
+    if(idealSize <= size){
+      size = idealSize;
       filled = true;
       break;
     }
   }
 
-  return { items, height, filled };
+  return { items, size, filled };
 }
 
-function adjusted(height: number, item: Sizable){
-  return "aspect" in item 
-    ? height * item.aspect
-    : height / item.height * item.width;
-}
+function getAspectRatio(item: Sizable, rotate = false){
+  const ratio = "aspect" in item
+    ? item.aspect : (item.width / item.height);
 
-function combineAspectRatio(total: number, item: Sizable){
-  return total + (
-    "aspect" in item
-      ? item.aspect
-      : (item.width / item.height)
-  )
+  if(rotate)
+    return 1 / ratio;
+  else
+    return ratio;
 }
