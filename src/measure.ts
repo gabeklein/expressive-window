@@ -44,3 +44,8 @@ export function absolute(
     left, top
   } as const;
 }
+
+export function limit(number: number, decimals = 1){
+  const factor = Math.pow(10, decimals)
+  return Math.round(number * factor) / factor;
+}
