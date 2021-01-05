@@ -1,23 +1,31 @@
+export type ClientRect = {
+	width: number,
+	height: number
+}
+
 type RectProps = {
-	rect: DOMRect;
 	callbacks: Set<Function>;
+	rect: ClientRect;
 };
 
 let COMPARE_KEYS = [
-	"bottom",
 	"height",
-	"left",
-	"right",
-	"top",
 	"width",
 ] as const;
 
 const observedNodes = new Map<Element, RectProps>();
 let active: boolean;
 
+export function getRect(node: Element){
+	return {
+		width: node.clientWidth,
+		height: node.clientHeight
+	}
+}
+
 export function observeRect(
 	node: Element, 
-	callback: (rect: DOMRect) => void){
+	callback: (rect: ClientRect) => void){
 
 	let state = observedNodes.get(node)!;
 
@@ -56,7 +64,7 @@ function checkForUpdates(){
 function assertDidUpdate(
 	state: RectProps, node: Element){
 
-	const current = node.getBoundingClientRect();
+	const current = getRect(node);
 
 	for(const key of COMPARE_KEYS)
 		if(current[key] !== state.rect[key]){

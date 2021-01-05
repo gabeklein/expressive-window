@@ -2,8 +2,8 @@ import VC, { def, ref, tuple, wrap } from 'react-use-controller';
 
 import { watchForEvent } from './helpers';
 import { alignedOffset, Alignment } from './measure';
-import { observeRect } from './rect';
-import { WindowContainer } from "./window";
+import { ClientRect, getRect, observeRect } from './rect';
+import { WindowContainer } from './window';
 
 type Axis =
   | ["width", "height"]
@@ -71,7 +71,7 @@ abstract class Core<P extends Item> extends VC {
     if(!element)
       return;
 
-    const applySize = (rect: DOMRect) => {
+    const applySize = (rect: ClientRect) => {
       this.size = [rect[x], rect[y]];
     }
 
@@ -91,7 +91,7 @@ abstract class Core<P extends Item> extends VC {
         passive: true,
       });
 
-    applySize(element.getBoundingClientRect());
+    applySize(getRect(element));
     updateOffset();
 
     return () => {
