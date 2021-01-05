@@ -26,6 +26,7 @@ abstract class Core<P extends Item> extends VC {
   paddingStart = def(0);
   paddingEnd = def(0);
   horizontal = def(false);
+  maintain = true;
 
   end = false;
 
@@ -79,7 +80,7 @@ abstract class Core<P extends Item> extends VC {
     }
 
     const releaseObserver = 
-      observeRect(element, applySize);
+      this.maintain && observeRect(element, applySize);
 
     const releaseHandler =
       watchForEvent({
@@ -95,7 +96,8 @@ abstract class Core<P extends Item> extends VC {
 
     return () => {
       releaseHandler();
-      releaseObserver();
+      if(releaseObserver)
+        releaseObserver();
     }
   }
 
