@@ -1,5 +1,5 @@
 import Core, { Item } from './controller';
-import { absolute, truncate } from './measure';
+import { truncate } from './measure';
 
 export type Sizable =
   | { aspect: number; }
@@ -20,7 +20,7 @@ export default class Justified extends Core<Inline> {
   chop = false;
 
   get measurements(){
-    const { items, gap, size, horizontal } = this;
+    const { items, gap, size } = this;
     const available = size[1];
 
     if(!available)
@@ -47,7 +47,7 @@ export default class Justified extends Core<Inline> {
         const start = totalHeight;
         const end = start + size + gap;
         const boxSize = [itemWidth, size] as [number, number];
-        const style = absolute(horizontal, boxSize, [start, columnOffset]);
+        const style = this.position(boxSize, [start, columnOffset]);
         const position = {
           index,
           key: index,

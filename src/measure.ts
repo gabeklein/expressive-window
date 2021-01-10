@@ -28,23 +28,6 @@ export function alignedOffset(
   }
 }
 
-export function absolute(
-  horizontal: boolean,
-  size: [x: number, y: number],
-  offset: [x: number, y: number]){
-
-  const [[width, height], [top, left]] = 
-    [size, offset].map(a => 
-      horizontal ? [...a].reverse() : a
-    );
-
-  return {
-    position: "absolute",
-    width, height,
-    left, top
-  } as const;
-}
-
 export function truncate(number: number, decimals = 1){
   const factor = Math.pow(10, decimals)
   return Math.round(number * factor) / factor;

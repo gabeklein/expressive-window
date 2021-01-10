@@ -1,5 +1,4 @@
 import Core, { Item } from "./controller";
-import { absolute } from "./measure";
 
 export interface Cell extends Item {
   start: number;
@@ -47,11 +46,7 @@ class Virtual extends Core<Cell> {
       column == 0 ? previous.end : 
       previous.start;
     const end = start + itemHeight;
-    const style = absolute(
-      this.horizontal,
-      [itemWidth, itemHeight],
-      [start, offset]
-    );
+    const style = this.position([itemWidth, itemHeight], [start, offset]);
 
     return {
       index, key, start, offset, 

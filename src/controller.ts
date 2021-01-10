@@ -180,6 +180,29 @@ abstract class Core<P extends Item> extends VC {
     );
   }
 
+  protected position(
+    size: [x: number, y: number],
+    offset: [x: number, y: number]){
+
+    const { horizontal } = this;
+    let width, height, top, left;
+
+    if(horizontal){
+      [height, width] = size;
+      [left, top] = offset;
+    }
+    else {
+      [width, height] = size;
+      [top, left] = offset;
+    }
+
+    return {
+      position: "absolute",
+      width, height,
+      left, top
+    } as const;
+  }
+
   protected findItem(align: Alignment, index: number){
     const { offset, length, measurements, size: [ available ] } = this;
     const clampedIndex = Math.max(0, Math.min(index, length - 1));
