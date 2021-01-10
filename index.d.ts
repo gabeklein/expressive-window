@@ -139,7 +139,7 @@ declare namespace Justified {
 declare class Justified extends Virtual<Justified.Item> {
   items: Justified.Input;
   rowSize: number;
-  gridGap: number;
+  gap: number;
   chop: boolean;
 }
 

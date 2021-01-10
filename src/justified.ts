@@ -15,11 +15,11 @@ export interface Inline extends Item {
 export default class Justified extends Core<Inline> {
   items = [] as Sizable[];
   rowSize = 150;
-  gridGap = 1;
+  gap = 1;
   chop = false;
 
   get measurements(){
-    const { items, gridGap, rowSize, size, horizontal: rotate } = this;
+    const { items, gap, size, horizontal } = this;
     const available = size[1];
 
     if(!available)
@@ -33,7 +33,7 @@ export default class Justified extends Core<Inline> {
   
     while(remaining.length){
       let { items, size, filled } =
-        fitItems(remaining, available, rowSize, gridGap, rotate);
+        fitItems(remaining, available, rowSize, gap, rotate);
 
       size = limit(size, 3);
 
@@ -46,7 +46,7 @@ export default class Justified extends Core<Inline> {
         const index = indexOffset + column;
         const itemWidth = limit(size * getAspectRatio(item, rotate), 3);
         const start = totalHeight;
-        const end = start + size + gridGap;
+        const end = start + size + gap;
 
         const style = absolute(
           this.horizontal,
@@ -66,12 +66,12 @@ export default class Justified extends Core<Inline> {
           style
         });
 
-        offset = limit(offset + itemWidth + gridGap, 3);
+        offset = limit(offset + itemWidth + gap, 3);
       })
   
       indexOffset += items.length;
       remaining = remaining.slice(items.length);
-      totalHeight += Math.round(size + gridGap);
+      totalHeight += Math.round(size + gap);
       currentRow += 1;
     }
 
