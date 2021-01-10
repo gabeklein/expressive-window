@@ -30,7 +30,7 @@ export default class Justified extends Core<Inline> {
     let output = [] as Inline[];
     let currentRow = 0;
     let totalHeight = 0;
-    let indexOffset = 0;
+    let currentOffset = 0;
   
     while(remaining.length){
       let { items, size, filled } =
@@ -39,39 +39,35 @@ export default class Justified extends Core<Inline> {
       if(!filled && this.chop)
         break;
       
-      let offset = 0;
+      let columnOffset = 0;
 
       items.forEach((item, column) => {
-        const index = indexOffset + column;
+        const index = currentOffset + column;
         const itemWidth = truncate(size * this.getItemAspect(item), 3);
         const start = totalHeight;
         const end = start + size + gap;
-
-        const style = absolute(
-          this.horizontal,
-          [itemWidth, size],
-          [start, offset]
-        );
-
-        output.push({
+        const boxSize = [itemWidth, size] as [number, number];
+        const style = absolute(horizontal, boxSize, [start, columnOffset]);
+        const position = {
           index,
           key: index,
+          size: boxSize,
           row: currentRow,
+          offset: columnOffset,
           column,
           start,
-          offset,
           end,
-          size: [itemWidth, size],
           style
-        });
+        };
 
-        offset = truncate(offset + itemWidth + gap, 3);
+        output.push(position);
+        columnOffset = truncate(columnOffset + itemWidth + gap, 3);
       })
   
-      indexOffset += items.length;
-      remaining = remaining.slice(items.length);
-      totalHeight += Math.round(size + gap);
       currentRow += 1;
+      currentOffset += items.length;
+      totalHeight += Math.round(size + gap);
+      remaining = remaining.slice(items.length);
     }
 
     return output;
