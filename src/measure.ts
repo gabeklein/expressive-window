@@ -45,7 +45,7 @@ export function absolute(
   } as const;
 }
 
-export function limit(number: number, decimals = 1){
+export function truncate(number: number, decimals = 1){
   const factor = Math.pow(10, decimals)
   return Math.round(number * factor) / factor;
 }

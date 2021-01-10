@@ -1,5 +1,5 @@
 import Core, { Item } from './controller';
-import { absolute, limit } from './measure';
+import { absolute, truncate } from './measure';
 
 export type Sizable =
   | { aspect: number; }
@@ -35,8 +35,6 @@ export default class Justified extends Core<Inline> {
       let { items, size, filled } =
         fitItems(remaining, available, rowSize, gap, rotate);
 
-      size = limit(size, 3);
-
       if(!filled && this.chop)
         break;
       
@@ -44,7 +42,7 @@ export default class Justified extends Core<Inline> {
 
       items.forEach((item, column) => {
         const index = indexOffset + column;
-        const itemWidth = limit(size * getAspectRatio(item, rotate), 3);
+        const itemWidth = truncate(size * getAspectRatio(item, rotate), 3);
         const start = totalHeight;
         const end = start + size + gap;
 
@@ -66,7 +64,7 @@ export default class Justified extends Core<Inline> {
           style
         });
 
-        offset = limit(offset + itemWidth + gap, 3);
+        offset = truncate(offset + itemWidth + gap, 3);
       })
   
       indexOffset += items.length;
@@ -100,7 +98,7 @@ function fitItems<T extends Sizable>(
     const idealSize = totalSize / combinedAR;
 
     if(idealSize <= size){
-      size = idealSize;
+      size = truncate(idealSize, 3);
       filled = true;
       break;
     }
