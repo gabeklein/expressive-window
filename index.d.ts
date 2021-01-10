@@ -1,7 +1,7 @@
 import { FC, CSSProperties } from "react";
 import VC from "react-use-controller";
 
-declare namespace Virtual {
+declare namespace Core {
   interface Item {
     index: number;
     key: number | string;
@@ -25,35 +25,29 @@ declare namespace Virtual {
   } 
 }
 
-declare abstract class Virtual<P extends Virtual.Item> extends VC {
-  public Window: FC<Virtual.ContainerProps>;
-  static Window: FC<Virtual.ContainerProps>;
+declare abstract class Core<P extends Core.Item> extends VC {
+  public Window: FC<Core.ContainerProps>;
+  static Window: FC<Core.ContainerProps>;
 
   /** Current size of virtual collection */
   length: number;
 
   /** 
-   * Amount of padding between container and first item. (In pixels)
+   * Amount of padding between container and its items.
+   * Follows standard CSS convention.
    * 
-   * Default: 0;
+   * (In pixels) Default is zero.
    * */
-  paddingStart: number;
+  padding: [number, number?, number?, number?];
 
   /** 
-   * Amount of padding between container and last item. (In pixels)
+   * List should scroll horizontally instead.
    * 
-   * Default: 0;
-   * */
-  paddingEnd: number;
-
-  /** 
-   * List should scroll horizontally.
-   * 
-   * Default: false;
+   * Default is to vertically scroll.
    * */
   horizontal: boolean;
 
-  readonly axis: Virtual.Axis;
+  readonly axis: Core.Axis;
   readonly visibleRange: [number, number];
   readonly itemsVisible: number;
 
@@ -86,14 +80,14 @@ declare abstract class Virtual<P extends Virtual.Item> extends VC {
   gotoIndex(index: number, opts?: any): void;
 }
 
-declare namespace Linear {
-  interface Row extends Virtual.Item {
+declare namespace Dynamic {
+  interface Row extends Core.Item {
     ref: (element: HTMLElement) => void;
     size: number;
   } 
 }
 
-declare class Linear extends Virtual<Linear.Row> {
+declare class Dynamic extends Core<Dynamic.Row> {
   /**
    * Number of items to render past container bounds
    * 
@@ -104,11 +98,11 @@ declare class Linear extends Virtual<Linear.Row> {
   /** Determines initial size to allocate before rendering a list element. */
   estimateSize?(forIndex: number): number;
 
-  readonly render: Linear.Row[];
+  readonly render: Dynamic.Row[];
 }
 
-declare namespace Grid {
-  interface Item extends Virtual.Item {
+declare namespace Virtual {
+  interface Item extends Core.Item {
     start: number;
     end: number;
     column: number;
@@ -117,14 +111,14 @@ declare namespace Grid {
   }
 }
 
-declare class Grid extends Virtual<Grid.Item> {
+declare class Virtual extends Core<Virtual.Item> {
   columns: number;
   itemWidth: number;
   itemHeight: number;
 }
 
 declare namespace Justified {
-  interface Item extends Virtual.Item {
+  interface Item extends Core.Item {
     offset: number;
     row: number;
     column: number;
@@ -136,7 +130,7 @@ declare namespace Justified {
   | { width: number; height: number; };
 }
 
-declare class Justified extends Virtual<Justified.Item> {
+declare class Justified extends Core<Justified.Item> {
   items: Justified.Input;
   rowSize: number;
   gap: number;
@@ -144,8 +138,8 @@ declare class Justified extends Virtual<Justified.Item> {
 }
 
 export {
+  Core,
+  Dynamic,
   Virtual,
-  Linear,
-  Grid,
   Justified
 }
