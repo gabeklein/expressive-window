@@ -27,35 +27,36 @@ class Virtual extends Core<Cell> {
     const measurements: Cell[] = [];
 
     for(let i = 0; i < length; i++){
-      const previous = measurements[i - 1];
-      const key = this.uniqueKey ? this.uniqueKey(i) : i;
-      const column = i % this.columns;
-  
-      const { itemWidth, itemHeight } = this;
-      const size = [itemHeight, itemWidth] as [number, number];
-      const offset = column * itemWidth;
-  
-      const start = !previous ? this.paddingStart : column == 0 ? previous.end : previous.start;
-      const end = start + itemHeight;
-      const style = absolute(
-        this.horizontal,
-        [itemWidth, itemHeight],
-        [start, offset]
-      );
-  
-      measurements.push({
-        index: i,
-        key,
-        start,
-        offset,
-        end,
-        size,
-        column,
-        style
-      });
+      const prev = measurements[i - 1];
+      const item = this.measure(i, prev);
+      measurements.push(item);
     }
 
     return measurements;
+  }
+
+  protected measure(index: number, previous?: Cell){
+    const { itemWidth, itemHeight } = this;
+    const key = this.uniqueKey ? this.uniqueKey(index) : index;
+    const column = index % this.columns;
+
+    const size = [itemHeight, itemWidth] as [number, number];
+    const offset = column * itemWidth;
+    const start =
+      !previous ? this.padding[1] : 
+      column == 0 ? previous.end : 
+      previous.start;
+    const end = start + itemHeight;
+    const style = absolute(
+      this.horizontal,
+      [itemWidth, itemHeight],
+      [start, offset]
+    );
+
+    return {
+      index, key, start, offset, 
+      end, size, column, style
+    }
   }
 }
 

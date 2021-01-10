@@ -29,36 +29,34 @@ class Dynamic extends Core<Row> {
     const measurements: Row[] = [];
 
     for(let i = 0; i < length; i++){
-      const { estimateSize, cache, paddingStart, horizontal } = this;
-      const previous = measurements[i - 1];
-  
-      const size = cache[i] || estimateSize(i);
-      const start = previous ? previous.end : paddingStart;
-      const end = start + size;
-  
-      const key = this.uniqueKey ? this.uniqueKey(i) : i;
-      const ref = this.measureRef(i);
-  
-      const placement = horizontal
-        ? { left: start, height: "100%" }
-        : { top: start, width: "100%" };
-  
-      const style: CSSProperties = {
-        position: "absolute", ...placement
-      };
-  
-      measurements.push({
-        index: i,
-        key,
-        start,
-        end,
-        size,
-        ref,
-        style
-      });
+      const prev = measurements[i - 1];
+      const item = this.measure(i, prev);
+      measurements.push(item);
     }
 
     return measurements;
+  }
+
+  protected measure(index: number, previous?: Row){
+    const size = this.cache[index] || this.estimateSize(index);
+    const start = previous ? previous.end : this.padding[1];
+    const end = start + size;
+
+    const key = this.uniqueKey ? this.uniqueKey(index) : index;
+    const ref = this.measureRef(index);
+
+    const placement = this.horizontal
+      ? { left: start, height: "100%" }
+      : { top: start, width: "100%" };
+
+    const style: CSSProperties = {
+      position: "absolute", ...placement
+    };
+
+    return {
+      index, key, start, 
+      end, size, style, ref
+    }
   }
 
   get visibleRange(): [number, number] {
