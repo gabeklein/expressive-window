@@ -19,7 +19,9 @@ class Virtual extends Core<Cell> {
     return this.itemWidth;
   }
 
-  uniqueKey?(forIndex: number): string | number;
+  uniqueKey(forIndex: number): string | number {
+    return forIndex;
+  }
 
   get measurements(){
     const { length } = this;
@@ -36,16 +38,16 @@ class Virtual extends Core<Cell> {
 
   protected measure(index: number, previous?: Cell){
     const { itemWidth, itemHeight } = this;
-    const key = this.uniqueKey ? this.uniqueKey(index) : index;
-    const column = index % this.columns;
-
     const size = [itemHeight, itemWidth] as [number, number];
+
+    const column = index % this.columns;
+    const start = previous
+      ? column === 0 ? previous.end : previous.start
+      : this.padding[this.horizontal ? 3 : 0];
     const offset = column * itemWidth;
-    const start =
-      !previous ? this.padding[1] : 
-      column == 0 ? previous.end : 
-      previous.start;
     const end = start + itemHeight;
+
+    const key = this.uniqueKey(index);
     const style = this.position([itemWidth, itemHeight], [start, offset]);
 
     return {

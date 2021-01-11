@@ -85,6 +85,10 @@ abstract class Core<P extends Item> extends VC {
     if(!element)
       return;
 
+    const updateOffset = () => {
+      this.offset = element[this.scrollKey];
+    }
+
     const applySize = (rect: ClientRect) => {
       const [top, right, bottom, left] = this.padding;
 
@@ -96,29 +100,25 @@ abstract class Core<P extends Item> extends VC {
       this.size = [rect[x], rect[y]];
     }
 
-    const updateOffset = () => {
-      this.offset = element[this.scrollKey];
-    }
-
-    const releaseObserver = 
-      this.maintain && observeRect(element, applySize);
-
-    const releaseHandler =
-      watchForEvent({
-        event: 'scroll',
-        target: element,
-        handler: updateOffset,
-        capture: false,
-        passive: true,
-      });
-
-    applySize(getRect(element));
     updateOffset();
+    applySize(getRect(element));
+
+    const releaseHandler = watchForEvent({
+      event: 'scroll',
+      target: element,
+      handler: updateOffset,
+      capture: false,
+      passive: true,
+    });
+
+    if(!this.maintain)
+      return releaseHandler;
+
+    const releaseObserver = observeRect(element, applySize);
 
     return () => {
       releaseHandler();
-      if(releaseObserver)
-        releaseObserver();
+      releaseObserver();
     }
   }
 
@@ -151,10 +151,9 @@ abstract class Core<P extends Item> extends VC {
   }
 
   public get visibleOffset(): [number, number] {
-    const { size, offset, padding } = this;
-    const paddingStart = this.horizontal ? padding[3] : padding[0];
-    const start = offset - paddingStart;
-    const end = offset - paddingStart + size[0];
+    const paddingStart = this.padding[this.horizontal ? 3 : 0];
+    const start = this.offset - paddingStart;
+    const end = this.offset - paddingStart + this.size[0];
 
     return [start, end];
   }
@@ -177,6 +176,28 @@ abstract class Core<P extends Item> extends VC {
     this.end = end == last;
 
     return [start, end]
+  }
+
+  protected position(
+    size: [x: number, y: number],
+    offset: [x: number, y: number]){
+
+    const { horizontal, padding } = this;
+    let width, height, top, left;
+
+    if(horizontal){
+      [height, width] = size;
+      [left, top] = offset;
+    }
+    else {
+      [width, height] = size;
+      [top, left] = offset;
+    }
+
+    top += padding[0];
+    left += padding[3];
+
+    return { width, height, left, top } as const;
   }
 
   protected scrollTo(offset: number){
@@ -212,28 +233,6 @@ abstract class Core<P extends Item> extends VC {
         align
       )
     );
-  }
-
-  protected position(
-    size: [x: number, y: number],
-    offset: [x: number, y: number]){
-
-    const { horizontal, padding } = this;
-    let width, height, top, left;
-
-    if(horizontal){
-      [height, width] = size;
-      [left, top] = offset;
-    }
-    else {
-      [width, height] = size;
-      [top, left] = offset;
-    }
-
-    top += padding[0];
-    left += padding[3];
-
-    return { width, height, left, top } as const;
   }
 
   protected findItem(align: Alignment, index: number){
