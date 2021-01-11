@@ -40,6 +40,15 @@ declare abstract class Core<P extends Core.Item> extends VC {
    * */
   padding: [number, number?, number?, number?];
 
+  /**
+   * Still render items an amount of pixels above and below viewport.
+   * 
+   * Useful to prevent unnecessary reloading of elements breifly out of view.
+   * 
+   * Default: 0;
+   * */
+  overscan: number;
+
   /** 
    * List should scroll horizontally instead.
    * 
@@ -89,13 +98,6 @@ declare namespace Dynamic {
 }
 
 declare class Dynamic extends Core<Dynamic.Row> {
-  /**
-   * Number of items to render past container bounds
-   * 
-   * Default: 0;
-   * */
-  overscan: number;
-
   /** Determines initial size to allocate before rendering a list element. */
   estimateSize?(forIndex: number): number;
 

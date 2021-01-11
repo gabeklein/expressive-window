@@ -21,6 +21,7 @@ abstract class Core<P extends Item> extends VC {
   container = ref(this.observeContainer);
   size = tuple(0, 0);
   offset = 0;
+  overscan = 0;
 
   length = def(0);
   padding = tuple(0,0,0,0);
@@ -159,11 +160,14 @@ abstract class Core<P extends Item> extends VC {
   }
 
   public get visibleRange(): [number, number] {
-    const [visibleStart, visibleEnd] = this.visibleOffset;
+    let [visibleStart, visibleEnd] = this.visibleOffset;
     const cache = this.measurements;
 
     let start = cache.length;
     const last = cache.length - 1;
+
+    visibleStart -= this.overscan;
+    visibleEnd += this.overscan;
 
     while(start > 0 && cache[start - 1].end >= visibleStart)
       start -= 1;

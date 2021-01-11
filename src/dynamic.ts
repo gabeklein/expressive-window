@@ -1,4 +1,3 @@
-import { def } from 'react-use-controller';
 import Core, { Item } from "./controller";
 
 interface Row extends Item {
@@ -7,7 +6,6 @@ interface Row extends Item {
 }
 
 class Dynamic extends Core<Row> {
-  overscan = def(0);
   cache = {} as { [index: number]: number };
 
   constructor(){
@@ -56,11 +54,10 @@ class Dynamic extends Core<Row> {
 
   get visibleRange(): [number, number] {
     let [ start, end ] = super.visibleRange;
-    const extra = this.overscan;
     const final = Math.max(0, this.length - 1);
 
-    start = Math.max(start - extra, 0);
-    end = Math.min(end + extra, final);
+    start = Math.max(start, 0);
+    end = Math.min(end, final);
 
     return [start, end];
   }
