@@ -196,11 +196,7 @@ abstract class Core<P extends Item> extends VC {
       [top, left] = offset;
     }
 
-    return {
-      position: "absolute",
-      width, height,
-      left, top
-    } as const;
+    return { width, height, left, top } as const;
   }
 
   protected findItem(align: Alignment, index: number){

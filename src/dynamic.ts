@@ -1,4 +1,3 @@
-import { CSSProperties } from 'react';
 import { def } from 'react-use-controller';
 import Core, { Item } from "./controller";
 
@@ -45,13 +44,9 @@ class Dynamic extends Core<Row> {
     const key = this.uniqueKey ? this.uniqueKey(index) : index;
     const ref = this.measureRef(index);
 
-    const placement = this.horizontal
+    const style = this.horizontal
       ? { left: start, height: "100%" }
       : { top: start, width: "100%" };
-
-    const style: CSSProperties = {
-      position: "absolute", ...placement
-    };
 
     return {
       index, key, start, 
