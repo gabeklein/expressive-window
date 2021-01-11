@@ -10,8 +10,8 @@ declare namespace Core {
   }
 
   type Axis =
-  | ["width", "height"]
-  | ["height", "width"]
+    | ["width", "height"]
+    | ["height", "width"]
 
   interface ComponentProps {
     index: number;
@@ -114,6 +114,7 @@ declare namespace Virtual {
 
 declare class Virtual extends Core<Virtual.Item> {
   columns: number;
+  gap: number;
   itemWidth: number;
   itemHeight: number;
 }
@@ -127,8 +128,8 @@ declare namespace Justified {
   }
 
   type Input =
-  | { aspect: number; }
-  | { width: number; height: number; };
+    | { aspect: number; }
+    | { width: number; height: number; };
 }
 
 declare class Justified extends Core<Justified.Item> {

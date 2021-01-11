@@ -10,9 +10,12 @@ export interface Cell extends Item {
 
 class Virtual extends Core<Cell> {
   columns = 1;
+  gap = 0;
 
   get itemWidth(){
-    return Math.floor(this.size[1] / this.columns);
+    const whitespace = (this.columns - 1) * this.gap;
+    const available = this.size[1] - whitespace;
+    return Math.floor(available / this.columns);
   }
 
   get itemHeight(){
@@ -37,14 +40,14 @@ class Virtual extends Core<Cell> {
   }
 
   protected measure(index: number, previous?: Cell){
-    const { itemWidth, itemHeight } = this;
+    const { itemWidth, itemHeight, gap } = this;
     const size = [itemHeight, itemWidth] as [number, number];
 
     const column = index % this.columns;
     const start = previous
-      ? column === 0 ? previous.end : previous.start
+      ? column > 0 ? previous.start : previous.end + gap
       : this.padding[this.horizontal ? 3 : 0];
-    const offset = column * itemWidth;
+    const offset = column * (itemWidth + gap);
     const end = start + itemHeight;
 
     const key = this.uniqueKey(index);
