@@ -23,8 +23,7 @@ abstract class Core<P extends Item> extends VC {
   offset = 0;
 
   length = def(0);
-  paddingStart = def(0);
-  paddingEnd = def(0);
+  padding = tuple(0,0,0,0);
   horizontal = def(false);
   maintain = true;
 
@@ -43,8 +42,23 @@ abstract class Core<P extends Item> extends VC {
   constructor(){
     super();
 
+    this.requestUpdate(() => this.initPadding());
+
     if(this.didReachEnd)
       this.on($ => $.end, this.toggleEnd);
+  }
+
+  private initPadding(){
+    if(this.padding.length < 4){
+      const [a, b, c] = this.padding;
+  
+      this.padding =
+        b === undefined 
+          ? [a,a,a,a] :
+        c === undefined 
+          ? [a,b,a,b] 
+          : [b,c,b,a]
+    }
   }
 
   private toggleEnd(is: boolean){
@@ -72,6 +86,13 @@ abstract class Core<P extends Item> extends VC {
       return;
 
     const applySize = (rect: ClientRect) => {
+      const [top, right, bottom, left] = this.padding;
+
+      if(this.horizontal)
+        rect.height -= top + bottom;
+      else
+        rect.width -= left + right;
+
       this.size = [rect[x], rect[y]];
     }
 
@@ -115,9 +136,13 @@ abstract class Core<P extends Item> extends VC {
   }
 
   public get totalSize(){
-    const { measurements, paddingEnd } = this;
-    const offset = measurements[measurements.length - 1];
-    return (offset ? offset.end : 0) + paddingEnd;
+    const [ top, right, bottom, left ] = this.padding;
+    const items = this.measurements;
+    const last = items[items.length - 1];
+    const paddingOnAxis = this.horizontal
+      ? left + right : top + bottom;
+
+    return (last ? last.end : 0) + paddingOnAxis;
   }
 
   public get itemsVisible(){
@@ -125,24 +150,33 @@ abstract class Core<P extends Item> extends VC {
     return r[1] - r[0];
   }
 
+  public get visibleOffset(): [number, number] {
+    const { size, offset, padding } = this;
+    const paddingStart = this.horizontal ? padding[3] : padding[0];
+    const start = offset - paddingStart;
+    const end = offset - paddingStart + size[0];
+
+    return [start, end];
+  }
+
   public get visibleRange(): [number, number] {
-    const { measurements, size, offset } = this;
-    const total = measurements.length;
-    const final = total - 1;
+    const [visibleStart, visibleEnd] = this.visibleOffset;
+    const cache = this.measurements;
 
-    let start = final;
-    let end = 0;
+    let start = cache.length;
+    const last = cache.length - 1;
 
-    while(start > 0 && measurements[start].end >= offset)
+    while(start > 0 && cache[start - 1].end >= visibleStart)
       start -= 1;
 
-    if(final > 0)
-    while(end < final && measurements[end].start <= offset + size[0])
+    let end = start;
+
+    while(end < last && cache[end + 1] && cache[end + 1].start <= visibleEnd)
       end += 1;
 
-    this.end = end == final;
+    this.end = end == last;
 
-    return [ start, end ]
+    return [start, end]
   }
 
   protected scrollTo(offset: number){
@@ -184,7 +218,7 @@ abstract class Core<P extends Item> extends VC {
     size: [x: number, y: number],
     offset: [x: number, y: number]){
 
-    const { horizontal } = this;
+    const { horizontal, padding } = this;
     let width, height, top, left;
 
     if(horizontal){
@@ -195,6 +229,9 @@ abstract class Core<P extends Item> extends VC {
       [width, height] = size;
       [top, left] = offset;
     }
+
+    top += padding[0];
+    left += padding[3];
 
     return { width, height, left, top } as const;
   }

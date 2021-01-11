@@ -48,6 +48,7 @@ declare abstract class Core<P extends Core.Item> extends VC {
   horizontal: boolean;
 
   readonly axis: Core.Axis;
+  readonly visibleOffset: [number, number];
   readonly visibleRange: [number, number];
   readonly itemsVisible: number;
 
