@@ -28,7 +28,7 @@ export function alignedOffset(
   }
 }
 
-export function truncate(number: number, decimals = 1){
+export function decimal(number: number, decimals = 1){
   const factor = Math.pow(10, decimals)
   return Math.round(number * factor) / factor;
 }

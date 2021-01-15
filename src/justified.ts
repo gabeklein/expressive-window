@@ -1,5 +1,5 @@
 import Core, { Item } from './controller';
-import { truncate } from './measure';
+import { decimal } from './measure';
 
 export type Sizable =
   | { aspect: number; }
@@ -57,7 +57,7 @@ export default class Justified extends Core<Inline> {
   protected generateRow(
     items: Sizable[],
     height: number,
-    indexOffset: number,
+    current: number,
     start: number,
     row: number){
 
@@ -66,14 +66,14 @@ export default class Justified extends Core<Inline> {
 
     return items.map((item, column) => {
       const aspect = this.getItemAspect(item);
-      const width = truncate(height * aspect, 3);
+      const width = decimal(height * aspect, 3);
       const size = [width, height] as [number, number];
 
-      const index = indexOffset + column;
+      const index = current + column;
       const style = this.position(size, [start, offset]);
       const end = start + height + gap;
 
-      offset = truncate(offset + width + gap, 3);
+      offset = decimal(offset + width + gap, 3);
 
       return {
         index, key: index, row, column, 
@@ -101,7 +101,7 @@ export default class Justified extends Core<Inline> {
       const idealSize = totalSize / totalAspect;
 
       if(idealSize <= size){
-        size = truncate(idealSize, 3);
+        size = decimal(idealSize, 3);
         filled = true;
         break;
       }
