@@ -27,7 +27,6 @@ abstract class Core<P extends Item> extends VC {
   padding = tuple(0,0,0,0);
   horizontal = def(false);
   maintain = true;
-
   end = false;
 
   didReachEnd?(): void;
@@ -127,7 +126,7 @@ abstract class Core<P extends Item> extends VC {
     const [ start, end ] = this.visibleRange;
     const rendered = [];
 
-    if(end == 0)
+    if(end - start == 0)
       return [];
 
     for(let i = start; i <= end; i++)
@@ -179,7 +178,7 @@ abstract class Core<P extends Item> extends VC {
 
     this.end = end == last;
 
-    return [start, end]
+    return [start, end];
   }
 
   protected position(
