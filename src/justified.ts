@@ -73,18 +73,6 @@ export default class Justified extends Core<Inline> {
     return output;
   }
 
-  protected getItemAspect(item: Sizable){
-    const ratio =
-      "aspect" in item ? item.aspect : 
-      "size" in item ? (item.size[0] / item.size[1]) : 
-      (item.width / item.height);
-  
-    if(this.horizontal)
-      return 1 / ratio;
-    else
-      return ratio;
-  }
-
   protected buildRow(source: Sizable[]){
     const space = this.size[1];
     const items: Sizable[] = [];
@@ -111,5 +99,17 @@ export default class Justified extends Core<Inline> {
     }
 
     return { items, size, filled };
+  }
+
+  protected getItemAspect(item: Sizable){
+    const ratio =
+      "aspect" in item ? item.aspect : 
+      "size" in item ? (item.size[0] / item.size[1]) : 
+      (item.width / item.height);
+  
+    if(this.horizontal)
+      return 1 / ratio;
+    else
+      return ratio;
   }
 }
