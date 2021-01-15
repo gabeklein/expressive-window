@@ -20,57 +20,66 @@ export default class Justified extends Core<Inline> {
   chop = false;
 
   get measurements(){
-    const { items, gap, size } = this;
-    const available = size[1];
-
-    if(!available)
+    if(!this.size[1])
       return [];
   
-    let remaining = Array.from(items);
+    const source = this.items;
     let output = [] as Inline[];
+    let currectOffset = 0;
+    let currentIndex = 0;
     let currentRow = 0;
-    let totalHeight = 0;
-    let currentOffset = 0;
   
-    while(remaining.length){
-      let { items, size, filled } =
-        this.buildRow(remaining);
+    while(source.length > currentIndex){
+      const remaining = source.slice(currentIndex);
+      let { items, size, filled } = this.buildRow(remaining);
 
       if(!filled && this.chop)
         break;
       
-      let columnOffset = 0;
+      const entries =
+        this.generateRow(
+          items,
+          size,
+          currentIndex,
+          currectOffset,
+          currentRow
+        );
 
-      items.forEach((item, column) => {
-        const index = currentOffset + column;
-        const itemWidth = truncate(size * this.getItemAspect(item), 3);
-        const start = totalHeight;
-        const end = start + size + gap;
-        const boxSize = [itemWidth, size] as [number, number];
-        const style = this.position(boxSize, [start, columnOffset]);
-        const position = {
-          index,
-          key: index,
-          size: boxSize,
-          row: currentRow,
-          offset: columnOffset,
-          column,
-          start,
-          end,
-          style
-        };
-
-        output.push(position);
-        columnOffset = truncate(columnOffset + itemWidth + gap, 3);
-      })
-  
+      output.push(...entries);
       currentRow += 1;
-      currentOffset += items.length;
-      totalHeight += Math.round(size + gap);
-      remaining = remaining.slice(items.length);
+      currentIndex += items.length;
+      currectOffset += Math.round(size + this.gap);
     }
 
     return output;
+  }
+
+  protected generateRow(
+    items: Sizable[],
+    height: number,
+    indexOffset: number,
+    start: number,
+    row: number){
+
+    const { gap } = this;
+    let offset = 0;
+
+    return items.map((item, column) => {
+      const aspect = this.getItemAspect(item);
+      const width = truncate(height * aspect, 3);
+      const size = [width, height] as [number, number];
+
+      const index = indexOffset + column;
+      const style = this.position(size, [start, offset]);
+      const end = start + height + gap;
+
+      offset = truncate(offset + width + gap, 3);
+
+      return {
+        index, key: index, row, column, 
+        offset, start, end, size, style
+      };
+    })
   }
 
   protected buildRow(source: Sizable[]){
