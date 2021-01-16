@@ -1,11 +1,11 @@
 import { act, fireEvent, render, waitFor } from '@testing-library/react';
 import * as React from 'react';
 
-import { Linear } from '../src';
+import { Dynamic } from '../src';
 import { Container, Inner, VirtualRow } from './components';
 
-describe('adjustment', () => {
-  class Window extends Linear {
+describe.skip('adjustment', () => {
+  class Window extends Dynamic {
     length = 100;
   }
 
@@ -20,7 +20,7 @@ describe('adjustment', () => {
 })
 
 describe.skip('scrolling', () => {
-  class Window extends Linear {
+  class Window extends Dynamic {
     length = 1000;
     overscan = 5;
     estimateSize = () => 35;

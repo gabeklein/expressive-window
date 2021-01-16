@@ -1,11 +1,11 @@
 import { render, waitFor } from '@testing-library/react';
 import * as React from 'react';
 
-import { Linear } from '../src';
+import { Dynamic } from '../src';
 import { Container, Inner, VirtualRow } from './components';
 
-describe("dynamic sizing", () => {
-  class Window extends Linear {
+describe.skip("dynamic sizing", () => {
+  class Window extends Dynamic {
     length = 20;
     overscan = 5;
   }
