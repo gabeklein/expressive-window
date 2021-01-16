@@ -182,8 +182,8 @@ abstract class Core<P extends Item> extends VC {
   }
 
   protected position(
-    size: [x: number, y: number],
-    offset: [x: number, y: number]){
+    size: [number, number],
+    offset: [number, number]){
 
     const { horizontal, padding } = this;
     let width, height, top, left;
