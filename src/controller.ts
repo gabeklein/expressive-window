@@ -67,13 +67,13 @@ abstract class Core<P extends Item> extends VC {
     });
   }
 
-  protected get scrollKey(){
+  get scrollKey(){
     return this.horizontal
       ? 'scrollLeft'
       : 'scrollTop';
   }
 
-  protected get axis(): Axis {
+  get axis(): Axis {
     return this.horizontal
       ? ['width', 'height']
       : ['height', 'width'];
