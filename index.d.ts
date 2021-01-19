@@ -73,7 +73,11 @@ declare abstract class Core<P extends Core.Item> extends VC {
 
   readonly end: boolean;
 
+  readonly speed: number;
+
   didReachEnd?(): void;
+
+  didStop?(): void;
 
   /** 
    * Convert position index into unique key of a target list item.

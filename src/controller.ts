@@ -22,6 +22,7 @@ abstract class Core<P extends Item> extends VC {
   size = tuple(0, 0);
   offset = 0;
   overscan = 0;
+  speed = 0;
 
   length = def(0);
   padding = tuple(0,0,0,0);
@@ -29,6 +30,7 @@ abstract class Core<P extends Item> extends VC {
   maintain = true;
   end = false;
 
+  didStop?(offset: number): void;
   didReachEnd?(): void;
 
   abstract measurements: P[];
@@ -43,6 +45,7 @@ abstract class Core<P extends Item> extends VC {
     super();
 
     this.requestUpdate(() => this.initPadding());
+    this.observeSpeed();
 
     if(this.didReachEnd)
       this.on($ => $.end, this.toggleEnd);
@@ -77,6 +80,22 @@ abstract class Core<P extends Item> extends VC {
     return this.horizontal
       ? ['width', 'height']
       : ['height', 'width'];
+  }
+
+  protected observeSpeed(){
+    this.once($ => $.offset, (pos: number) => {
+      let interval = setInterval(() => {
+        const speed = this.speed =
+          (pos - (pos = this.offset)) * -20;
+  
+        if(!speed && pos >= 0){
+          clearInterval(interval);
+          if(this.didStop) 
+            this.didStop(pos);
+          this.observeSpeed();
+        }
+      }, 50)
+    });
   }
 
   protected observeContainer(element: HTMLElement){
