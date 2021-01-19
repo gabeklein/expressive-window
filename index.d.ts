@@ -67,7 +67,7 @@ declare abstract class Core<P extends Core.Item> extends VC {
   }
 
   /** Index and computed postion of all drawn containers */
-  readonly render: P[];
+  readonly visible: P[];
 
   readonly totalSize: number;
 

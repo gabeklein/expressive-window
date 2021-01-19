@@ -141,17 +141,17 @@ abstract class Core<P extends Item> extends VC {
     }
   }
 
-  public get render(): P[] {
+  public get visible(): P[] {
     const [ start, end ] = this.visibleRange;
-    const rendered = [];
+    const items = [];
 
     if(end - start == 0)
       return [];
 
     for(let i = start; i <= end; i++)
-      rendered.push(this.measurements[i]);
+      items.push(this.measurements[i]);
 
-    return rendered;
+    return items;
   }
 
   public get totalSize(){
