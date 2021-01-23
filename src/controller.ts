@@ -150,6 +150,14 @@ abstract class Core<P extends Item> extends VC {
     }
   }
 
+  public get totalSize(){
+    const [ top, right, bottom, left ] = this.padding;
+    const paddingOnAxis = this.horizontal
+      ? left + right : top + bottom;
+
+    return this.scrollArea + paddingOnAxis;
+  }
+
   public get visible(): P[] {
     const [ start, end ] = this.visibleRange;
     const items = [];
@@ -161,19 +169,6 @@ abstract class Core<P extends Item> extends VC {
       items.push(this.measurements[i]);
 
     return items;
-  }
-
-  public get totalSize(){
-    const [ top, right, bottom, left ] = this.padding;
-    const paddingOnAxis = this.horizontal
-      ? left + right : top + bottom;
-
-    return this.scrollArea + paddingOnAxis;
-  }
-
-  public get itemsVisible(){
-    const r = this.visibleRange;
-    return r[1] - r[0];
   }
 
   public get visibleOffset(): [number, number] {

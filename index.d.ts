@@ -59,7 +59,6 @@ declare abstract class Core<P extends Core.Item> extends VC {
   readonly axis: Core.Axis;
   readonly visibleOffset: [number, number];
   readonly visibleRange: [number, number];
-  readonly itemsVisible: number;
 
   /** Apply this reference to container element! */
   readonly container: {
