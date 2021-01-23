@@ -24,7 +24,7 @@ abstract class Core<P extends Item> extends VC {
   overscan = 0;
   speed = 0;
 
-  length = def(0);
+  scrollArea = def(0);
   padding = tuple(0,0,0,0);
   horizontal = def(false);
   maintain = true;
@@ -33,6 +33,7 @@ abstract class Core<P extends Item> extends VC {
   didStop?(offset: number): void;
   didReachEnd?(): void;
 
+  abstract length: number;
   abstract measurements: P[];
 
   Window = wrap(WindowContainer);
@@ -164,12 +165,10 @@ abstract class Core<P extends Item> extends VC {
 
   public get totalSize(){
     const [ top, right, bottom, left ] = this.padding;
-    const items = this.measurements;
-    const last = items[items.length - 1];
     const paddingOnAxis = this.horizontal
       ? left + right : top + bottom;
 
-    return (last ? last.end : 0) + paddingOnAxis;
+    return this.scrollArea + paddingOnAxis;
   }
 
   public get itemsVisible(){

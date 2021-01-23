@@ -16,36 +16,76 @@ export interface Inline extends Item {
 export default class Justified extends Core<Inline> {
   items = [] as Sizable[];
   rowSize = 150;
+  rows = 0;
   gap = 1;
   chop = false;
 
   get measurements(){
-    if(!this.size[1])
-      return [];
-  
-    const source = this.items;
-    let output = [] as Inline[];
-    let offset = 0;
-    let index = 0;
-    let row = 0;
-  
-    while(source.length > index){
-      const remaining = source.slice(index);
-      const entries = this.buildRow(remaining, index, offset, row);
-
-      if(!entries.length)
-        break;
-
-      output.push(...entries);
-      offset = Math.round(entries[0].end + this.gap);
-      index += entries.length;
-      row += 1;
-    }
-
-    return output;
+    this.size;
+    this.items;
+    this.set.scrollArea = 0;
+    return [] as Inline[];
   }
 
-  protected buildRow(
+  public get length(){
+    return this.items.length;
+  }
+
+  public get visibleRange(): [number, number] {
+    const { length, overscan, visibleOffset } = this;
+
+    const beginAt = visibleOffset[0] - overscan;
+    const stopAt = visibleOffset[1] + overscan;
+
+    if(beginAt == stopAt)
+      return [0,0];
+    
+    let first = 0;
+
+    while(this.measure(first).end < beginAt)
+      first++;
+
+    let last = first;
+
+    while(this.measure(last + 1).start < stopAt)
+      last++;
+
+    this.end = last == length - 1;
+
+    return [first, last];
+  }
+
+  measure(index: number): Inline {
+    const { measurements, length } = this;
+
+    if(index >= length)
+      return {} as any;
+
+    while(index >= measurements.length)
+      if(!this.extend())
+        return {} as any;
+
+    return measurements[index];
+  }
+
+  extend(){
+    const { measurements, rows, scrollArea } = this;
+
+    const next = measurements.length;
+    const queue = this.items.slice(next);
+    const entries = this.buildRow(queue, next, scrollArea, rows);
+
+    if(!entries.length)
+      return false;
+
+    measurements.push(...entries);
+    this.scrollArea = Math.round(entries[0].end);
+    this.rows += 1;
+
+    return true;
+  }
+
+  private buildRow(
     source: Sizable[],
     current: number,
     start: number,
