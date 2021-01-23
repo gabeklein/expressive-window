@@ -38,7 +38,7 @@ declare abstract class Core<P extends Core.Item> extends VC {
    * 
    * (In pixels) Default is zero.
    * */
-  padding: [number, number?, number?, number?];
+  padding: number | [number, number?, number?, number?];
 
   /**
    * Still render items an amount of pixels above and below viewport.

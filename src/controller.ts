@@ -44,24 +44,32 @@ abstract class Core<P extends Item> extends VC {
   constructor(){
     super();
 
-    this.requestUpdate(() => this.initPadding());
+    this.normalizePadding()
     this.observeSpeed();
 
     if(this.didReachEnd)
       this.on($ => $.end, this.toggleEnd);
   }
 
-  private initPadding(){
-    if(this.padding.length < 4){
-      const [a, b, c] = this.padding;
-  
+  private async normalizePadding(){
+    this.requestUpdate(() => {
+      let p = this.padding;
+
+      if(typeof p == "number")
+        p = [p] as any;
+
+      else if(p.length >= 4)
+        return;
+
+      const [a, b, c] = p;
+
       this.padding =
         b === undefined 
           ? [a,a,a,a] :
         c === undefined 
           ? [a,b,a,b] 
           : [b,c,b,a]
-    }
+    });
   }
 
   private toggleEnd(is: boolean){
