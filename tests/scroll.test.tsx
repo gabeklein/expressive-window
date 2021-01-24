@@ -32,7 +32,7 @@ describe.skip('scrolling', () => {
       goto50,
       container,
       totalSize,
-      render
+      visible
     } = Window.use();
   
     return (
@@ -42,7 +42,7 @@ describe.skip('scrolling', () => {
         </button>
         <Container ref={container}>
           <Inner height={totalSize}>
-            {render.map(info =>
+            {visible.map(info =>
               <VirtualRow {...info} />
             )}
           </Inner>

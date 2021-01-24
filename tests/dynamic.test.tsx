@@ -14,13 +14,13 @@ describe.skip("dynamic sizing", () => {
     const {
       container,
       totalSize,
-      render
+      visible
     } = Window.use()
   
     return (
       <Container ref={container}>
         <Inner height={totalSize}>
-          {render.map(info =>
+          {visible.map(info =>
             <VirtualRow {...info} />
           )}
         </Inner>
