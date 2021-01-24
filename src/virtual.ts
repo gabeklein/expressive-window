@@ -1,3 +1,4 @@
+import { def } from "react-use-controller";
 import Core, { Item } from "./controller";
 
 export interface Cell extends Item {
@@ -11,7 +12,7 @@ export interface Cell extends Item {
 class Virtual extends Core<Cell> {
   columns = 1;
   gap = 0;
-  length = 0;
+  length = def(0);
   scrollArea = 0;
   horizontal = false;
 
@@ -29,37 +30,35 @@ class Virtual extends Core<Cell> {
     return forIndex;
   }
 
-  get measurements(){
-    const { length } = this;
-    const measurements: Cell[] = [];
+  extend(){
+    const next = this.measurements.length;
 
-    for(let i = 0; i < length; i++){
-      const prev = measurements[i - 1];
-      const item = this.measure(i, prev);
-      measurements.push(item);
-    }
+    if(!this.size[1] || next >= this.length)
+      return false;
 
-    return measurements;
-  }
-
-  protected measure(index: number, previous?: Cell){
     const { itemWidth, itemHeight, gap } = this;
+    const start = next ? this.scrollArea + gap : 0;
     const size = [itemHeight, itemWidth] as [number, number];
+    const end = this.scrollArea = start + itemHeight;
+    
+    for(
+      let i = 0;
+      this.columns > i &&
+      this.length > i + next; 
+      i++
+    ){
+      const index = next + i;
+      const offset = i * (itemWidth + gap);
+      const key = this.uniqueKey(index);
+      const style = this.position([itemWidth, itemHeight], [start, offset]);
 
-    const column = index % this.columns;
-    const start = previous
-      ? column > 0 ? previous.start : previous.end + gap
-      : this.padding[this.horizontal ? 3 : 0];
-    const offset = column * (itemWidth + gap);
-    const end = start + itemHeight;
-
-    const key = this.uniqueKey(index);
-    const style = this.position([itemWidth, itemHeight], [start, offset]);
-
-    return {
-      index, key, start, offset, 
-      end, size, column, style
+      this.measurements.push({
+        index, key, start, offset, 
+        end, size, column: i, style
+      })
     }
+
+    return true;
   }
 }
 

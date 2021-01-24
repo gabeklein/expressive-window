@@ -15,56 +15,26 @@ export interface Inline extends Item {
 
 export default class Justified extends Core<Inline> {
   items = [] as Sizable[];
-  measurements = [] as Inline[];
   rowSize = 150;
   rows = 0;
   gap = 1;
   chop = false;
-  scrollArea = 0;
   horizontal = false;
-
-  constructor(){
-    super();
-    this.on(x => x.size, () => {
-      this.measurements = [];
-      this.scrollArea = 0;
-    })
-  }
 
   public get length(){
     return this.items.length;
   }
 
   public extend(){
-    const { measurements, rows, scrollArea } = this;
-
-    const next = measurements.length;
+    const padding = this.gap;
+    const next = this.measurements.length;
     const queue = this.items.slice(next);
-    const entries = this.buildRow(queue, next, scrollArea, rows);
 
-    if(!entries.length)
-      return false;
-
-    measurements.push(...entries);
-    this.scrollArea = Math.round(entries[0].end);
-    this.rows += 1;
-
-    return true;
-  }
-
-  private buildRow(
-    source: Sizable[],
-    current: number,
-    start: number,
-    row: number){
-
-    const { gap } = this;
-    const available = this.size[1];
     const items: Sizable[] = [];
-    let height = this.rowSize;
+    let { rowSize } = this;
     let full = false;
 
-    for(const item of source){
+    for(const item of queue){
       items.push(item);
 
       let totalAspect = 0;
@@ -72,38 +42,45 @@ export default class Justified extends Core<Inline> {
       for(const item of items)
         totalAspect += this.getItemAspect(item);
 
-      const whiteSpace = (items.length - 1) * gap;
-      const totalSize = available - whiteSpace;
+      const whiteSpace = (items.length - 1) * padding;
+      const totalSize = this.size[1] - whiteSpace;
       const idealSize = totalSize / totalAspect;
 
-      if(idealSize <= height){
-        height = decimal(idealSize, 3);
+      if(idealSize <= rowSize){
+        rowSize = decimal(idealSize, 3);
         full = true;
         break;
       }
     }
 
     if(!full && this.chop)
-      return [];
+      return false;
 
     let offset = 0;
+    const row = this.rows;
+    const start = this.scrollArea;
+    const end = start + rowSize + padding;
 
-    return items.map((item, column) => {
+    const entries = items.map((item, column) => {
+      const index = next + column;
       const aspect = this.getItemAspect(item);
-      const width = decimal(height * aspect, 3);
-
-      const index = current + column;
-      const end = start + height + gap;
-      const size = [width, height] as [number, number];
+      const width = decimal(rowSize * aspect, 3);
+      const size = [width, rowSize] as [number, number];
       const style = this.position(size, [start, offset]);
 
-      offset = decimal(offset + width + gap, 3);
+      offset = decimal(offset + width + padding, 3);
 
       return {
-        index, key: index, row, column, 
+        index, key: index, row, column,
         offset, start, end, size, style
       };
     })
+
+    this.measurements.push(...entries);
+    this.scrollArea = Math.round(end);
+    this.rows += 1;
+
+    return true;
   }
 
   protected getItemAspect(item: Sizable){

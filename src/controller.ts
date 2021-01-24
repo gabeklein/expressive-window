@@ -20,6 +20,8 @@ export interface Item {
 abstract class Core<P extends Item> extends VC {
   container = ref(this.observeContainer);
   size = tuple(0, 0);
+  measurements: P[] = [];
+  scrollArea = 0;
   offset = 0;
   speed = 0;
 
@@ -33,8 +35,6 @@ abstract class Core<P extends Item> extends VC {
 
   abstract length: number;
   abstract horizontal: boolean;
-  abstract scrollArea: number;
-  abstract measurements: P[];
   abstract extend(): boolean;
 
   Window = wrap(WindowContainer);
@@ -46,8 +46,13 @@ abstract class Core<P extends Item> extends VC {
   constructor(){
     super();
 
-    this.normalizePadding()
+    this.normalizePadding();
     this.observeSpeed();
+
+    this.on($ => $.size, () => {
+      this.measurements = [];
+      this.scrollArea = 0;
+    })
 
     if(this.didReachEnd)
       this.on($ => $.end, this.toggleEnd);
