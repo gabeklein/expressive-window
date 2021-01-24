@@ -35,6 +35,7 @@ abstract class Core<P extends Item> extends VC {
   abstract horizontal: boolean;
   abstract scrollArea: number;
   abstract measurements: P[];
+  abstract extend(): boolean;
 
   Window = wrap(WindowContainer);
 
@@ -180,27 +181,40 @@ abstract class Core<P extends Item> extends VC {
   }
 
   public get visibleRange(): [number, number] {
-    const cache = this.measurements;
     const range = this.visibleOffset;
     const overscan = this.overscan || 0;
-
-    let start = cache.length;
-    const last = cache.length - 1;
-
     const beginAt = range[0] - overscan;
     const stopAt = range[1] + overscan;
 
-    while(start > 0 && cache[start - 1].end >= beginAt)
-      start -= 1;
+    if(beginAt == stopAt)
+      return [0,0];
 
-    let end = start;
+    let first = 0;
 
-    while(end < last && cache[end + 1] && cache[end + 1].start <= stopAt)
-      end += 1;
+    while(this.locate(first).end < beginAt)
+      first++;
 
-    this.end = end == last;
+    let last = first;
 
-    return [start, end];
+    while(this.locate(last + 1).start < stopAt)
+      last++;
+
+    this.end = last == this.length - 1;
+
+    return [first, last];
+  }
+
+  public locate(index: number): P {
+    const cache = this.measurements;
+
+    if(index >= this.length)
+      return {} as any;
+
+    while(index >= cache.length)
+      if(!this.extend())
+        return {} as any;
+
+    return cache[index];
   }
 
   protected position(

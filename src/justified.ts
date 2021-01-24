@@ -15,6 +15,7 @@ export interface Inline extends Item {
 
 export default class Justified extends Core<Inline> {
   items = [] as Sizable[];
+  measurements = [] as Inline[];
   rowSize = 150;
   rows = 0;
   gap = 1;
@@ -22,55 +23,19 @@ export default class Justified extends Core<Inline> {
   scrollArea = 0;
   horizontal = false;
 
-  get measurements(){
-    this.size;
-    this.items;
-    this.set.scrollArea = 0;
-    return [] as Inline[];
+  constructor(){
+    super();
+    this.on(x => x.size, () => {
+      this.measurements = [];
+      this.scrollArea = 0;
+    })
   }
 
   public get length(){
     return this.items.length;
   }
 
-  public get visibleRange(): [number, number] {
-    const { length, overscan, visibleOffset } = this;
-
-    const beginAt = visibleOffset[0] - overscan;
-    const stopAt = visibleOffset[1] + overscan;
-
-    if(beginAt == stopAt)
-      return [0,0];
-    
-    let first = 0;
-
-    while(this.measure(first).end < beginAt)
-      first++;
-
-    let last = first;
-
-    while(this.measure(last + 1).start < stopAt)
-      last++;
-
-    this.end = last == length - 1;
-
-    return [first, last];
-  }
-
-  measure(index: number): Inline {
-    const { measurements, length } = this;
-
-    if(index >= length)
-      return {} as any;
-
-    while(index >= measurements.length)
-      if(!this.extend())
-        return {} as any;
-
-    return measurements[index];
-  }
-
-  extend(){
+  public extend(){
     const { measurements, rows, scrollArea } = this;
 
     const next = measurements.length;
