@@ -11,6 +11,9 @@ export interface Cell extends Item {
 class Virtual extends Core<Cell> {
   columns = 1;
   gap = 0;
+  length = 0;
+  scrollArea = 0;
+  horizontal = false;
 
   get itemWidth(){
     const whitespace = (this.columns - 1) * this.gap;

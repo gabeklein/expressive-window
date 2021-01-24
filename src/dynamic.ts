@@ -7,6 +7,9 @@ interface Row extends Item {
 
 class Dynamic extends Core<Row> {
   cache = {} as { [index: number]: number };
+  scrollArea = 0;
+  horizontal = false;
+  length = 0;
 
   constructor(){
     super();

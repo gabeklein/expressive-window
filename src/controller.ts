@@ -1,4 +1,4 @@
-import VC, { def, ref, tuple, wrap } from 'react-use-controller';
+import VC, { ref, tuple, wrap } from 'react-use-controller';
 
 import { watchForEvent } from './helpers';
 import { alignedOffset, Alignment } from './measure';
@@ -24,9 +24,7 @@ abstract class Core<P extends Item> extends VC {
   overscan = 0;
   speed = 0;
 
-  scrollArea = def(0);
   padding = tuple(0,0,0,0);
-  horizontal = def(false);
   maintain = true;
   end = false;
 
@@ -34,6 +32,8 @@ abstract class Core<P extends Item> extends VC {
   didReachEnd?(): void;
 
   abstract length: number;
+  abstract horizontal: boolean;
+  abstract scrollArea: number;
   abstract measurements: P[];
 
   Window = wrap(WindowContainer);

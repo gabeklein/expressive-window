@@ -19,6 +19,8 @@ export default class Justified extends Core<Inline> {
   rows = 0;
   gap = 1;
   chop = false;
+  scrollArea = 0;
+  horizontal = false;
 
   get measurements(){
     this.size;
