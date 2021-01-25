@@ -138,7 +138,7 @@ declare namespace Justified {
 }
 
 declare class Justified extends Core<Justified.Item> {
-  items: Justified.Input;
+  items: Justified.Input[];
   rowSize: number;
   gap: number;
   chop: boolean;
