@@ -56,14 +56,22 @@ declare abstract class Core<P extends Core.Item> extends VC {
    * */
   horizontal: boolean;
 
+  size: [number, number];
+
+  offset: 0;
+
   readonly axis: Core.Axis;
   readonly visibleOffset: [number, number];
   readonly visibleRange: [number, number];
+
+  readonly scrollArea: number;
 
   /** Apply this reference to container element! */
   readonly container: {
     current: HTMLElement | null;
   }
+
+  readonly measurements: P[];
 
   /** Index and computed postion of all drawn containers */
   readonly visible: P[];
@@ -138,10 +146,14 @@ declare namespace Justified {
 }
 
 declare class Justified extends Core<Justified.Item> {
+  readonly rows: number;
+
   items: Justified.Input[];
   rowSize: number;
   gap: number;
   chop: boolean;
+
+  extend(): boolean;
 }
 
 export {
