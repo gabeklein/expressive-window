@@ -165,6 +165,7 @@ abstract class Core<P extends Item> extends VC {
   }
 
   public get visible(): P[] {
+    const source = this.measurements;
     const [ start, end ] = this.visibleRange;
     const items = [];
 
@@ -172,7 +173,7 @@ abstract class Core<P extends Item> extends VC {
       return [];
 
     for(let i = start; i <= end; i++)
-      items.push(this.measurements[i]);
+      items.push(source[i]);
 
     return items;
   }
@@ -186,6 +187,7 @@ abstract class Core<P extends Item> extends VC {
   }
 
   public get visibleRange(): [number, number] {
+    this.measurements;
     const range = this.visibleOffset;
     const overscan = this.overscan || 0;
     const beginAt = range[0] - overscan;
