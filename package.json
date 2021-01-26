@@ -20,7 +20,7 @@
     "react": ">=16.8.0"
   },
   "dependencies": {
-    "react-use-controller": "^1.0.0-beta.42"
+    "react-use-controller": "^1.0.0-beta.43"
   },
   "devDependencies": {
     "@testing-library/react": "^11.0.4",
