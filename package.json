@@ -12,6 +12,7 @@
     "build": "tsc",
     "test": "jest --watchAll",
     "prebuild": "rm -rf lib/",
+    "publish:beta": "npm version prerelease --preid=beta",
     "preversion": "jest",
     "postversion": "npm run build; npm publish",
     "postpublish": "git push; git push --tags; rm -rf lib"
