@@ -17,6 +17,22 @@ export interface Item {
   style: {};
 }
 
+function observeSpeed(controller: Core<any>){
+  controller.once($ => $.offset, (pos: number) => {
+    let interval = setInterval(() => {
+      const speed = controller.speed =
+        (pos - (pos = controller.offset)) * -20;
+
+      if(!speed && pos >= 0){
+        clearInterval(interval);
+        if(controller.didStop) 
+          controller.didStop(pos);
+        observeSpeed(controller);
+      }
+    }, 50)
+  });
+}
+
 abstract class Core<P extends Item> extends VC {
   container = ref(this.observeContainer);
   size = tuple(0, 0);
@@ -46,19 +62,6 @@ abstract class Core<P extends Item> extends VC {
   constructor(){
     super();
 
-    this.normalizePadding();
-    this.observeSpeed();
-
-    this.on($ => $.size, () => {
-      this.measurements = [];
-      this.scrollArea = 0;
-    })
-
-    if(this.didReachEnd)
-      this.on($ => $.end, this.toggleEnd);
-  }
-
-  private async normalizePadding(){
     this.requestUpdate(() => {
       let p = this.padding;
 
@@ -77,12 +80,18 @@ abstract class Core<P extends Item> extends VC {
           ? [a,b,a,b] 
           : [b,c,b,a]
     });
-  }
 
-  private toggleEnd(is: boolean){
-    if(is) this.requestUpdate(() => {
-      this.didReachEnd!();
-    });
+    if(this.didReachEnd)
+      this.on($ => $.end, (is) => {
+        if(is) this.didReachEnd!();
+      })
+
+    this.on($ => $.size, () => {
+      this.measurements = [];
+      this.scrollArea = 0;
+    })
+    
+    observeSpeed(this);
   }
 
   get scrollKey(){
@@ -95,22 +104,6 @@ abstract class Core<P extends Item> extends VC {
     return this.horizontal
       ? ['width', 'height']
       : ['height', 'width'];
-  }
-
-  protected observeSpeed(){
-    this.once($ => $.offset, (pos: number) => {
-      let interval = setInterval(() => {
-        const speed = this.speed =
-          (pos - (pos = this.offset)) * -20;
-  
-        if(!speed && pos >= 0){
-          clearInterval(interval);
-          if(this.didStop) 
-            this.didStop(pos);
-          this.observeSpeed();
-        }
-      }, 50)
-    });
   }
 
   protected observeContainer(element: HTMLElement){
