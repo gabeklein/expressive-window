@@ -1,8 +1,7 @@
 import VC, { ref, tuple, wrap } from 'react-use-controller';
 
-import { watchForEvent } from './helpers';
 import { alignedOffset, Alignment } from './measure';
-import { ClientRect, getRect, observeRect } from './rect';
+import { observeContainer, observeSpeed } from './observer';
 import { WindowContainer } from './window';
 
 type Axis =
@@ -17,24 +16,8 @@ export interface Item {
   style: {};
 }
 
-function observeSpeed(controller: Core<any>){
-  controller.once($ => $.offset, (pos: number) => {
-    let interval = setInterval(() => {
-      const speed = controller.speed =
-        (pos - (pos = controller.offset)) * -20;
-
-      if(!speed && pos >= 0){
-        clearInterval(interval);
-        if(controller.didStop) 
-          controller.didStop(pos);
-        observeSpeed(controller);
-      }
-    }, 50)
-  });
-}
-
 abstract class Core<P extends Item> extends VC {
-  container = ref(this.observeContainer);
+  container = ref(observeContainer);
   size = tuple(0, 0);
   measurements: P[] = [];
   scrollArea = 0;
@@ -61,6 +44,8 @@ abstract class Core<P extends Item> extends VC {
 
   constructor(){
     super();
+    
+    observeSpeed(this);
 
     this.requestUpdate(() => {
       let p = this.padding;
@@ -81,17 +66,15 @@ abstract class Core<P extends Item> extends VC {
           : [b,c,b,a]
     });
 
-    if(this.didReachEnd)
-      this.on($ => $.end, (is) => {
-        if(is) this.didReachEnd!();
-      })
-
     this.on($ => $.size, () => {
       this.measurements = [];
       this.scrollArea = 0;
     })
-    
-    observeSpeed(this);
+
+    if(this.didReachEnd)
+      this.on($ => $.end, (is) => {
+        if(is) this.didReachEnd!();
+      })
   }
 
   get scrollKey(){
@@ -104,49 +87,6 @@ abstract class Core<P extends Item> extends VC {
     return this.horizontal
       ? ['width', 'height']
       : ['height', 'width'];
-  }
-
-  protected observeContainer(element: HTMLElement){
-    const [ x, y ] = this.axis;
-
-    if(!element)
-      return;
-
-    const updateOffset = () => {
-      this.offset = element[this.scrollKey];
-    }
-
-    const applySize = (rect: ClientRect) => {
-      const [top, right, bottom, left] = this.padding;
-
-      if(this.horizontal)
-        rect.height -= top + bottom;
-      else
-        rect.width -= left + right;
-
-      this.size = [rect[x], rect[y]];
-    }
-
-    updateOffset();
-    applySize(getRect(element));
-
-    const releaseHandler = watchForEvent({
-      event: 'scroll',
-      target: element,
-      handler: updateOffset,
-      capture: false,
-      passive: true,
-    });
-
-    if(!this.maintain)
-      return releaseHandler;
-
-    const releaseObserver = observeRect(element, applySize);
-
-    return () => {
-      releaseHandler();
-      releaseObserver();
-    }
   }
 
   public get totalSize(){
@@ -306,5 +246,7 @@ abstract class Core<P extends Item> extends VC {
     )
   }
 }
+
+
 
 export default Core;
