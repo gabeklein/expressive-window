@@ -180,7 +180,7 @@ abstract class Core<P extends Item> extends VC {
   }
 
   public get visibleRange(): [number, number] {
-    this.measurements;
+    const cache = this.measurements;
     const range = this.visibleOffset;
     const overscan = this.overscan || 0;
     const beginAt = range[0] - overscan;
@@ -189,12 +189,19 @@ abstract class Core<P extends Item> extends VC {
     if(beginAt == stopAt)
       return [0,0];
 
-    let first = 0;
+    const current = this.visibleRange;
+    let first = current ? current[0] : 0;
 
+    while(first > 0 && cache[first] && cache[first].start > beginAt)
+      first--;
+      
     while(this.locate(first).end < beginAt)
       first++;
 
-    let last = first;
+    let last = current ? current[1] : first;
+
+    while(cache[last] && cache[last].start > stopAt)
+      last--;
 
     while(this.locate(last + 1).start < stopAt)
       last++;
