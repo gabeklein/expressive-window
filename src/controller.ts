@@ -111,6 +111,8 @@ abstract class Core<P extends Item> extends VC {
     return items;
   }
 
+  public visibleFrame = tuple(0, 0);
+
   public get visibleOffset(): [number, number] {
     const paddingStart = this.padding[this.horizontal ? 3 : 0];
     const start = this.offset - paddingStart;
@@ -120,46 +122,69 @@ abstract class Core<P extends Item> extends VC {
   }
 
   public get visibleRange(): [number, number] {
+    const frame = this.visibleFrame;
+    const top = this.offset;
+    const bottom = top + this.size[0];
+
+    if(top <= frame[0] || bottom >= frame[1])
+      return top < bottom ? this.findRange() : [0, 0];
+
+    return this.visibleRange
+  }
+
+  public findRange(): [number, number] {
     const cache = this.measurements;
+    const current = this.visibleRange;
     const range = this.visibleOffset;
     const overscan = this.overscan || 0;
     const beginAt = range[0] - overscan;
     const stopAt = range[1] + overscan;
+    const frame = [0,0] as [number, number];
 
-    if(beginAt == stopAt)
-      return [0,0];
-
-    const current = this.visibleRange;
+    let target: Item;
     let first = current ? current[0] : 0;
 
-    while(first > 0 && cache[first] && cache[first].start > beginAt)
+    while(first > 0 && cache[first - 1] && cache[first - 1].end > beginAt)
       first--;
-      
-    while(this.locate(first).end < beginAt)
-      first++;
+
+    while(target = this.locate(first)!)
+      if(target.end <= beginAt)
+        first++
+      else
+        break;
+
+    if(target)
+      frame[0] = target.start;
 
     let last = current ? current[1] : first;
 
     while(cache[last] && cache[last].start > stopAt)
       last--;
 
-    while(this.locate(last + 1).start < stopAt)
-      last++;
+    while(target = this.locate(last + 1)!)
+      if(target.start <= stopAt)
+        last++;
+      else
+        break;
 
+    if(target)
+      frame[1] = target.start;
+
+    this.visibleFrame = frame;
     this.end = last == this.length - 1;
 
     return [first, last];
   }
 
-  public locate(index: number): P {
+  public locate(index: number): P | undefined {
     const cache = this.measurements;
 
     if(index >= this.length)
-      return {} as any;
+      return;
 
     while(index >= cache.length)
       if(!this.extend())
-        return {} as any;
+        return;
 
     return cache[index];
   }
