@@ -141,17 +141,14 @@ abstract class Core<P extends Item> extends VC {
     const stopAt = range[1] + overscan;
     const frame = [0,0] as [number, number];
 
-    let target: Item;
+    let target: Item | undefined;
     let first = current ? current[0] : 0;
 
     while(first > 0 && cache[first - 1] && cache[first - 1].end > beginAt)
       first--;
 
-    while(target = this.locate(first)!)
-      if(target.end <= beginAt)
-        first++
-      else
-        break;
+    while((target = this.locate(first)) && target.end <= beginAt)
+      first++
 
     if(target)
       frame[0] = target.start;
@@ -161,11 +158,8 @@ abstract class Core<P extends Item> extends VC {
     while(cache[last] && cache[last].start > stopAt)
       last--;
 
-    while(target = this.locate(last + 1)!)
-      if(target.start <= stopAt)
-        last++;
-      else
-        break;
+    while((target = this.locate(last + 1)) && target.start <= stopAt)
+      last++;
 
     if(target)
       frame[1] = target.start;
