@@ -10,6 +10,7 @@ class Dynamic extends Core<Row> {
   scrollArea = 0;
   horizontal = false;
   length = 0;
+  gap = 0;
 
   constructor(){
     super();
@@ -26,7 +27,7 @@ class Dynamic extends Core<Row> {
     if(index >= this.length)
       return false;
 
-    const start = this.scrollArea;
+    const start = this.scrollArea + this.gap;
     const size = this.cache[index] || this.estimateSize(index);
     const end = this.scrollArea = start + size;
 

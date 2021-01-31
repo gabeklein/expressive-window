@@ -32,6 +32,9 @@ declare abstract class Core<P extends Core.Item> extends VC {
   /** Current size of virtual collection */
   length: number;
 
+  /** Spacing between items displayed */
+  gap: number;
+
   /** 
    * Amount of padding between container and its items.
    * Follows standard CSS convention.
@@ -128,7 +131,6 @@ declare namespace Virtual {
 
 declare class Virtual extends Core<Virtual.Item> {
   columns: number;
-  gap: number;
   itemWidth: number;
   itemHeight: number;
 }
@@ -151,7 +153,6 @@ declare class Justified extends Core<Justified.Item> {
 
   items: Justified.Input[];
   rowSize: number;
-  gap: number;
   chop: boolean;
 
   extend(): boolean;
