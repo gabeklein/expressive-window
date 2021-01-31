@@ -126,13 +126,10 @@ abstract class Core<P extends Item> extends VC {
     const [ start, stop ] = this.visibleFrame;
     const [ top, bottom ] = this.visibleOffset;
 
-    if(!this.visibleRange || !this.get.size[0])
+    if(!this.visibleRange || !this.size[0])
       return [0,0];
 
-    if(
-      stop - start == 0 ||
-      (top < start && top >= 0) || 
-      (bottom > stop && bottom < this.totalSize))
+    if(top < start || bottom > stop)
       return this.findRange();
 
     return this.visibleRange
@@ -160,8 +157,7 @@ abstract class Core<P extends Item> extends VC {
     while((target = this.locate(first)) && target.end <= beginAt)
       first++
 
-    if(target)
-      frame[0] = target.start - gap;
+    frame[0] = first ? target!.start - gap : -Infinity;
 
     let last = current ? current[1] : first;
 
@@ -171,8 +167,7 @@ abstract class Core<P extends Item> extends VC {
     while((target = this.locate(last + 1)) && target.start <= stopAt)
       last++;
 
-    if(target)
-      frame[1] = target.start;
+    frame[1] = target ? target.start : Infinity;
 
     this.visibleFrame = frame;
     this.end = last == this.length - 1;
