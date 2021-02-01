@@ -74,7 +74,8 @@ abstract class Core<P extends Item> extends VC {
 
     if(this.didReachEnd)
       this.on($ => $.end, (is) => {
-        if(is) this.didReachEnd!();
+        if(is)
+          this.didReachEnd!();
       })
   }
 
@@ -91,11 +92,11 @@ abstract class Core<P extends Item> extends VC {
   }
 
   public get totalSize(){
-    const [ top, right, bottom, left ] = this.padding;
-    const paddingOnAxis = this.horizontal
-      ? left + right : top + bottom;
+    const p = this.padding;
 
-    return this.scrollArea + paddingOnAxis;
+    return this.scrollArea + (
+      this.horizontal ? p[3] + p[1] : p[0] + p[2]
+    );
   }
 
   public get visible(): P[] {
@@ -249,7 +250,7 @@ abstract class Core<P extends Item> extends VC {
   }
 
   protected findItem(align: Alignment, index: number){
-    const { offset, length, measurements, size: [ available ] } = this;
+    const { offset, length, measurements, size } = this;
     const clampedIndex = Math.max(0, Math.min(index, length - 1));
     const measurement = measurements[clampedIndex];
 
@@ -257,10 +258,10 @@ abstract class Core<P extends Item> extends VC {
       return;
 
     const { start, end } = measurement;
-    const size = end - start;
+    const range = end - start;
 
     if(align == 'auto')
-      if(end >= offset + available)
+      if(end >= offset + size[0])
         align = 'end'
       else if(start <= offset)
         align = 'start'
@@ -268,7 +269,7 @@ abstract class Core<P extends Item> extends VC {
         return;
 
     return (
-      align == 'center' ? start + size / 2 :
+      align == 'center' ? start + range / 2 :
       align == 'end' ? end : start
     )
   }
