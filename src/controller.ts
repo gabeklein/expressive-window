@@ -1,7 +1,7 @@
 import VC, { ref, tuple, wrap } from 'react-use-controller';
 
 import { alignedOffset, Alignment } from './measure';
-import { observeContainer, observeSpeed } from './observer';
+import { observeContainer } from './observer';
 import { WindowContainer } from './window';
 
 type Axis =
@@ -22,7 +22,6 @@ abstract class Core<P extends Item> extends VC {
   measurements: P[] = [];
   scrollArea = 0;
   offset = 0;
-  speed = 0;
 
   padding = tuple(0,0,0,0);
   maintain = true;
@@ -45,8 +44,6 @@ abstract class Core<P extends Item> extends VC {
 
   constructor(){
     super();
-    
-    observeSpeed(this);
 
     this.requestUpdate(() => {
       let p = this.padding;

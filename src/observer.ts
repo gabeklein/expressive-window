@@ -45,19 +45,3 @@ export function observeContainer(
     releaseObserver();
   }
 }
-
-export function observeSpeed(controller: Core<any>){
-  controller.once($ => $.offset, (pos: number) => {
-    let interval = setInterval(() => {
-      const speed = controller.speed =
-        (pos - (pos = controller.offset)) * -20;
-
-      if(!speed && pos >= 0){
-        clearInterval(interval);
-        if(controller.didStop) 
-          controller.didStop(pos);
-        observeSpeed(controller);
-      }
-    }, 50)
-  });
-}
