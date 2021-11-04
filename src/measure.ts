@@ -1,8 +1,4 @@
-export type Alignment = 
-  | "center" 
-  | "start" 
-  | "end" 
-  | "auto";
+export type Alignment = "center" | "start" | "end" | "auto";
 
 export function alignedOffset(
   next: number,
@@ -29,6 +25,6 @@ export function alignedOffset(
 }
 
 export function decimal(number: number, decimals = 1){
-  const factor = Math.pow(10, decimals)
+  const factor = Math.pow(10, decimals);
   return Math.round(number * factor) / factor;
 }

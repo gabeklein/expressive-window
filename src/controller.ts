@@ -276,6 +276,4 @@ abstract class Core<P extends Item> extends Model {
   }
 }
 
-
-
 export default Core;

@@ -31,14 +31,12 @@ class Dynamic extends Core<Row> {
     const size = this.cache[index] || this.estimateSize(index);
     const end = this.scrollArea = start + size;
 
+    const key = this.uniqueKey ? this.uniqueKey(index) : index;
+    const style = this.horizontal ? { left: start } : { top: start };
+    const ref = this.measureSize(index);
+
     this.measurements.push({
-      index,
-      key: this.uniqueKey ? this.uniqueKey(index) : index,
-      start,
-      size,
-      end,
-      style: this.horizontal ? { left: start } : { top: start },
-      ref: this.measureSize(index)
+      index, key, start, size, end, style, ref
     });
 
     return true;
