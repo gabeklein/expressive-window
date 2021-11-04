@@ -2,6 +2,7 @@ import Model, { from, ref } from '@expressive/mvc';
 
 import { alignedOffset, Alignment } from './measure';
 import { observeContainer } from './observer';
+import { tuple } from './tuple';
 
 type Axis =
   | ["width", "height"]
