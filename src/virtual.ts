@@ -1,4 +1,4 @@
-import { def } from "react-use-controller";
+import { from } from "@expressive/mvc";
 import Core, { Item } from "./controller";
 
 export interface Cell extends Item {
@@ -12,17 +12,20 @@ export interface Cell extends Item {
 class Virtual extends Core<Cell> {
   columns = 1;
   gap = 0;
-  length = def(0);
+  length = 0;
   scrollArea = 0;
   horizontal = false;
 
-  get itemWidth(){
+  readonly itemWidth = from(this.getItemWidth);
+  readonly itemHeight = from(this.getItemHeight);
+
+  private getItemWidth(){
     const whitespace = (this.columns - 1) * this.gap;
     const available = this.size[1] - whitespace;
     return Math.floor(available / this.columns);
   }
 
-  get itemHeight(){
+  private getItemHeight(){
     return this.itemWidth;
   }
 

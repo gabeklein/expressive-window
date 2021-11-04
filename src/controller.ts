@@ -1,12 +1,15 @@
-import VC, { ref, tuple, wrap } from 'react-use-controller';
+import Model, { from, ref } from '@expressive/mvc';
 
 import { alignedOffset, Alignment } from './measure';
 import { observeContainer } from './observer';
-import { WindowContainer } from './window';
 
 type Axis =
   | ["width", "height"]
   | ["height", "width"]
+
+type ScrollKey =
+  | "scrollLeft"
+  | "scrollTop";
 
 export interface Item {
   index: number;
@@ -16,7 +19,7 @@ export interface Item {
   style: {};
 }
 
-abstract class Core<P extends Item> extends VC {
+abstract class Core<P extends Item> extends Model {
   container = ref(observeContainer);
   size = tuple(0, 0);
   measurements: P[] = [];
@@ -31,21 +34,22 @@ abstract class Core<P extends Item> extends VC {
   didStop?(offset: number): void;
   didReachEnd?(): void;
 
+  readonly axis = from(this.getAxis);
+  readonly visible = from(this.getVisible);
+  readonly visibleRange = from(this.getVisibleRange);
+  readonly visibleOffset = from(this.getVisibleOffset);
+  readonly totalSize = from(this.getTotalSize);
+  readonly scrollKey = from(this.getScrollKey);
+
   abstract gap: number;
   abstract length: number;
   abstract horizontal: boolean;
   abstract extend(): boolean;
 
-  Window = wrap(WindowContainer);
-
-  static get Window(){
-    return this.wrap(WindowContainer);
-  }
-
   constructor(){
     super();
 
-    this.requestUpdate(() => {
+    this.update().then(() => {
       let p = this.padding;
 
       if(typeof p == "number")
@@ -76,19 +80,19 @@ abstract class Core<P extends Item> extends VC {
       })
   }
 
-  get scrollKey(){
+  protected getScrollKey(): ScrollKey {
     return this.horizontal
       ? 'scrollLeft'
       : 'scrollTop';
   }
 
-  get axis(): Axis {
+  protected getAxis(): Axis {
     return this.horizontal
       ? ['width', 'height']
       : ['height', 'width'];
   }
 
-  public get totalSize(){
+  protected getTotalSize(){
     const p = this.padding;
 
     return this.scrollArea + (
@@ -96,7 +100,7 @@ abstract class Core<P extends Item> extends VC {
     );
   }
 
-  public get visible(): P[] {
+  protected getVisible(): P[] {
     const source = this.measurements;
     const [ start, end ] = this.visibleRange;
     const items = [];
@@ -112,7 +116,7 @@ abstract class Core<P extends Item> extends VC {
 
   public visibleFrame = tuple(0, 0);
 
-  public get visibleOffset(): [number, number] {
+  protected getVisibleOffset(): [number, number] {
     const paddingStart = this.padding[this.horizontal ? 3 : 0];
     const start = this.offset - paddingStart;
     const end = this.offset - paddingStart + this.size[0];
@@ -120,7 +124,7 @@ abstract class Core<P extends Item> extends VC {
     return [start, end];
   }
 
-  public get visibleRange(): [number, number] {
+  protected getVisibleRange(): [number, number] {
     const [ start, stop ] = this.visibleFrame;
     const [ top, bottom ] = this.visibleOffset;
 

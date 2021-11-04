@@ -1,3 +1,4 @@
+import { from } from '@expressive/mvc';
 import Core, { Item } from './controller';
 import { decimal } from './measure';
 
@@ -21,7 +22,9 @@ export default class Justified extends Core<Inline> {
   chop = false;
   horizontal = false;
 
-  public get length(){
+  readonly length = from(this.getLength);
+
+  protected getLength(){
     return this.items.length;
   }
 
