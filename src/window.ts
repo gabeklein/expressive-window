@@ -1,5 +1,7 @@
-import { FC, CSSProperties, createElement as create, ReactNode, useCallback } from "react";
-import Control, { Item } from "./controller";
+import { Provider } from '@expressive/mvc';
+import { createElement, CSSProperties, FC, ReactNode } from 'react';
+
+import Control from './controller';
 
 interface ComponentProps {
   index: number;
@@ -7,27 +9,37 @@ interface ComponentProps {
 }
 
 interface ContainerProps {
+  for: typeof Control;
   component: FC<ComponentProps>;
   children?: ReactNode;
   style?: CSSProperties;
   className?: string;
 }
 
-export function WindowContainer(
-  props: ContainerProps, context: Control<Item>){
+export default function Window(props: ContainerProps){
+  const {
+    for: Model,
+    component: Component,
+    children = [],
+    ...rest
+  } = props;
 
-  const { totalSize, container, visible, axis: [x] } = context.tap();
-  const { component, children, ...rest } = props;
-  const Child = useCallback((props: any) => {
-    return component(props, context); 
-  }, [component]);
+  const { 
+    totalSize,
+    container,
+    visible,
+    axis: [ direction ],
+    get: controller
+  } = (Model as any).use();
+
+  const content = visible.map((props: any) => createElement(Component, props));
+  const style = { [direction]: totalSize };
 
   return (
-    create("div", { ref: container, ...rest },
-      create("div", { style: { [x]: totalSize } },
-        children,
-        visible.map(props => 
-          create(Child, props))
-      ))
+    createElement("div", { ref: container, ...rest },
+      createElement(Provider, { of: controller }, 
+        createElement("div", { style }, children, content)
+      )
+    )
   )
 }

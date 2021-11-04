@@ -1,18 +1,7 @@
 import { FC, CSSProperties } from "react";
-import VC from "react-use-controller";
+import Model from "@expressive/mvc";
 
-declare namespace Core {
-  interface Item {
-    index: number;
-    key: number | string;
-    start: number
-    end: number
-  }
-
-  type Axis =
-    | ["width", "height"]
-    | ["height", "width"]
-
+declare namespace Window {
   interface ComponentProps {
     index: number;
     style: CSSProperties;
@@ -25,9 +14,23 @@ declare namespace Core {
   } 
 }
 
-declare abstract class Core<P extends Core.Item> extends VC {
-  public Window: FC<Core.ContainerProps>;
-  static Window: FC<Core.ContainerProps>;
+declare const Window: FC<Window.ContainerProps>;
+
+declare namespace Core {
+  interface Item {
+    index: number;
+    key: number | string;
+    start: number
+    end: number
+  }
+
+  type Axis =
+    | ["width", "height"]
+    | ["height", "width"]
+}
+
+declare abstract class Core
+  <P extends Core.Item = Core.Item> extends Model {
 
   /** Current size of virtual collection */
   length: number;
@@ -162,5 +165,6 @@ export {
   Core,
   Dynamic,
   Virtual,
-  Justified
+  Justified,
+  Window
 }
