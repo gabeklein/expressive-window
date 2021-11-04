@@ -318,10 +318,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@expressive/mvc@^1.0.0-beta.14":
-  version "1.0.0-beta.14"
-  resolved "https://registry.yarnpkg.com/@expressive/mvc/-/mvc-1.0.0-beta.14.tgz#5ae03f5ee306924c4e85e8a6de516589af9c4759"
-  integrity sha512-oq5HT4v8JjB5vgZREmRmSzg1/vQqyvTrHyrt1e6tSoeQV3erBzazPX39en5xZMuEnEho/V4Js6whm5428uJCUw==
+"@expressive/mvc@^1.0.0-beta.15":
+  version "1.0.0-beta.15"
+  resolved "https://registry.yarnpkg.com/@expressive/mvc/-/mvc-1.0.0-beta.15.tgz#d22d3cc2b5f3ae66c9b7323e06a8f0f31944d40a"
+  integrity sha512-Ae1+ch9NRZMjuky0tWECJ3YPeqHDhtkIx4GxRco/OEIb2JAwySzM+Qo5iPp1WFBVdG6kCJTEOuUbj8WIWk+ucQ==
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
