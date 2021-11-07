@@ -1,7 +1,8 @@
 import Model, { from, ref } from '@expressive/mvc';
 
 import { alignedOffset, Alignment } from './measure';
-import { observeContainer } from './observer';
+import { observeScroll } from './observer';
+import { ClientRect, getRect, observeRect } from './rect';
 import { tuple } from './tuple';
 
 type Axis =
@@ -23,7 +24,7 @@ export interface Item {
 type Padding = [number, number, number, number];
 
 abstract class Core<P extends Item> extends Model {
-  container = ref(observeContainer);
+  container = ref(this.observeContainer);
 
   size = tuple(0, 0);
   visibleFrame = tuple(0, 0);
@@ -78,6 +79,39 @@ abstract class Core<P extends Item> extends Model {
         if(yes)
           this.didReachEnd!();
       })
+  }
+
+  protected observeContainer(element: HTMLElement){
+    if(!element)
+      return;
+
+    this.resize(getRect(element));
+
+    const releaseScroll =
+      observeScroll(this, element);
+
+    if(!this.maintain)
+      return releaseScroll;
+
+    const releaseObserver =
+      observeRect(element, r => this.resize(r));
+
+    return () => {
+      releaseScroll();
+      releaseObserver();
+    }
+  }
+
+  public resize(rect: ClientRect){
+    const [ x, y ] = this.axis;
+    const [top, right, bottom, left] = this.padding;
+
+    if(this.horizontal)
+      rect.height -= top + bottom;
+    else
+      rect.width -= left + right;
+
+    this.size = [rect[x], rect[y]];
   }
 
   protected getScrollKey(): ScrollKey {
