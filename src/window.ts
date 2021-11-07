@@ -1,7 +1,7 @@
 import { Provider } from '@expressive/mvc';
 import { createElement, CSSProperties, FC, ReactNode } from 'react';
 
-import Control from './controller';
+import Control from './Core';
 
 interface ComponentProps {
   index: number;

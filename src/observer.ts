@@ -1,4 +1,4 @@
-import type Core from "./controller"
+import type Core from "./Core"
 
 export function observeScroll(
   on: Core<any>, element: HTMLElement){

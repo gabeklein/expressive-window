@@ -1,5 +1,5 @@
 import { from } from "@expressive/mvc";
-import Core, { Item } from "./controller";
+import Core, { Item } from "./Core";
 
 export interface Cell extends Item {
   start: number;
