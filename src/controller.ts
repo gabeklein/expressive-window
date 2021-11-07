@@ -1,8 +1,7 @@
-import Model, { from, ref } from '@expressive/mvc';
+import Model, { from, on, ref } from '@expressive/mvc';
 
 import { alignedOffset, Alignment } from './measure';
 import { observeContainer } from './observer';
-import { tuple } from './tuple';
 
 type Axis =
   | ["width", "height"]
@@ -20,14 +19,37 @@ export interface Item {
   style: {};
 }
 
+type Padding = [number, number, number, number];
+
 abstract class Core<P extends Item> extends Model {
   container = ref(observeContainer);
-  size = tuple(0, 0);
+
+  size = on([0, 0], next => {
+    const [a, b] = this.size;
+    const [x, y] = next;
+
+    if(a === x && b === y)
+      return false;
+
+    if(!a && !b){
+      this.measurements = [];
+      this.scrollArea = 0;
+    }
+  });
+
+  public visibleFrame = on([0, 0], next => {
+    const [a, b] = this.visibleFrame;
+    const [x, y] = next;
+
+    if(a === x && b === y)
+      return false as any;
+  });
+
   measurements: P[] = [];
   scrollArea = 0;
   offset = 0;
 
-  padding = tuple(0,0,0,0);
+  padding = [0,0,0,0] as Padding;
   maintain = true;
   end = false;
 
@@ -50,33 +72,28 @@ abstract class Core<P extends Item> extends Model {
   constructor(){
     super();
 
-    this.update().then(() => {
-      let p = this.padding;
+    // this.update().then(() => {
+    //   let p = this.padding;
 
-      if(typeof p == "number")
-        p = [p] as any;
+    //   if(typeof p == "number")
+    //     p = [p] as any;
 
-      else if(p.length >= 4)
-        return;
+    //   else if(p.length >= 4)
+    //     return;
 
-      const [a, b, c] = p;
+    //   const [a, b, c] = p;
 
-      this.padding =
-        b === undefined 
-          ? [a,a,a,a] :
-        c === undefined 
-          ? [a,b,a,b] 
-          : [b,c,b,a]
-    });
-
-    this.on($ => $.size, () => {
-      this.measurements = [];
-      this.scrollArea = 0;
-    })
+    //   this.padding =
+    //     b === undefined 
+    //       ? [a,a,a,a] :
+    //     c === undefined 
+    //       ? [a,b,a,b] 
+    //       : [b,c,b,a]
+    // });
 
     if(this.didReachEnd)
-      this.on($ => $.end, (is) => {
-        if(is)
+      this.on($ => $.end, yes => {
+        if(yes)
           this.didReachEnd!();
       })
   }
@@ -114,8 +131,6 @@ abstract class Core<P extends Item> extends Model {
 
     return items;
   }
-
-  public visibleFrame = tuple(0, 0);
 
   protected getVisibleOffset(): [number, number] {
     const paddingStart = this.padding[this.horizontal ? 3 : 0];

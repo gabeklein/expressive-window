@@ -12,12 +12,16 @@ export interface Cell extends Item {
 class Virtual extends Core<Cell> {
   columns = 1;
   gap = 0;
-  length = 0;
   scrollArea = 0;
   horizontal = false;
 
+  readonly length = from((x: this) => x.getLength());
   readonly itemWidth = from(this.getItemWidth);
   readonly itemHeight = from(this.getItemHeight);
+
+  public getLength(){
+    return 0;
+  }
 
   private getItemWidth(){
     const whitespace = (this.columns - 1) * this.gap;
