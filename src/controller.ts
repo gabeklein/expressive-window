@@ -1,7 +1,8 @@
-import Model, { from, on, ref } from '@expressive/mvc';
+import Model, { from, ref } from '@expressive/mvc';
 
 import { alignedOffset, Alignment } from './measure';
 import { observeContainer } from './observer';
+import { tuple } from './tuple';
 
 type Axis =
   | ["width", "height"]
@@ -24,27 +25,8 @@ type Padding = [number, number, number, number];
 abstract class Core<P extends Item> extends Model {
   container = ref(observeContainer);
 
-  size = on([0, 0], next => {
-    const [a, b] = this.size;
-    const [x, y] = next;
-
-    if(a === x && b === y)
-      return false;
-
-    if(!a && !b){
-      this.measurements = [];
-      this.scrollArea = 0;
-    }
-  });
-
-  public visibleFrame = on([0, 0], next => {
-    const [a, b] = this.visibleFrame;
-    const [x, y] = next;
-
-    if(a === x && b === y)
-      return false as any;
-  });
-
+  size = tuple(0, 0);
+  visibleFrame = tuple(0, 0);
   measurements: P[] = [];
   scrollArea = 0;
   offset = 0;

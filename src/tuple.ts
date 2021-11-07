@@ -1,6 +1,6 @@
 import Model, { set } from "@expressive/mvc";
 
-export function tuple<T extends any[]>(...value: T): T | undefined {
+export function tuple<T extends any[]>(...value: T): T {
   return set(
     function tuple(this: Model.Controller, key: string){
       this.manage(key, value, (next: T) => {
