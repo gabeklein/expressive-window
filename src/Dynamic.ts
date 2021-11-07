@@ -1,4 +1,4 @@
-import Core, { Item } from "./controller";
+import Core, { Item } from "./Core";
 
 interface Row extends Item {
   ref: (element: HTMLElement) => void;

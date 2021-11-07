@@ -1,5 +1,5 @@
-export { default as Core } from './controller';
-export { default as Virtual } from './virtual';
-export { default as Dynamic } from './dynamic';
-export { default as Justified } from './justified';
-export { default as Window } from './window';
+export { default as Core } from './Core';
+export { default as Virtual } from './Virtual';
+export { default as Dynamic } from './Dynamic';
+export { default as Justified } from './Justified';
+export { default as Window } from './Window';
