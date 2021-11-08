@@ -15,9 +15,9 @@ class Virtual extends Core<Cell> {
   scrollArea = 0;
   horizontal = false;
 
-  readonly length = from((x: this) => x.getLength());
-  readonly itemWidth = from(this.getItemWidth);
-  readonly itemHeight = from(this.getItemHeight);
+  readonly length = from(() => this.getLength);
+  readonly itemWidth = from(() => this.getItemWidth);
+  readonly itemHeight = from(() => this.getItemHeight);
 
   public getLength(){
     return 0;

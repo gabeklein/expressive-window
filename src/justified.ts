@@ -22,7 +22,7 @@ export default class Justified extends Core<Inline> {
   chop = false;
   horizontal = false;
 
-  readonly length = from(this.getLength);
+  readonly length = from(() => this.getLength);
 
   protected getLength(){
     return this.items.length;
