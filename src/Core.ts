@@ -40,12 +40,12 @@ abstract class Core<P extends Item> extends Model {
   didStop?(offset: number): void;
   didReachEnd?(): void;
 
-  readonly axis = from(this.getAxis);
-  readonly visible = from(this.getVisible);
-  readonly visibleRange = from(this.getVisibleRange);
-  readonly visibleOffset = from(this.getVisibleOffset);
-  readonly totalSize = from(this.getTotalSize);
-  readonly scrollKey = from(this.getScrollKey);
+  readonly axis = from(() => this.getAxis);
+  readonly visible = from(() => this.getVisible);
+  readonly visibleRange = from(() => this.getVisibleRange);
+  readonly visibleOffset = from(() => this.getVisibleOffset);
+  readonly totalSize = from(() => this.getTotalSize);
+  readonly scrollKey = from(() => this.getScrollKey);
 
   abstract gap: number;
   abstract length: number;
