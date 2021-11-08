@@ -1,4 +1,4 @@
-import { Virtual, Window } from '@expressive/window';
+import { Virtual, Window } from '../..';
 
 import Birds from './birds';
 
