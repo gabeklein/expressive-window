@@ -1,4 +1,4 @@
-import { Justified, Window } from '@expressive/window';
+import { Justified, Window } from '../..';
 
 import Birds from './birds';
 
