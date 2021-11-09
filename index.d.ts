@@ -38,14 +38,6 @@ declare abstract class Core
   /** Spacing between items displayed */
   gap: number;
 
-  /** 
-   * Amount of padding between container and its items.
-   * Follows standard CSS convention.
-   * 
-   * (In pixels) Default is zero.
-   * */
-  padding: number | [number, number?, number?, number?];
-
   /**
    * Still render items an amount of pixels above and below viewport.
    * 
@@ -64,7 +56,7 @@ declare abstract class Core
 
   size: [number, number];
 
-  offset: 0;
+  readonly offset: number;
 
   readonly axis: Core.Axis;
   readonly visibleOffset: [number, number];
@@ -83,13 +75,7 @@ declare abstract class Core
   /** Index and computed postion of all drawn containers */
   readonly visible: P[];
 
-  readonly totalSize: number;
-
   readonly end: boolean;
-
-  readonly speed: number;
-
-  didStop?(): void;
 
   /** 
    * Convert position index into unique key of a target list item.
