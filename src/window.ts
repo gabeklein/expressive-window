@@ -25,7 +25,7 @@ export default function Window(props: ContainerProps){
   } = props;
 
   const { 
-    totalSize,
+    scrollArea,
     container,
     visible,
     axis: [ direction ],
@@ -33,7 +33,7 @@ export default function Window(props: ContainerProps){
   } = (Model as any).use();
 
   const content = visible.map((props: any) => createElement(Component, props));
-  const style = { [direction]: totalSize };
+  const style = { [direction]: scrollArea, position: "relative" };
 
   return (
     createElement(Provider, { of: controller }, 

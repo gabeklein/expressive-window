@@ -41,6 +41,7 @@ const Scrollable = () => do {
     overflow: scroll;
     fixed: 50, 10, 10, 10;
     outline: blue;
+    padding: 20;
   } 
 
   <Window for={Grid} component={Image} />
