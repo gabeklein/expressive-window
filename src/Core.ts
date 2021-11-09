@@ -40,12 +40,19 @@ abstract class Core<P extends Item> extends Model {
   didStop?(offset: number): void;
   didReachEnd?(): void;
 
-  readonly axis = from(() => this.getAxis);
+  readonly axis: Axis = from(this, state => (
+    state.horizontal
+      ? ['width', 'height'] : ['height', 'width']
+  ));
+
+  readonly scrollKey: ScrollKey = from(this, state => (
+    state.horizontal ? 'scrollLeft' : 'scrollTop'
+  ));
+
   readonly visible = from(() => this.getVisible);
   readonly visibleRange = from(() => this.getVisibleRange);
   readonly visibleOffset = from(() => this.getVisibleOffset);
   readonly totalSize = from(() => this.getTotalSize);
-  readonly scrollKey = from(() => this.getScrollKey);
 
   abstract gap: number;
   abstract length: number;
@@ -112,18 +119,6 @@ abstract class Core<P extends Item> extends Model {
       rect.width -= left + right;
 
     this.size = [rect[x], rect[y]];
-  }
-
-  protected getScrollKey(): ScrollKey {
-    return this.horizontal
-      ? 'scrollLeft'
-      : 'scrollTop';
-  }
-
-  protected getAxis(): Axis {
-    return this.horizontal
-      ? ['width', 'height']
-      : ['height', 'width'];
   }
 
   protected getTotalSize(){
