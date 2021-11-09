@@ -9,7 +9,8 @@ export interface Cell extends Item {
   size: [number, number];
 }
 
-class Virtual extends Core<Cell> {
+class Virtual extends Core {
+  measurements = [] as Cell[];
   columns = 1;
   gap = 0;
   scrollArea = 0;
