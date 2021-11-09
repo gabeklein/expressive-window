@@ -28,8 +28,6 @@ abstract class Core extends Model {
   offset = 0;
   end = false;
 
-  didStop?(offset: number): void;
-
   abstract length: number;
   abstract extend(): boolean;
 
