@@ -24,19 +24,23 @@ export interface Item {
 
 abstract class Core extends Model {
   container = ref(this.observeContainer);
+  horizontal = false;
+  overscan = 0;
+  maintain = true;
+  gap = 0;
 
   size = tuple(0, 0);
   visibleFrame = tuple(0, 0);
   measurements: Item[] = [];
   scrollArea = 0;
   offset = 0;
-
-  maintain = true;
   end = false;
 
-  overscan?: number;
   didStop?(offset: number): void;
   didReachEnd?(): void;
+
+  abstract length: number;
+  abstract extend(): boolean;
 
   readonly axis: Axis = from(this, state => (
     state.horizontal
@@ -50,11 +54,6 @@ abstract class Core extends Model {
   readonly visible = from(() => this.getVisible);
   readonly visibleRange = from(() => this.getVisibleRange);
   readonly visibleOffset = from(() => this.getVisibleOffset);
-
-  abstract gap: number;
-  abstract length: number;
-  abstract horizontal: boolean;
-  abstract extend(): boolean;
 
   constructor(){
     super();
@@ -129,7 +128,7 @@ abstract class Core extends Model {
       measurements: cache,
       visibleRange: current,
       visibleOffset: range,
-      overscan = 0,
+      overscan,
       gap
     } = this;
 
