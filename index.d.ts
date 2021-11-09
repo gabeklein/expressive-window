@@ -29,8 +29,7 @@ declare namespace Core {
     | ["height", "width"]
 }
 
-declare abstract class Core
-  <P extends Core.Item = Core.Item> extends Model {
+declare abstract class Core extends Model {
 
   /** Current size of virtual collection */
   length: number;
@@ -70,10 +69,10 @@ declare abstract class Core
     current: HTMLElement | null;
   }
 
-  readonly measurements: P[];
+  readonly measurements: Core.Item[];
 
   /** Index and computed postion of all drawn containers */
-  readonly visible: P[];
+  readonly visible: this["measurements"];
 
   readonly end: boolean;
 
@@ -93,17 +92,18 @@ declare abstract class Core
 }
 
 declare namespace Dynamic {
-  interface Row extends Core.Item {
+  interface Item extends Core.Item {
     ref: (element: HTMLElement) => void;
     size: number;
   } 
 }
 
-declare class Dynamic extends Core<Dynamic.Row> {
+declare class Dynamic extends Core {
   /** Determines initial size to allocate before rendering a list element. */
   estimateSize?(forIndex: number): number;
 
-  readonly render: Dynamic.Row[];
+  readonly measurements: Dynamic.Item[];
+  readonly render: Dynamic.Item[];
 }
 
 declare namespace Virtual {
@@ -116,7 +116,8 @@ declare namespace Virtual {
   }
 }
 
-declare class Virtual extends Core<Virtual.Item> {
+declare class Virtual extends Core {
+  readonly measurements: Virtual.Item[];
   columns: number;
   itemWidth: number;
   itemHeight: number;
@@ -135,9 +136,10 @@ declare namespace Justified {
     | { width: number; height: number; };
 }
 
-declare class Justified extends Core<Justified.Item> {
+declare class Justified extends Core {
   readonly rows: number;
 
+  readonly measurements: Justified.Item[];
   items: Justified.Input[];
   rowSize: number;
   chop: boolean;
