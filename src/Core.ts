@@ -2,7 +2,6 @@ import Model, { from, ref } from '@expressive/mvc';
 
 import { alignedOffset, Alignment } from './measure';
 import { observeScroll } from './observer';
-import { ClientRect, getRect, observeRect } from './rect';
 import { tuple } from './tuple';
 
 type Axis =
@@ -21,8 +20,6 @@ export interface Item {
   style: {};
 }
 
-type Padding = [number, number, number, number];
-
 abstract class Core<P extends Item> extends Model {
   container = ref(this.observeContainer);
 
@@ -32,7 +29,6 @@ abstract class Core<P extends Item> extends Model {
   scrollArea = 0;
   offset = 0;
 
-  padding = [0,0,0,0] as Padding;
   maintain = true;
   end = false;
 
@@ -52,7 +48,6 @@ abstract class Core<P extends Item> extends Model {
   readonly visible = from(() => this.getVisible);
   readonly visibleRange = from(() => this.getVisibleRange);
   readonly visibleOffset = from(() => this.getVisibleOffset);
-  readonly totalSize = from(() => this.getTotalSize);
 
   abstract gap: number;
   abstract length: number;
@@ -61,25 +56,6 @@ abstract class Core<P extends Item> extends Model {
 
   constructor(){
     super();
-
-    // this.update().then(() => {
-    //   let p = this.padding;
-
-    //   if(typeof p == "number")
-    //     p = [p] as any;
-
-    //   else if(p.length >= 4)
-    //     return;
-
-    //   const [a, b, c] = p;
-
-    //   this.padding =
-    //     b === undefined 
-    //       ? [a,a,a,a] :
-    //     c === undefined 
-    //       ? [a,b,a,b] 
-    //       : [b,c,b,a]
-    // });
 
     if(this.didReachEnd)
       this.on($ => $.end, yes => {
@@ -92,7 +68,7 @@ abstract class Core<P extends Item> extends Model {
     if(!element)
       return;
 
-    this.resize(getRect(element));
+    this.resize(element);
 
     const releaseScroll =
       observeScroll(this, element);
@@ -100,33 +76,19 @@ abstract class Core<P extends Item> extends Model {
     if(!this.maintain)
       return releaseScroll;
 
-    const releaseObserver =
-      observeRect(element, r => this.resize(r));
-
     return () => {
       releaseScroll();
-      releaseObserver();
     }
   }
 
-  public resize(rect: ClientRect){
-    const [ x, y ] = this.axis;
-    const [top, right, bottom, left] = this.padding;
-
-    if(this.horizontal)
-      rect.height -= top + bottom;
-    else
-      rect.width -= left + right;
-
-    this.size = [rect[x], rect[y]];
-  }
-
-  protected getTotalSize(){
-    const p = this.padding;
-
-    return this.scrollArea + (
-      this.horizontal ? p[3] + p[1] : p[0] + p[2]
-    );
+  public resize(element: HTMLElement){
+    const inner = element.firstChild as HTMLElement;
+    const [ a, b ] = this.axis;
+  
+    this.size = [
+      element.getBoundingClientRect()[a],
+      inner.getBoundingClientRect()[b]
+    ];
   }
 
   protected getVisible(): P[] {
@@ -144,11 +106,7 @@ abstract class Core<P extends Item> extends Model {
   }
 
   protected getVisibleOffset(): [number, number] {
-    const paddingStart = this.padding[this.horizontal ? 3 : 0];
-    const start = this.offset - paddingStart;
-    const end = this.offset - paddingStart + this.size[0];
-
-    return [start, end];
+    return [this.offset, this.offset + this.size[0]];
   }
 
   protected getVisibleRange(): [number, number] {
@@ -224,10 +182,9 @@ abstract class Core<P extends Item> extends Model {
     size: [number, number],
     offset: [number, number]){
 
-    const { horizontal, padding } = this;
     let width, height, top, left;
 
-    if(horizontal){
+    if(this.horizontal){
       [height, width] = size;
       [left, top] = offset;
     }
@@ -235,9 +192,6 @@ abstract class Core<P extends Item> extends Model {
       [width, height] = size;
       [top, left] = offset;
     }
-
-    top += padding[0];
-    left += padding[3];
 
     return { width, height, left, top } as const;
   }
