@@ -14,8 +14,9 @@ export interface Inline extends Item {
   size: [number, number];
 }
 
-export default class Justified extends Core<Inline> {
+export default class Justified extends Core {
   items = [] as Sizable[];
+  measurements = [] as Inline[];
   rowSize = 150;
   rows = 0;
   gap = 1;

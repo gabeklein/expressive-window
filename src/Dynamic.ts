@@ -5,8 +5,9 @@ interface Row extends Item {
   size: number;
 }
 
-class Dynamic extends Core<Row> {
+class Dynamic extends Core {
   cache = {} as { [index: number]: number };
+  measurements = [] as Row[];
   scrollArea = 0;
   horizontal = false;
   length = 0;

@@ -12,6 +12,8 @@ type ScrollKey =
   | "scrollLeft"
   | "scrollTop";
 
+type One<T> = T extends (infer U)[] ? U : never;
+
 export interface Item {
   index: number;
   key: number | string;
@@ -20,12 +22,12 @@ export interface Item {
   style: {};
 }
 
-abstract class Core<P extends Item> extends Model {
+abstract class Core extends Model {
   container = ref(this.observeContainer);
 
   size = tuple(0, 0);
   visibleFrame = tuple(0, 0);
-  measurements: P[] = [];
+  measurements: Item[] = [];
   scrollArea = 0;
   offset = 0;
 
@@ -91,7 +93,7 @@ abstract class Core<P extends Item> extends Model {
     ];
   }
 
-  protected getVisible(): P[] {
+  protected getVisible(): this["measurements"] {
     const source = this.measurements;
     const [ start, end ] = this.visibleRange;
     const items = [];
@@ -165,7 +167,7 @@ abstract class Core<P extends Item> extends Model {
     return [first, last];
   }
 
-  public locate(index: number): P | undefined {
+  public locate(index: number){
     const cache = this.measurements;
 
     if(index >= this.length)
@@ -175,7 +177,7 @@ abstract class Core<P extends Item> extends Model {
       if(!this.extend())
         return;
 
-    return cache[index];
+    return cache[index] as One<this["measurements"]>;
   }
 
   protected position(
