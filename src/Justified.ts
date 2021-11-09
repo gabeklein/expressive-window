@@ -47,7 +47,7 @@ export default class Justified extends Core {
         totalAspect += this.getItemAspect(item);
 
       const whiteSpace = (items.length - 1) * padding;
-      const totalSize = this.size[1] - whiteSpace;
+      const totalSize = this.areaY - whiteSpace;
       const idealSize = totalSize / totalAspect;
 
       if(idealSize <= rowSize){

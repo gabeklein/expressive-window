@@ -26,7 +26,7 @@ class Virtual extends Core {
 
   private getItemWidth(){
     const whitespace = (this.columns - 1) * this.gap;
-    const available = this.size[1] - whitespace;
+    const available = this.areaY - whitespace;
     return Math.floor(available / this.columns);
   }
 
@@ -41,7 +41,7 @@ class Virtual extends Core {
   extend(){
     const next = this.measurements.length;
 
-    if(!this.size[1] || next >= this.length)
+    if(!this.areaY || next >= this.length)
       return false;
 
     const { itemWidth, itemHeight, gap } = this;

@@ -18,10 +18,12 @@ abstract class Core extends Model {
   container = ref(this.observeContainer);
   horizontal = false;
   overscan = 0;
-  maintain = true;
+  maintain = false;
   gap = 0;
 
-  size = tuple(0, 0);
+  areaX = 0;
+  areaY = 0;
+
   visibleFrame = tuple(0, 0);
   measurements: Item[] = [];
   scrollArea = 0;
@@ -49,27 +51,24 @@ abstract class Core extends Model {
     if(!element)
       return;
 
-    this.resize(element);
+    const [ a, b ] = this.axis;
+    const inner = element.firstChild as HTMLElement;
+    const release = observeScroll(this, element);
 
-    const releaseScroll =
-      observeScroll(this, element);
+    const resize = () => {
+      if(this.maintain)
+        window.requestAnimationFrame(resize);
 
-    if(!this.maintain)
-      return releaseScroll;
+      this.areaX = element.getBoundingClientRect()[a];
+      this.areaY = inner.getBoundingClientRect()[b];
+    }
+
+    resize();
 
     return () => {
-      releaseScroll();
+      this.maintain = false;
+      release();
     }
-  }
-
-  public resize(element: HTMLElement){
-    const inner = element.firstChild as HTMLElement;
-    const [ a, b ] = this.axis;
-  
-    this.size = [
-      element.getBoundingClientRect()[a],
-      inner.getBoundingClientRect()[b]
-    ];
   }
 
   protected getVisible(): this["measurements"] {
@@ -87,14 +86,14 @@ abstract class Core extends Model {
   }
 
   protected getVisibleOffset(): [number, number] {
-    return [this.offset, this.offset + this.size[0]];
+    return [this.offset, this.offset + this.areaX];
   }
 
   protected getVisibleRange(): [number, number] {
     const [ start, stop ] = this.visibleFrame;
     const [ top, bottom ] = this.visibleOffset;
 
-    if(!this.visibleRange || !this.size[0])
+    if(!this.visibleRange || !this.areaX)
       return [0,0];
 
     if(bottom > stop || top < start)
@@ -189,7 +188,7 @@ abstract class Core extends Model {
       alignedOffset(
         toOffset,
         this.offset,
-        this.size[0],
+        this.areaX,
         opts.align
       )
     );
@@ -206,14 +205,14 @@ abstract class Core extends Model {
       alignedOffset(
         target,
         this.offset,
-        this.size[0],
+        this.areaX,
         align
       )
     );
   }
 
   protected findItem(align: Alignment, index: number){
-    const { offset, length, measurements, size } = this;
+    const { offset, length, measurements } = this;
     const clampedIndex = Math.max(0, Math.min(index, length - 1));
     const measurement = measurements[clampedIndex];
 
@@ -224,7 +223,7 @@ abstract class Core extends Model {
     const range = end - start;
 
     if(align == 'auto')
-      if(end >= offset + size[0])
+      if(end >= offset + this.areaX)
         align = 'end'
       else if(start <= offset)
         align = 'start'
