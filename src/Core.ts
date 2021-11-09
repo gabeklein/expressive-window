@@ -29,7 +29,6 @@ abstract class Core extends Model {
   end = false;
 
   didStop?(offset: number): void;
-  didReachEnd?(): void;
 
   abstract length: number;
   abstract extend(): boolean;
@@ -47,16 +46,6 @@ abstract class Core extends Model {
   readonly visible = from(() => this.getVisible);
   readonly visibleRange = from(() => this.getVisibleRange);
   readonly visibleOffset = from(() => this.getVisibleOffset);
-
-  constructor(){
-    super();
-
-    if(this.didReachEnd)
-      this.on($ => $.end, yes => {
-        if(yes)
-          this.didReachEnd!();
-      })
-  }
 
   protected observeContainer(element: HTMLElement){
     if(!element)
