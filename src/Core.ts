@@ -4,14 +4,6 @@ import { alignedOffset, Alignment } from './measure';
 import { observeScroll } from './observer';
 import { tuple } from './tuple';
 
-type Axis =
-  | ["width", "height"]
-  | ["height", "width"]
-
-type ScrollKey =
-  | "scrollLeft"
-  | "scrollTop";
-
 type One<T> = T extends (infer U)[] ? U : never;
 
 export interface Item {
@@ -42,12 +34,13 @@ abstract class Core extends Model {
   abstract length: number;
   abstract extend(): boolean;
 
-  readonly axis: Axis = from(this, state => (
+  readonly axis = from(this, state => (
     state.horizontal
-      ? ['width', 'height'] : ['height', 'width']
+      ? ['width', 'height'] as const
+      : ['height', 'width'] as const
   ));
 
-  readonly scrollKey: ScrollKey = from(this, state => (
+  readonly scrollKey = from(this, state => (
     state.horizontal ? 'scrollLeft' : 'scrollTop'
   ));
 
