@@ -36,8 +36,8 @@ export default function Window(props: ContainerProps){
   const style = { [direction]: totalSize };
 
   return (
-    createElement("div", { ref: container, ...rest },
-      createElement(Provider, { of: controller }, 
+    createElement(Provider, { of: controller }, 
+      createElement("div", { ref: container, ...rest },
         createElement("div", { style }, children, content)
       )
     )
