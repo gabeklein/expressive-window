@@ -89,8 +89,6 @@ declare abstract class Core
 
   readonly speed: number;
 
-  didReachEnd?(): void;
-
   didStop?(): void;
 
   /** 
