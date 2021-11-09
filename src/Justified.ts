@@ -57,15 +57,16 @@ export default class Justified extends Core {
       }
     }
 
-    if(!full && this.chop)
+    if(!full && this.chop){
       return false;
+    }
 
     let offset = 0;
     const row = this.rows;
-    const start = this.scrollArea;
-    const end = start + rowSize + padding;
+    const start = this.scrollArea + (row ? padding : 0);
+    const end = start + rowSize;
 
-    const entries = items.map((item, column) => {
+    items.forEach((item, column) => {
       const index = next + column;
       const aspect = this.getItemAspect(item);
       const width = decimal(rowSize * aspect, 3);
@@ -74,13 +75,12 @@ export default class Justified extends Core {
 
       offset = decimal(offset + width + padding, 3);
 
-      return {
+      this.measurements.push({
         index, key: index, row, column,
         offset, start, end, size, style
-      };
-    })
+      });
+    });
 
-    this.measurements.push(...entries);
     this.scrollArea = Math.round(end);
     this.rows += 1;
 
