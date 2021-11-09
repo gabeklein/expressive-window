@@ -117,7 +117,7 @@ abstract class Core extends Model {
     if(!this.visibleRange || !this.size[0])
       return [0,0];
 
-    if(top < start || bottom > stop)
+    if(bottom > stop || top < start)
       return this.findRange();
 
     return this.visibleRange
