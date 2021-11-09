@@ -5,9 +5,8 @@ import Birds from './birds';
 export class Grid extends Justified {
   items = Birds;
   rowSize = 300;
-  gap = 10;
   overscan = 150;
-  padding = [20, 20, 20, 20];
+  gap = 10;
 
   getLength(){
     return this.items.length;

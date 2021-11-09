@@ -8,7 +8,6 @@ class Grid extends Virtual {
   itemHeight = 150
   overscan = 100;
   items = Birds;
-  padding = [20, 20, 20, 20];
 
   getLength(){
     return this.items.length;
