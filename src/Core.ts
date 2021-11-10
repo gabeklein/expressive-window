@@ -18,7 +18,6 @@ abstract class Core extends Model {
   horizontal = false;
   overscan = 0;
   maintain = false;
-  gap = 0;
 
   areaX = 0;
   areaY = 0;
@@ -116,7 +115,7 @@ abstract class Core extends Model {
     if(bottom > stop || top < start)
       return this.findRange();
 
-    return this.visibleRange
+    return this.visibleRange;
   }
 
   public findRange(): [number, number] {
@@ -124,13 +123,11 @@ abstract class Core extends Model {
       measurements: cache,
       visibleRange: current,
       visibleOffset: range,
-      overscan,
-      gap
+      overscan
     } = this;
 
     const beginAt = range[0] - overscan;
     const stopAt = range[1] + overscan;
-    const frame = [0,0] as [number, number];
 
     let target: Item | undefined;
     let first = current ? current[0] : 0;
@@ -139,9 +136,9 @@ abstract class Core extends Model {
       first--;
 
     while((target = this.locate(first)) && target.end <= beginAt)
-      first++
+      first++;
 
-    frame[0] = first ? target!.start - gap : -Infinity;
+    const start = first ? target!.start : -Infinity;
 
     let last = current ? current[1] : first;
 
@@ -151,9 +148,9 @@ abstract class Core extends Model {
     while((target = this.locate(last + 1)) && target.start <= stopAt)
       last++;
 
-    frame[1] = target ? target.start : Infinity;
+    const stop = target ? target.start : Infinity;
 
-    this.visibleFrame = frame;
+    this.visibleFrame = [start, stop];
     this.end = last == this.length - 1;
 
     if(current[0] == first && current[1] == last)
