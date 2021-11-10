@@ -185,12 +185,7 @@ abstract class Core extends Model {
 
   public gotoOffset(toOffset: number, opts: any){
     this.scrollTo(
-      alignedOffset(
-        toOffset,
-        this.offset,
-        this.areaX,
-        opts.align
-      )
+      alignedOffset(toOffset, this.offset, this.areaX, opts.align)
     );
   }
 
@@ -202,12 +197,7 @@ abstract class Core extends Model {
       return;
 
     this.scrollTo(
-      alignedOffset(
-        target,
-        this.offset,
-        this.areaX,
-        align
-      )
+      alignedOffset(target, this.offset, this.areaX, align)
     );
   }
 
