@@ -9,7 +9,7 @@ interface ComponentProps {
 }
 
 interface ContainerProps {
-  for: typeof Control;
+  for: typeof Control | Control;
   component: FC<ComponentProps>;
   children?: ReactNode;
   style?: CSSProperties;

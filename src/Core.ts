@@ -47,6 +47,10 @@ abstract class Core extends Model {
   readonly visibleRange = from(() => this.getVisibleRange);
   readonly visibleOffset = from(() => this.getVisibleOffset);
 
+  public use(){
+    return this.tap();
+  }
+
   protected observeContainer(element: HTMLElement){
     if(!element)
       return;
