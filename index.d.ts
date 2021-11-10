@@ -106,7 +106,7 @@ declare class Dynamic extends Core {
   readonly render: Dynamic.Item[];
 }
 
-declare namespace Virtual {
+declare namespace Grid {
   interface Item extends Core.Item {
     start: number;
     end: number;
@@ -116,8 +116,8 @@ declare namespace Virtual {
   }
 }
 
-declare class Virtual extends Core {
-  readonly measurements: Virtual.Item[];
+declare class Grid extends Core {
+  readonly measurements: Grid.Item[];
   columns: number;
   itemWidth: number;
   itemHeight: number;
@@ -150,7 +150,7 @@ declare class Justified extends Core {
 export {
   Core,
   Dynamic,
-  Virtual,
+  Grid,
   Justified,
   Window
 }

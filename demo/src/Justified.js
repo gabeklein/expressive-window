@@ -2,7 +2,7 @@ import { Justified, Window } from '../..';
 
 import Birds from './birds';
 
-export class Grid extends Justified {
+export class Images extends Justified {
   items = Birds;
   rowSize = 300;
   overscan = 150;
@@ -14,7 +14,7 @@ export class Grid extends Justified {
 }
 
 const Image = ({ style, index }) => do {
-  const { items } = Grid.tap();
+  const { items } = Images.tap();
   const { src } = items[index] || {};
 
   position: absolute;
@@ -42,7 +42,7 @@ const Scrollable = () => do {
     padding: 20;
   } 
 
-  <Window for={Grid} component={Image} />
+  <Window for={Images} component={Image} />
 }
 
 export default Scrollable;

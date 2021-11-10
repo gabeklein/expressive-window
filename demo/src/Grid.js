@@ -1,8 +1,8 @@
-import { Virtual, Window } from '../..';
+import { Grid, Window } from '../..';
 
 import Birds from './birds';
 
-class Grid extends Virtual {
+class Images extends Grid {
   gap = 10;
   columns = 3;
   itemHeight = 150
@@ -15,7 +15,7 @@ class Grid extends Virtual {
 }
 
 const Image = ({ style, index }) => do {
-  const { items } = Grid.tap();
+  const { items } = Images.tap();
   const { src } = items[index] || {};
 
   position: absolute;
@@ -43,7 +43,7 @@ const Scrollable = () => do {
     padding: 20;
   } 
 
-  <Window for={Grid} component={Image} />
+  <Window for={Images} component={Image} />
 }
 
 export default Scrollable;
