@@ -1,7 +1,6 @@
 import Model, { from, ref } from '@expressive/mvc';
 
 import { alignedOffset, Alignment } from './measure';
-import { observeScroll } from './observer';
 import { tuple } from './tuple';
 
 type One<T> = T extends (infer U)[] ? U : never;
@@ -55,23 +54,37 @@ abstract class Core extends Model {
     if(!element)
       return;
 
+    let scrollOffset = 0;
     const [ a, b ] = this.axis;
-    const inner = element.firstChild as HTMLElement;
-    const release = observeScroll(this, element);
+    const inner = element.firstChild as HTMLDivElement;
 
     const resize = () => {
       if(this.maintain)
         window.requestAnimationFrame(resize);
 
-      this.areaX = element.getBoundingClientRect()[a];
-      this.areaY = inner.getBoundingClientRect()[b];
+      const outerRect = element.getBoundingClientRect();
+      const innerRect = inner.getBoundingClientRect();
+
+      scrollOffset = outerRect.top - innerRect.top;
+
+      this.areaX = outerRect[a];
+      this.areaY = innerRect[b];
+    }
+
+    const update = () => {
+      this.offset = element[this.scrollKey] + scrollOffset;
     }
 
     resize();
+    update();
+  
+    element.addEventListener("scroll", update, {
+      capture: false, passive: true
+    });
 
     return () => {
       this.maintain = false;
-      release();
+      element.removeEventListener("scroll", update);
     }
   }
 
