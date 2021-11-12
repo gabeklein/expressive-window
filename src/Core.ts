@@ -32,15 +32,15 @@ abstract class Core extends Model {
   abstract length: number;
   abstract extend(): boolean;
 
-  readonly axis = from(this, state => (
-    state.horizontal
+  get axis(){
+    return this.horizontal
       ? ['width', 'height'] as const
       : ['height', 'width'] as const
-  ));
+  }
 
-  readonly scrollKey = from(this, state => (
-    state.horizontal ? 'scrollLeft' : 'scrollTop'
-  ));
+  get scrollKey(){
+    return this.horizontal ? 'scrollLeft' : 'scrollTop';
+  }
 
   readonly visible = from(() => this.getVisible);
   readonly visibleRange = from(() => this.getVisibleRange);
@@ -55,7 +55,8 @@ abstract class Core extends Model {
       return;
 
     let scrollOffset = 0;
-    const [ a, b ] = this.axis;
+    const { scrollKey } = this;
+    const [ x, y ] = this.axis;
     const inner = element.firstChild as HTMLDivElement;
 
     const resize = () => {
@@ -67,12 +68,12 @@ abstract class Core extends Model {
 
       scrollOffset = outerRect.top - innerRect.top;
 
-      this.areaX = outerRect[a];
-      this.areaY = innerRect[b];
+      this.areaX = outerRect[x];
+      this.areaY = innerRect[y];
     }
 
     const update = () => {
-      this.offset = element[this.scrollKey] + scrollOffset;
+      this.offset = element[scrollKey] + scrollOffset;
     }
 
     resize();
@@ -192,10 +193,10 @@ abstract class Core extends Model {
   }
 
   protected scrollTo(offset: number){
-    const { current } = this.container;
+    const container = this.container.current;
 
-    if(current)
-      current[this.scrollKey] = offset;
+    if(container)
+      container[this.scrollKey] = offset;
   }
 
   public gotoOffset(toOffset: number, opts: any){
