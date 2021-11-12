@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "webpack serve --mode=development --hot",
-    "build": "webpack"
+    "start": "webpack serve --mode=development --hot"
   },
   "dependencies": {
     "@expressive/css": "^1.0.0-beta.68",
@@ -16,14 +15,10 @@
   "devDependencies": {
     "@babel/core": "^7.15.5",
     "@babel/plugin-proposal-class-properties": "^7.14.5",
-    "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.15.0",
     "@expressive/babel-preset-react": "^1.0.0-beta.74",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.1",
     "@types/react": "^17.0.19",
     "babel-loader": "^8.2.2",
-    "html-webpack-plugin": "^5.3.2",
-    "react-refresh": "^0.10.0",
     "webpack": "^5.52.1",
     "webpack-cli": "^4.8.0",
     "webpack-dev-server": "^4.2.0"

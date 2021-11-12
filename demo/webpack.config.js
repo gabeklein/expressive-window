@@ -1,7 +1,3 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
-
 const linked = {
   "react": require.resolve("react"),
   "react-dom": require.resolve("react-dom"),
@@ -11,12 +7,11 @@ const linked = {
 
 const babelrc = {
   presets: [
-    require("@babel/preset-typescript"),
-    require("@expressive/babel-preset-react")
+    "@babel/preset-typescript",
+    "@expressive/babel-preset-react"
   ],
   plugins: [
-    require("@babel/plugin-proposal-class-properties"),
-    require("react-refresh/babel")
+    "@babel/plugin-proposal-class-properties"
   ]
 }
 
@@ -31,16 +26,16 @@ module.exports = {
     devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]'
   },
   devtool: "source-map",
-  stats: {
-    modules: false,
-    assets: false,
-    chunks: false
-  },
   devServer: {
     host: "0.0.0.0",
     port: 8080,
     historyApiFallback: true,
     hot: true
+  },
+  stats: {
+    modules: false,
+    assets: false,
+    chunks: false
   },
   resolve: {
     alias: linked,
@@ -55,18 +50,7 @@ module.exports = {
           loader: 'babel-loader',
           options: babelrc
         }
-      },
-      {
-        test: /\.(svg|png|jpg|otf)$/i,
-        type: 'asset/resource'
       }
     ]
-  },
-  plugins: [
-    new ReactRefreshWebpackPlugin(),
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: "./src/index.html"
-    })
-  ]
+  }
 };

@@ -23,7 +23,7 @@ const Image = ({ style, index }) => do {
   backgroundColor: pink;
   backgroundPosition: center;
   backgroundSize: cover;
-  backgroundImage: `url(${src})`;
+  backgroundImage: `url(/birds/${src}.jpg)`;
   overflow: hidden;
   radius: 4;
 
