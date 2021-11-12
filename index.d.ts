@@ -152,13 +152,20 @@ declare namespace Justified {
 }
 
 declare class Justified extends Core {
+  readonly measurements: Justified.Item[];
+
+  /** Number of rows generated so far. */
   readonly rows: number;
 
-  readonly measurements: Justified.Item[];
   items: Justified.Input[];
+
+  /** Minimum row-height used to while filling row. */
   rowSize: number;
+
+  /** Hide final row of elements if not full. */
   chop: boolean;
 
+  /** Logic to generate a new row. */
   extend(): boolean;
 }
 
