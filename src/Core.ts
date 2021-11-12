@@ -4,10 +4,11 @@ import { alignedOffset, Alignment } from './measure';
 import { tuple } from './tuple';
 
 type One<T> = T extends (infer U)[] ? U : never;
+type value = string | number;
 
 export interface Item {
   index: number;
-  key: number | string;
+  key: value;
   start: number;
   end: number;
   style: {};
@@ -173,18 +174,18 @@ abstract class Core extends Model {
   }
 
   protected position(
-    size: [number, number],
-    offset: [number, number]){
+    size: [value, value],
+    offset: [value, value]){
 
     let width, height, top, left;
 
     if(this.horizontal){
       [height, width] = size;
-      [left, top] = offset;
+      [top, left] = offset;
     }
     else {
       [width, height] = size;
-      [top, left] = offset;
+      [left, top] = offset;
     }
 
     return { width, height, left, top } as const;

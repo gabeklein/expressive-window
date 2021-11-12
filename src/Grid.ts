@@ -58,7 +58,7 @@ class Virtual extends Core {
       const index = next + i;
       const offset = i * (itemWidth + gap);
       const key = this.uniqueKey(index);
-      const style = this.position([itemWidth, itemHeight], [start, offset]);
+      const style = this.position([itemHeight, itemWidth], [start, offset]);
 
       this.measurements.push({
         index, key, start, offset, 
