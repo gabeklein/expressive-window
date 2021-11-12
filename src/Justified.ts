@@ -70,8 +70,8 @@ export default class Justified extends Core {
       const index = next + column;
       const aspect = this.getItemAspect(item);
       const width = decimal(rowSize * aspect, 3);
-      const size = [rowSize, width] as [number, number];
-      const style = this.position(size, [start, offset]);
+      const size = [width, rowSize] as [number, number];
+      const style = this.position(size, [offset, start]);
       const key = this.uniqueKey(index);
 
       offset = decimal(offset + width + padding, 3);

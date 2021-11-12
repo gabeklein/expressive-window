@@ -4,13 +4,10 @@ import Birds from './birds';
 
 export class Images extends Justified {
   items = Birds;
+  length = this.items.length;
   rowSize = 300;
   overscan = 150;
   gap = 10;
-
-  getLength(){
-    return this.items.length;
-  }
 }
 
 const Image = ({ style, index }) => do {
@@ -25,7 +22,7 @@ const Image = ({ style, index }) => do {
   backgroundColor: pink;
   backgroundPosition: center;
   backgroundSize: cover;
-  backgroundImage: `url(${src})`;
+  backgroundImage: `url(/birds/${src}.jpg)`;
   overflow: hidden;
   radius: 4;
 
