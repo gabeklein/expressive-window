@@ -31,6 +31,11 @@ module.exports = {
     devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]'
   },
   devtool: "source-map",
+  stats: {
+    modules: false,
+    assets: false,
+    chunks: false
+  },
   devServer: {
     host: "0.0.0.0",
     port: 8080,
