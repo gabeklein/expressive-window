@@ -1,4 +1,3 @@
 node_modules
-public
-src/birds
+public/birds
 .DS_Store

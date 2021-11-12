@@ -1,25 +1,3 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
-
-const linked = {
-  "react": require.resolve("react"),
-  "react-dom": require.resolve("react-dom"),
-  "@expressive/mvc": require.resolve("@expressive/mvc"),
-  "@expressive/css": require.resolve("@expressive/css"),
-}
-
-const babelrc = {
-  presets: [
-    require("@babel/preset-typescript"),
-    require("@expressive/babel-preset-react")
-  ],
-  plugins: [
-    require("@babel/plugin-proposal-class-properties"),
-    require("react-refresh/babel")
-  ]
-}
-
 module.exports = {
   mode: "development",
   entry: {
@@ -31,19 +9,24 @@ module.exports = {
     devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]'
   },
   devtool: "source-map",
-  stats: {
-    modules: false,
-    assets: false,
-    chunks: false
-  },
   devServer: {
     host: "0.0.0.0",
     port: 8080,
     historyApiFallback: true,
     hot: true
   },
+  stats: {
+    modules: false,
+    assets: false,
+    chunks: false
+  },
   resolve: {
-    alias: linked,
+    alias: {
+      "react": require.resolve("react"),
+      "react-dom": require.resolve("react-dom"),
+      "@expressive/mvc": require.resolve("@expressive/mvc"),
+      "@expressive/css": require.resolve("@expressive/css"),
+    },
     extensions: ['.js', '.ts'],
   },
   module: {
@@ -53,20 +36,17 @@ module.exports = {
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
-          options: babelrc
+          options: {
+            presets: [
+              "@babel/preset-typescript",
+              "@expressive/babel-preset-react"
+            ],
+            plugins: [
+              "@babel/plugin-proposal-class-properties"
+            ]
+          }
         }
-      },
-      {
-        test: /\.(svg|png|jpg|otf)$/i,
-        type: 'asset/resource'
       }
     ]
-  },
-  plugins: [
-    new ReactRefreshWebpackPlugin(),
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: "./src/index.html"
-    })
-  ]
+  }
 };
