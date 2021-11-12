@@ -18,10 +18,6 @@ class Grid extends Core {
     return Math.floor(state.areaY / state.columns);
   });
 
-  uniqueKey(forIndex: number): string | number {
-    return forIndex;
-  }
-
   extend(){
     const next = this.cache.length;
 

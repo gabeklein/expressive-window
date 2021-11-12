@@ -205,6 +205,10 @@ abstract class Core extends Model {
     );
   }
 
+  public uniqueKey(forIndex: number): string | number {
+    return forIndex;
+  }
+
   protected gotoIndex(index: number, opts: any = {}){
     const align = opts.align || 'auto';
     const target = this.findItem(align, index);

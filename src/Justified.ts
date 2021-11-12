@@ -72,11 +72,12 @@ export default class Justified extends Core {
       const width = decimal(rowSize * aspect, 3);
       const size = [rowSize, width] as [number, number];
       const style = this.position(size, [start, offset]);
+      const key = this.uniqueKey(index);
 
       offset = decimal(offset + width + padding, 3);
 
       this.cache.push({
-        index, key: index, row, column,
+        index, key, row, column,
         offset, start, end, size, style
       });
     });

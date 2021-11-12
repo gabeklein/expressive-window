@@ -18,10 +18,6 @@ class Dynamic extends Core {
     this.on($ => $.length, () => this.measurements = {});
   }
 
-  uniqueKey(index: number){
-    return index;
-  }
-
   extend(){
     const index = this.cache.length;
 

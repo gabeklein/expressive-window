@@ -95,6 +95,14 @@ declare abstract class Core extends Model {
 
   /** Programatically scroll to specific item by index. */
   gotoIndex(index: number, opts?: any): void;
+
+  /** 
+   * Convert position index into unique key of a target list item.
+   * Useful if items have unique IDs and reshuffling may occure.
+   * 
+   * May be overridden; returns index argument by default.
+   */
+  uniqueKey(forIndex: number): string | number;
 }
 
 declare namespace Dynamic {
@@ -128,14 +136,6 @@ declare class Grid extends Core {
 
   /** Row height. */
   height: number;
-
-  /** 
-   * Convert position index into unique key of a target list item.
-   * Useful if items have unique IDs and reshuffling may occure.
-   * 
-   * May be overridden; returns index argument by default.
-   */
-  uniqueKey(forIndex: number): string | number;
 }
 
 declare namespace Justified {
