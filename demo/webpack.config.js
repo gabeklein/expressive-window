@@ -1,3 +1,20 @@
+const linked = {
+  "react": require.resolve("react"),
+  "react-dom": require.resolve("react-dom"),
+  "@expressive/mvc": require.resolve("@expressive/mvc"),
+  "@expressive/css": require.resolve("@expressive/css"),
+}
+
+const babelrc = {
+  presets: [
+    "@babel/preset-typescript",
+    "@expressive/babel-preset-react"
+  ],
+  plugins: [
+    "@babel/plugin-proposal-class-properties"
+  ]
+}
+
 module.exports = {
   mode: "development",
   entry: {
