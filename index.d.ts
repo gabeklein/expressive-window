@@ -111,16 +111,13 @@ declare namespace Grid {
     start: number;
     end: number;
     column: number;
-    offset: number;
-    size: [number, number];
   }
 }
 
 declare class Grid extends Core {
   readonly measurements: Grid.Item[];
   columns: number;
-  itemWidth: number;
-  itemHeight: number;
+  height: number;
 }
 
 declare namespace Justified {

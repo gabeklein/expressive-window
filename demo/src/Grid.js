@@ -9,9 +9,7 @@ class Images extends Grid {
   overscan = 100;
   items = Birds;
 
-  getLength(){
-    return this.items.length;
-  }
+  length = this.items.length;
 }
 
 const Image = ({ style, index }) => do {

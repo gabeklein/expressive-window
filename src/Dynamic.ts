@@ -52,15 +52,15 @@ class Dynamic extends Core {
       if(!element)
         return;
 
-      const { offset, axis: [ direction ] } = this;
-      const { size: current, start: position } = this.measurements[forIndex];
-      const { [direction]: measured } = element.getBoundingClientRect();
+      const [ direction ] = this.axis; 
+      const { size, start } = this.measurements[forIndex];
+      const measured = element.getBoundingClientRect()[direction];
   
-      if(measured === current)
+      if(measured === size)
         return;
   
-      if(position < offset)
-        this.scrollTo(offset + measured - current)
+      if(start < this.offset)
+        this.scrollTo(this.offset + measured - size)
   
       this.cache[forIndex] = measured;
     }

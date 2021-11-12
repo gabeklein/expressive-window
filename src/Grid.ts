@@ -5,34 +5,18 @@ export interface Cell extends Item {
   start: number;
   end: number;
   column: number;
-  offset: number;
-  size: [number, number];
 }
 
-class Virtual extends Core {
+class Grid extends Core {
   measurements = [] as Cell[];
   columns = 1;
-  gap = 0;
   scrollArea = 0;
   horizontal = false;
+  length = 0;
 
-  readonly length = from(() => this.getLength);
-  readonly itemWidth = from(() => this.getItemWidth);
-  readonly itemHeight = from(() => this.getItemHeight);
-
-  public getLength(){
-    return 0;
-  }
-
-  private getItemWidth(){
-    const whitespace = (this.columns - 1) * this.gap;
-    const available = this.areaY - whitespace;
-    return Math.floor(available / this.columns);
-  }
-
-  private getItemHeight(){
-    return this.itemWidth;
-  }
+  height = from(this, state => {
+    return Math.floor(state.areaY / state.columns);
+  });
 
   uniqueKey(forIndex: number): string | number {
     return forIndex;
@@ -44,25 +28,28 @@ class Virtual extends Core {
     if(!this.areaY || next >= this.length)
       return false;
 
-    const { itemWidth, itemHeight, gap } = this;
-    const start = next ? this.scrollArea + gap : 0;
-    const size = [itemHeight, itemWidth] as [number, number];
-    const end = this.scrollArea = start + itemHeight;
+    const { columns, height } = this;
+    const percent = 100 / columns;
+    const start = next ? this.scrollArea : 0;
+    const end = this.scrollArea = start + height;
     
     for(
-      let i = 0;
-      this.columns > i &&
-      this.length > i + next; 
-      i++
+      let column = 0;
+      this.columns > column &&
+      this.length > column + next; 
+      column++
     ){
-      const index = next + i;
-      const offset = i * (itemWidth + gap);
+      const index = next + column;
       const key = this.uniqueKey(index);
-      const style = this.position([itemHeight, itemWidth], [start, offset]);
+      const width = percent + "%";
+      const offset = (column * percent) + "%";
+      const style = this.position(
+        [width, height], [offset, start]
+      );
 
       this.measurements.push({
-        index, key, start, offset, 
-        end, size, column: i, style
+        index, key, start,
+        end, column, style
       })
     }
 
@@ -70,4 +57,4 @@ class Virtual extends Core {
   }
 }
 
-export default Virtual;
+export default Grid;
