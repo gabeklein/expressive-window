@@ -102,10 +102,6 @@ abstract class Core extends Model {
     return items;
   }
 
-  protected getVisibleOffset(): [number, number] {
-    return [this.offset, this.offset + this.areaX];
-  }
-
   protected getVisibleRange(): [number, number] {
     const current = this.range;
     const top = this.offset;
