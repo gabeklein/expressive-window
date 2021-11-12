@@ -8,7 +8,7 @@ export interface Cell extends Item {
 }
 
 class Grid extends Core {
-  measurements = [] as Cell[];
+  cache = [] as Cell[];
   columns = 1;
   scrollArea = 0;
   horizontal = false;
@@ -23,7 +23,7 @@ class Grid extends Core {
   }
 
   extend(){
-    const next = this.measurements.length;
+    const next = this.cache.length;
 
     if(!this.areaY || next >= this.length)
       return false;
@@ -47,7 +47,7 @@ class Grid extends Core {
         [width, height], [offset, start]
       );
 
-      this.measurements.push({
+      this.cache.push({
         index, key, start,
         end, column, style
       })

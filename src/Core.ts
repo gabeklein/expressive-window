@@ -24,7 +24,7 @@ abstract class Core extends Model {
   areaY = 0;
 
   frame = tuple(0, 0);
-  measurements: Item[] = [];
+  cache: Item[] = [];
   scrollArea = 0;
   offset = 0;
   end = false;
@@ -88,8 +88,8 @@ abstract class Core extends Model {
     }
   }
 
-  protected getVisible(): this["measurements"] {
-    const source = this.measurements;
+  protected getVisible(): this["cache"] {
+    const source = this.cache;
     const [ start, end ] = this.range;
     const items = [];
 
@@ -123,7 +123,7 @@ abstract class Core extends Model {
 
   public getRange(): [number, number] {
     const {
-      measurements: cache,
+      cache: cache,
       range: current,
       overscan
     } = this;
@@ -162,7 +162,7 @@ abstract class Core extends Model {
   }
 
   public locate(index: number){
-    const cache = this.measurements;
+    const cache = this.cache;
 
     if(index >= this.length)
       return;
@@ -171,7 +171,7 @@ abstract class Core extends Model {
       if(!this.extend())
         return;
 
-    return cache[index] as One<this["measurements"]>;
+    return cache[index] as One<this["cache"]>;
   }
 
   protected position(
@@ -218,9 +218,9 @@ abstract class Core extends Model {
   }
 
   protected findItem(align: Alignment, index: number){
-    const { offset, length, measurements } = this;
+    const { offset, length, cache } = this;
     const clampedIndex = Math.max(0, Math.min(index, length - 1));
-    const measurement = measurements[clampedIndex];
+    const measurement = cache[clampedIndex];
 
     if(!measurement)
       return;

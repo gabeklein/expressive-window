@@ -16,7 +16,7 @@ export interface Inline extends Item {
 
 export default class Justified extends Core {
   items = [] as Sizable[];
-  measurements = [] as Inline[];
+  cache = [] as Inline[];
   rowSize = 150;
   rows = 0;
   gap = 1;
@@ -31,7 +31,7 @@ export default class Justified extends Core {
 
   public extend(){
     const padding = this.gap;
-    const next = this.measurements.length;
+    const next = this.cache.length;
     const queue = this.items.slice(next);
 
     const items: Sizable[] = [];
@@ -75,7 +75,7 @@ export default class Justified extends Core {
 
       offset = decimal(offset + width + padding, 3);
 
-      this.measurements.push({
+      this.cache.push({
         index, key: index, row, column,
         offset, start, end, size, style
       });

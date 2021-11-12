@@ -6,8 +6,8 @@ interface Row extends Item {
 }
 
 class Dynamic extends Core {
-  cache = {} as { [index: number]: number };
-  measurements = [] as Row[];
+  measurements = {} as { [index: number]: number };
+  cache = [] as Row[];
   scrollArea = 0;
   horizontal = false;
   length = 0;
@@ -15,7 +15,7 @@ class Dynamic extends Core {
 
   constructor(){
     super();
-    this.on($ => $.length, () => this.cache = {});
+    this.on($ => $.length, () => this.measurements = {});
   }
 
   uniqueKey(index: number){
@@ -23,20 +23,20 @@ class Dynamic extends Core {
   }
 
   extend(){
-    const index = this.measurements.length;
+    const index = this.cache.length;
 
     if(index >= this.length)
       return false;
 
     const start = this.scrollArea + this.gap;
-    const size = this.cache[index] || this.estimateSize(index);
+    const size = this.measurements[index] || this.estimateSize(index);
     const end = this.scrollArea = start + size;
 
     const key = this.uniqueKey ? this.uniqueKey(index) : index;
     const style = this.horizontal ? { left: start } : { top: start };
     const ref = this.measureSize(index);
 
-    this.measurements.push({
+    this.cache.push({
       index, key, start, size, end, style, ref
     });
 
@@ -53,7 +53,7 @@ class Dynamic extends Core {
         return;
 
       const [ direction ] = this.axis; 
-      const { size, start } = this.measurements[forIndex];
+      const { size, start } = this.cache[forIndex];
       const measured = element.getBoundingClientRect()[direction];
   
       if(measured === size)
@@ -62,7 +62,7 @@ class Dynamic extends Core {
       if(start < this.offset)
         this.scrollTo(this.offset + measured - size)
   
-      this.cache[forIndex] = measured;
+      this.measurements[forIndex] = measured;
     }
   }
 }

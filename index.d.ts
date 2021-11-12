@@ -82,10 +82,10 @@ declare abstract class Core extends Model {
     current: HTMLElement | null;
   }
 
-  readonly measurements: Core.Item[];
+  readonly cache: Core.Item[];
 
   /** Index and computed postion of all drawn containers */
-  readonly visible: this["measurements"];
+  readonly visible: this["cache"];
 
   /** Index equal to length is currently visible. */
   readonly end: boolean;
@@ -108,7 +108,7 @@ declare class Dynamic extends Core {
   /** Determines initial size to allocate before rendering a list element. */
   estimateSize?(forIndex: number): number;
 
-  readonly measurements: Dynamic.Item[];
+  readonly cache: Dynamic.Item[];
   readonly render: Dynamic.Item[];
 }
 
@@ -121,7 +121,7 @@ declare namespace Grid {
 }
 
 declare class Grid extends Core {
-  readonly measurements: Grid.Item[];
+  readonly cache: Grid.Item[];
 
   /** Number of columns to break elements into. */
   columns: number;
@@ -152,7 +152,7 @@ declare namespace Justified {
 }
 
 declare class Justified extends Core {
-  readonly measurements: Justified.Item[];
+  readonly cache: Justified.Item[];
 
   /** Number of rows generated so far. */
   readonly rows: number;
