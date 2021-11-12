@@ -1,6 +1,5 @@
 import { from } from '@expressive/mvc';
 import Core, { Item } from './Core';
-import { decimal } from './measure';
 
 export type Sizable =
   | { aspect: number; }
@@ -99,4 +98,9 @@ export default class Justified extends Core {
     else
       return ratio;
   }
+}
+
+function decimal(number: number, decimals = 1){
+  const factor = Math.pow(10, decimals);
+  return Math.round(number * factor) / factor;
 }

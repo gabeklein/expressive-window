@@ -1,8 +1,8 @@
 import Model, { from, ref } from '@expressive/mvc';
 
-import { alignedOffset, Alignment } from './measure';
 import { tuple } from './tuple';
 
+type Alignment = "center" | "start" | "end" | "auto";
 type One<T> = T extends (infer U)[] ? U : never;
 type value = string | number;
 
@@ -199,14 +199,14 @@ abstract class Core extends Model {
       container[this.scrollKey] = offset;
   }
 
-  public gotoOffset(toOffset: number, opts: any){
-    this.scrollTo(
-      alignedOffset(toOffset, this.offset, this.areaX, opts.align)
-    );
-  }
-
   public uniqueKey(forIndex: number): string | number {
     return forIndex;
+  }
+
+  public gotoOffset(toOffset: number, opts: any){
+    this.scrollTo(
+      this.getOffset(toOffset, opts.align)
+    );
   }
 
   protected gotoIndex(index: number, opts: any = {}){
@@ -217,7 +217,7 @@ abstract class Core extends Model {
       return;
 
     this.scrollTo(
-      alignedOffset(target, this.offset, this.areaX, align)
+      this.getOffset(target, align)
     );
   }
 
@@ -244,6 +244,30 @@ abstract class Core extends Model {
       align == 'center' ? start + range / 2 :
       align == 'end' ? end : start
     )
+  }
+
+  public getOffset(
+    index: number,
+    mode: Alignment = "start"){
+
+    const { offset, areaX } = this;
+
+    if(mode === 'auto')
+      if(index <= offset)
+        mode = 'start'
+      else if(offset >= offset + areaX)
+        mode = 'end'
+      else 
+        mode = 'start'
+  
+    switch(mode){
+      case "start":
+        return index;
+      case "end":
+        return index - areaX;
+      case "center":
+        return index - areaX / 2;
+    }
   }
 }
 
