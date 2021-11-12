@@ -23,7 +23,7 @@ abstract class Core extends Model {
   areaX = 0;
   areaY = 0;
 
-  visibleFrame = tuple(0, 0);
+  frame = tuple(0, 0);
   measurements: Item[] = [];
   scrollArea = 0;
   offset = 0;
@@ -43,8 +43,7 @@ abstract class Core extends Model {
   }
 
   readonly visible = from(() => this.getVisible);
-  readonly visibleRange = from(() => this.getVisibleRange);
-  readonly visibleOffset = from(() => this.getVisibleOffset);
+  readonly range = from(() => this.getVisibleRange);
 
   public use(){
     return this.tap();
@@ -91,7 +90,7 @@ abstract class Core extends Model {
 
   protected getVisible(): this["measurements"] {
     const source = this.measurements;
-    const [ start, end ] = this.visibleRange;
+    const [ start, end ] = this.range;
     const items = [];
 
     if(end - start == 0)
@@ -108,28 +107,29 @@ abstract class Core extends Model {
   }
 
   protected getVisibleRange(): [number, number] {
-    const [ start, stop ] = this.visibleFrame;
-    const [ top, bottom ] = this.visibleOffset;
+    const current = this.range;
+    const top = this.offset;
+    const bottom = top + this.areaX;
+    const [ start, stop ] = this.frame;
 
-    if(!this.visibleRange || !this.areaX)
+    if(!current || !this.areaX)
       return [0,0];
 
     if(bottom > stop || top < start)
-      return this.findRange();
+      return this.getRange();
 
-    return this.visibleRange;
+    return current;
   }
 
-  public findRange(): [number, number] {
+  public getRange(): [number, number] {
     const {
       measurements: cache,
-      visibleRange: current,
-      visibleOffset: range,
+      range: current,
       overscan
     } = this;
 
-    const beginAt = range[0] - overscan;
-    const stopAt = range[1] + overscan;
+    const beginAt = this.offset - overscan;
+    const stopAt = this.offset + this.areaX + overscan;
 
     let target: Item | undefined;
     let first = current ? current[0] : 0;
@@ -152,7 +152,7 @@ abstract class Core extends Model {
 
     const stop = target ? target.start : Infinity;
 
-    this.visibleFrame = [start, stop];
+    this.frame = [start, stop];
     this.end = last == this.length - 1;
 
     if(current[0] == first && current[1] == last)

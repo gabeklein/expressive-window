@@ -5,7 +5,6 @@ import Birds from './birds';
 class Images extends Grid {
   gap = 10;
   columns = 3;
-  itemHeight = 150
   overscan = 100;
   items = Birds;
 

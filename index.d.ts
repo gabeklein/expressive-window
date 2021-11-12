@@ -53,16 +53,29 @@ declare abstract class Core extends Model {
    * */
   horizontal: boolean;
 
-  size: [number, number];
+  /**
+   * Keys [on-axis, off-axis] given current state of this.horizontal.
+   */
+  readonly axis: Core.Axis;
 
+  /** Space available for visible elements on-axis. */
+  readonly areaX: number;
+
+  /** Space available for visible elements off-axis. */
+  readonly areaY: number;
+
+  /** Total area of scrollable content. */
+  readonly scrollArea: number;
+
+  /** Current scroll offset. */
   readonly offset: number;
 
-  readonly axis: Core.Axis;
-  readonly visibleOffset: [number, number];
-  readonly visibleRange: [number, number];
-  readonly visibleFrame: [number, number];
+  /** Range of pixel offset visible in window. */
+  readonly frame: [number, number];
 
-  readonly scrollArea: number;
+  /** Range of indicies visible in window. */
+  readonly range: [number, number];
+
 
   /** Apply this reference to container element! */
   readonly container: {
@@ -74,15 +87,8 @@ declare abstract class Core extends Model {
   /** Index and computed postion of all drawn containers */
   readonly visible: this["measurements"];
 
+  /** Index equal to length is currently visible. */
   readonly end: boolean;
-
-  /** 
-   * Convert position index into unique key of a target list item.
-   * Useful if items have unique IDs and reshuffling may occure.
-   * 
-   * May be overridden; returns index argument by default.
-   */
-  uniqueKey(forIndex: number): string | number;
 
   /** Programatically scroll to specific offset. */
   gotoOffset(toOffset: number, opts: any): void;
@@ -116,8 +122,20 @@ declare namespace Grid {
 
 declare class Grid extends Core {
   readonly measurements: Grid.Item[];
+
+  /** Number of columns to break elements into. */
   columns: number;
+
+  /** Row height. */
   height: number;
+
+  /** 
+   * Convert position index into unique key of a target list item.
+   * Useful if items have unique IDs and reshuffling may occure.
+   * 
+   * May be overridden; returns index argument by default.
+   */
+  uniqueKey(forIndex: number): string | number;
 }
 
 declare namespace Justified {
