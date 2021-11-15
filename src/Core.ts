@@ -3,7 +3,6 @@ import Model, { from, ref } from '@expressive/mvc';
 import { tuple } from './tuple';
 
 type Alignment = "center" | "start" | "end" | "auto";
-type One<T> = T extends (infer U)[] ? U : never;
 type value = string | number;
 
 export interface Item {
@@ -105,47 +104,53 @@ abstract class Core extends Model {
   }
 
   protected getVisibleRange(): [number, number] {
-    const current = this.range;
-    const top = this.offset;
+    const {
+      cache,
+      overscan,
+      range: current,
+      offset: top,
+      frame
+    } = this;
+
     const bottom = top + this.areaX;
-    const [ start, stop ] = this.frame;
 
     if(!current || !this.areaX)
       return [0,0];
 
-    if(bottom > stop || top < start)
-      return this.getRange();
+    if(bottom <= frame[1] && top >= frame[0])
+      return current;
 
-    return current;
-  }
-
-  public getRange(): [number, number] {
-    const {
-      cache: cache,
-      range: current,
-      overscan
-    } = this;
-
-    const beginAt = this.offset - overscan;
-    const stopAt = this.offset + this.areaX + overscan;
+    const beginAt = top - overscan;
+    const stopAt = bottom + overscan;
 
     let target: Item | undefined;
-    let first = current ? current[0] : 0;
+    let first = 0;
+
+    const locate = (index: number) => {
+      if(index >= this.length)
+        return;
+  
+      while(index >= cache.length)
+        if(!this.extend())
+          return;
+  
+      return cache[index];
+    }
 
     while(first > 0 && cache[first - 1] && cache[first - 1].end > beginAt)
       first--;
 
-    while((target = this.locate(first)) && target.end <= beginAt)
+    while((target = locate(first)) && target.end <= beginAt)
       first++;
 
-    const start = first ? target!.start : -Infinity;
-
-    let last = current ? current[1] : first;
+    let last = current[1];
 
     while(cache[last] && cache[last].start > stopAt)
       last--;
 
-    while((target = this.locate(last + 1)) && target.start <= stopAt)
+    const start = first ? target!.start : -Infinity;
+
+    while((target = locate(last + 1)) && target.start <= stopAt)
       last++;
 
     const stop = target ? target.start : Infinity;
@@ -157,19 +162,6 @@ abstract class Core extends Model {
       return current;
 
     return [first, last];
-  }
-
-  public locate(index: number){
-    const cache = this.cache;
-
-    if(index >= this.length)
-      return;
-
-    while(index >= cache.length)
-      if(!this.extend())
-        return;
-
-    return cache[index] as One<this["cache"]>;
   }
 
   protected position(
