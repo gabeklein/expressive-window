@@ -18,7 +18,7 @@
     "postpublish": "git push; git push --tags; rm -rf lib"
   },
   "dependencies": {
-    "@expressive/mvc": "^1.0.0-beta.17"
+    "@expressive/mvc": "^1.0.0-beta.19"
   },
   "devDependencies": {
     "@testing-library/react": "^11.0.4",
