@@ -54,16 +54,18 @@ abstract class Core extends Model {
       return;
 
     let scrollOffset = 0;
+    let watchSize = this.maintain;
+
     const { scrollKey } = this;
     const [ x, y ] = this.axis;
-    const inner = element.firstChild as HTMLDivElement;
+    const content = element.firstChild as HTMLDivElement;
 
-    const resize = () => {
-      if(this.maintain)
-        window.requestAnimationFrame(resize);
+    const getSize = () => {
+      if(watchSize)
+        window.requestAnimationFrame(getSize);
 
       const outerRect = element.getBoundingClientRect();
-      const innerRect = inner.getBoundingClientRect();
+      const innerRect = content.getBoundingClientRect();
 
       scrollOffset = outerRect.top - innerRect.top;
 
@@ -71,20 +73,20 @@ abstract class Core extends Model {
       this.areaY = innerRect[y];
     }
 
-    const update = () => {
+    const getOffset = () => {
       this.offset = element[scrollKey] + scrollOffset;
     }
 
-    resize();
-    update();
+    getSize();
+    getOffset();
   
-    element.addEventListener("scroll", update, {
+    element.addEventListener("scroll", getOffset, {
       capture: false, passive: true
     });
 
     return () => {
-      this.maintain = false;
-      element.removeEventListener("scroll", update);
+      watchSize = false;
+      element.removeEventListener("scroll", getOffset);
     }
   }
 
