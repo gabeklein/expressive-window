@@ -22,12 +22,13 @@ class Grid extends Core {
     const next = this.cache.length;
 
     if(!this.areaY || next >= this.length)
-      return false;
+      return;
 
     const { columns, height } = this;
     const percent = 100 / columns;
     const start = next ? this.scrollArea : 0;
-    const end = this.scrollArea = start + height;
+    const end = start + height;
+    const insert = [] as Cell[];
     
     for(
       let column = 0;
@@ -43,13 +44,13 @@ class Grid extends Core {
         [width, height], [offset, start]
       );
 
-      this.cache.push({
+      insert.push({
         index, key, start,
         end, column, style
       })
     }
 
-    return true;
+    return insert;
   }
 }
 

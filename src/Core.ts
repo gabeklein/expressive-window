@@ -29,7 +29,7 @@ abstract class Core extends Model {
   end = false;
 
   abstract length: number;
-  abstract extend(): boolean;
+  abstract extend(): undefined | Item[];
 
   get axis(){
     return this.horizontal
@@ -126,21 +126,10 @@ abstract class Core extends Model {
     let target: Item | undefined;
     let first = 0;
 
-    const locate = (index: number) => {
-      if(index >= this.length)
-        return;
-  
-      while(index >= cache.length)
-        if(!this.extend())
-          return;
-  
-      return cache[index];
-    }
-
     while(first > 0 && cache[first - 1] && cache[first - 1].end > beginAt)
       first--;
 
-    while((target = locate(first)) && target.end <= beginAt)
+    while((target = this.locate(first)) && target.end <= beginAt)
       first++;
 
     let last = current[1];
@@ -150,7 +139,7 @@ abstract class Core extends Model {
 
     const start = first ? target!.start : -Infinity;
 
-    while((target = locate(last + 1)) && target.start <= stopAt)
+    while((target = this.locate(last + 1)) && target.start <= stopAt)
       last++;
 
     const stop = target ? target.start : Infinity;
@@ -162,6 +151,31 @@ abstract class Core extends Model {
       return current;
 
     return [first, last];
+  }
+
+  protected locate(index: number){
+    const { cache } = this;
+
+    if(index >= this.length)
+      return;
+
+    while(index >= cache.length){
+      const insert = this.extend();
+
+      if(!insert || !insert.length)
+        return;
+
+      let end = this.scrollArea;
+      
+      for(const entry of insert){
+        cache.push(entry);
+        end = Math.max(end, entry.end);
+      }
+
+      this.scrollArea = end;
+    }
+    
+    return cache[index];
   }
 
   protected position(

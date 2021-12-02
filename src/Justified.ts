@@ -56,14 +56,14 @@ export default class Justified extends Core {
       }
     }
 
-    if(!full && this.chop){
-      return false;
-    }
+    if(!full && this.chop)
+      return;
 
     let offset = 0;
     const row = this.rows;
     const start = this.scrollArea + (row ? padding : 0);
-    const end = start + rowSize;
+    const end = Math.round(start + rowSize);
+    const insert = [] as Inline[];    
 
     items.forEach((item, column) => {
       const index = next + column;
@@ -75,16 +75,15 @@ export default class Justified extends Core {
 
       offset = decimal(offset + width + padding, 3);
 
-      this.cache.push({
+      insert.push({
         index, key, row, column,
         offset, start, end, size, style
       });
     });
 
-    this.scrollArea = Math.round(end);
     this.rows += 1;
 
-    return true;
+    return insert;
   }
 
   protected getItemAspect(item: Sizable){

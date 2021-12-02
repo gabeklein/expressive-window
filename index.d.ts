@@ -8,11 +8,14 @@ declare namespace Window {
   }
   
   interface ContainerProps {
+    for: typeof Core | Core;
     component: FC<ComponentProps>;
     style?: CSSProperties;
     className?: string;
   } 
 }
+
+type value = string | number;
 
 declare const Window: FC<Window.ContainerProps>;
 
@@ -84,11 +87,21 @@ declare abstract class Core extends Model {
 
   readonly cache: Core.Item[];
 
+  /** Logic to generate a new row. */
+  extend(): this["cache"] | undefined;
+
   /** Index and computed postion of all drawn containers */
   readonly visible: this["cache"];
 
   /** Index equal to length is currently visible. */
   readonly end: boolean;
+
+  position(size: [value, value], offset: [value, value]): Readonly<{
+    width: value;
+    height: value;
+    left: value;
+    top: value;
+  }>
 
   /** Programatically scroll to specific offset. */
   gotoOffset(toOffset: number, opts: any): void;
@@ -164,9 +177,6 @@ declare class Justified extends Core {
 
   /** Hide final row of elements if not full. */
   chop: boolean;
-
-  /** Logic to generate a new row. */
-  extend(): boolean;
 }
 
 export {

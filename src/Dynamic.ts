@@ -22,7 +22,7 @@ class Dynamic extends Core {
     const index = this.cache.length;
 
     if(index >= this.length)
-      return false;
+      return;
 
     const start = this.scrollArea + this.gap;
     const size = this.measurements[index] || this.estimateSize(index);
@@ -32,11 +32,9 @@ class Dynamic extends Core {
     const style = this.horizontal ? { left: start } : { top: start };
     const ref = this.measureSize(index);
 
-    this.cache.push({
+    return [{
       index, key, start, size, end, style, ref
-    });
-
-    return true;
+    }]
   }
 
   estimateSize(index: number){
