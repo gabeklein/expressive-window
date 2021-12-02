@@ -13,7 +13,7 @@ describe.skip('adjustment', () => {
     const virtual = Window.create();
 
     virtual.length = 101;
-    const keys = await virtual.requestUpdate();
+    const keys = await virtual.update();
 
     expect(keys).toMatchObject(["length", "cache"]);
   })
@@ -31,7 +31,7 @@ describe.skip('scrolling', () => {
     const {
       goto50,
       container,
-      totalSize,
+      scrollArea,
       visible
     } = Window.use();
   
@@ -41,7 +41,7 @@ describe.skip('scrolling', () => {
           Goto 50
         </button>
         <Container ref={container}>
-          <Inner height={totalSize}>
+          <Inner height={scrollArea}>
             {visible.map(info =>
               <VirtualRow {...info} />
             )}

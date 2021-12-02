@@ -13,13 +13,13 @@ describe.skip("dynamic sizing", () => {
   const App = () => {
     const {
       container,
-      totalSize,
+      scrollArea,
       visible
     } = Window.use()
   
     return (
       <Container ref={container}>
-        <Inner height={totalSize}>
+        <Inner height={scrollArea}>
           {visible.map(info =>
             <VirtualRow {...info} />
           )}
