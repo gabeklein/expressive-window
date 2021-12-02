@@ -4,6 +4,16 @@
   "module": "src",
   "main": "lib",
   "types": "index.d.ts",
+  "license": "MIT",
+  "author": {
+    "name": "Gabe Klein",
+    "email": "gabe@termtm.com",
+    "url": "https://github.com/gabeklein"
+  },
+  "repository": "https://github.com/gabeklein/expressive-window",
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "lib/*.js",
     "index.d.ts"
