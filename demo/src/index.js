@@ -8,8 +8,8 @@ import Justified from "./Justified";
 const App = () => do {
   <BrowserRouter>
     <Routes>
-      <Route path="/*" element={do { <Grid /> }} />
-      <Route path="/justified" element={do { <Justified /> }} />
+      <Route path="/*" element={<Grid />} />
+      <Route path="/justified" element={<Justified />} />
     </Routes>
   </BrowserRouter>
 }

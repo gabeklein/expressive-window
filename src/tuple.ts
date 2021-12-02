@@ -1,7 +1,7 @@
-import Model, { set } from "@expressive/mvc";
+import Model, { apply } from "@expressive/mvc";
 
 export function tuple<T extends any[]>(...value: T): T {
-  return set(
+  return apply(
     function tuple(this: Model.Controller, key: string){
       this.manage(key, value, (next: T) => {
         let isNew = false;
