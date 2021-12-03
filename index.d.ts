@@ -15,7 +15,9 @@ declare namespace Window {
   } 
 }
 
+type Alignment = "center" | "start" | "end" | "auto";
 type value = string | number;
+type OneOf<T extends any[]> = T extends (infer U)[] ? U : never;
 
 declare const Window: FC<Window.ContainerProps>;
 
@@ -96,7 +98,16 @@ declare abstract class Core extends Model {
   /** Index equal to length is currently visible. */
   readonly end: boolean;
 
-  position(size: [value, value], offset: [value, value]): Readonly<{
+  protected observeContainer(element: HTMLElement): (() => void) | undefined;
+  protected getVisible(): this["cache"];
+  protected getVisibleRange(): [number, number];
+  protected locate(index: number): OneOf<this["cache"]> | undefined;
+
+  protected scrollTo(offset: number): void;
+
+  protected findItem(align: Alignment, index: number): number | undefined;
+
+  protected position(size: [value, value], offset: [value, value]): Readonly<{
     width: value;
     height: value;
     left: value;
