@@ -1,25 +1,36 @@
-import { FC, CSSProperties } from "react";
+import { FC, CSSProperties, ReactNode, ReactElement } from "react";
 import Model from "@expressive/mvc";
 
+type Alignment = "center" | "start" | "end" | "auto";
+type Item<T> = T extends { ["cache"]: (infer U)[] } ? U : never;
+type value = string | number;
+
 declare namespace Window {
-  interface ComponentProps {
-    index: number;
-    style: CSSProperties;
-  }
+  type Type = Core | typeof Core;
+  type Class = new (...args: any[]) => any;
+  type Instance<E> = E extends Class ? InstanceType<E> : E extends Model ? E : never;
+
+  /**
+   * Props for component `C` passable to `<Window for={T} component={C}>`,
+   * where T is an extension of model `Core`.
+   **/
+  type RowProps<T extends Core> = Item<T> & { context: T };
+
+  type RenderProps<T extends Core> =
+    | { component: FC<RowProps<T>> }
+    | { render: (info: Item<T>, index: number) => ReactNode }
   
-  interface ContainerProps {
-    for: typeof Core | Core;
-    component: FC<ComponentProps>;
-    style?: CSSProperties;
-    className?: string;
-  } 
+  type Props<T extends Type> =
+    & {
+      for: T;
+      children?: ReactNode;
+      style?: CSSProperties;
+      className?: string;
+    }
+    & RenderProps<Instance<T>>
 }
 
-type Alignment = "center" | "start" | "end" | "auto";
-type value = string | number;
-type OneOf<T extends any[]> = T extends (infer U)[] ? U : never;
-
-declare const Window: FC<Window.ContainerProps>;
+declare function Window<T extends Window.Type>(props: Window.Props<T>): ReactElement<typeof props>;
 
 declare namespace Core {
   interface Item {
@@ -101,7 +112,7 @@ declare abstract class Core extends Model {
   protected observeContainer(element: HTMLElement): (() => void) | undefined;
   protected getVisible(): this["cache"];
   protected getVisibleRange(): [number, number];
-  protected locate(index: number): OneOf<this["cache"]> | undefined;
+  protected locate(index: number): Item<this> | undefined;
 
   protected scrollTo(offset: number): void;
 

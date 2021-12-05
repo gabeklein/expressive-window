@@ -1,5 +1,5 @@
 import { Provider } from '@expressive/mvc';
-import React, { CSSProperties, FC, ReactNode } from 'react';
+import React, { CSSProperties, FC, ReactNode, useMemo } from 'react';
 
 import Control from './Core';
 
@@ -10,34 +10,39 @@ interface ComponentProps {
 
 interface ContainerProps {
   for: typeof Control | Control;
-  component: FC<ComponentProps>;
   children?: ReactNode;
   style?: CSSProperties;
   className?: string;
 }
 
-export default function Window(props: ContainerProps){
-  const {
-    for: Model,
-    component: Component,
-    children,
-    ...rest
-  } = props;
+type RenderFunction =
+  (info: ComponentProps, index: number) => ReactNode;
 
-  const { 
+type WindowProps =
+  | (ContainerProps & { component: FC<ComponentProps> })
+  | (ContainerProps & { render: RenderFunction })
+
+export default function Window(props: WindowProps){
+  const {
+    get: controller,
+    axis: [ direction ],
     scrollArea,
     container,
     visible,
-    axis: [ direction ],
-    get: controller
-  } = (Model as any).use();
+  } = (props.for as any).use();
+
+  const renderRow = useMemo(() => (
+    "component" in props
+      ? (p: any) => <props.component context={controller} {...p} />
+      : props.render
+  ), []);
 
   return (
     <Provider of={controller}>
-      <div ref={container} {...rest}>
+      <div ref={container} style={props.style} className={props.className}>
         <div style={{ position: "relative", [direction]: scrollArea }}>
-          {children}
-          {visible.map((p: any) => <Component {...p} />)}
+          {props.children}
+          {visible.map(renderRow)}
         </div>
       </div>
     </Provider>
