@@ -44,12 +44,12 @@ module.exports = {
       "@expressive/mvc": require.resolve("@expressive/mvc"),
       "@expressive/css": require.resolve("@expressive/css"),
     },
-    extensions: ['.js', '.ts'],
+    extensions: ['.js', '.ts', '.tsx'],
   },
   module: {
     rules: [
       {
-        test: /\.(js|ts)$/,
+        test: /\.(js|ts)x?$/,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',

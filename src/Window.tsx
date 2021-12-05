@@ -1,5 +1,5 @@
 import { Provider } from '@expressive/mvc';
-import { createElement, CSSProperties, FC, ReactNode } from 'react';
+import React, { CSSProperties, FC, ReactNode } from 'react';
 
 import Control from './Core';
 
@@ -20,7 +20,7 @@ export default function Window(props: ContainerProps){
   const {
     for: Model,
     component: Component,
-    children = [],
+    children,
     ...rest
   } = props;
 
@@ -32,14 +32,14 @@ export default function Window(props: ContainerProps){
     get: controller
   } = (Model as any).use();
 
-  const content = visible.map((props: any) => createElement(Component, props));
-  const style = { [direction]: scrollArea, position: "relative" };
-
   return (
-    createElement(Provider, { of: controller }, 
-      createElement("div", { ref: container, ...rest },
-        createElement("div", { style }, children, content)
-      )
-    )
+    <Provider of={controller}>
+      <div ref={container} {...rest}>
+        <div style={{ position: "relative", [direction]: scrollArea }}>
+          {children}
+          {visible.map((p: any) => <Component {...p} />)}
+        </div>
+      </div>
+    </Provider>
   )
 }
