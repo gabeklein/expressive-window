@@ -1,8 +1,6 @@
 import Model, { from, ref } from '@expressive/mvc';
 import { observeContainer } from './dom';
 
-import { tuple } from './tuple';
-
 type Alignment = "center" | "start" | "end" | "auto";
 type value = string | number;
 
@@ -23,7 +21,7 @@ abstract class Core extends Model {
   areaX = 0;
   areaY = 0;
 
-  frame = tuple(0, 0);
+  frame: readonly [number, number] = [0, 0];
   cache: Item[] = [];
   scrollArea = 0;
   offset = 0;
@@ -107,7 +105,9 @@ abstract class Core extends Model {
 
     const stop = target ? target.start : Infinity;
 
-    this.frame = [start, stop];
+    if(frame[0] != start || frame[1] != stop)
+      this.frame = [start, stop];
+
     this.end = last == this.length - 1;
 
     if(range[0] == first && range[1] == last)
