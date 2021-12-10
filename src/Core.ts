@@ -50,37 +50,40 @@ abstract class Core extends Model {
   }
 
   protected getVisible(): this["cache"] {
-    const source = this.cache;
-    const [ start, end ] = this.range;
-    const items = [];
+    const {
+      cache,
+      range: [ start, end ]
+    } = this;
 
     if(end - start == 0)
       return [];
 
+    const items = [];
+
     for(let i = start; i <= end; i++)
-      items.push(source[i]);
+      items.push(cache[i]);
 
     return items;
   }
 
   protected getVisibleRange(): [number, number] {
     const {
+      range,
       cache,
       overscan,
-      range: current,
-      offset: top,
+      offset,
       frame
     } = this;
 
-    const bottom = top + this.areaX;
+    const bottom = offset + this.areaX;
 
-    if(!current || !this.areaX)
+    if(!range || !this.areaX)
       return [0,0];
 
-    if(bottom <= frame[1] && top >= frame[0])
-      return current;
+    if(bottom <= frame[1] && offset >= frame[0])
+      return range;
 
-    const beginAt = top - overscan;
+    const beginAt = offset - overscan;
     const stopAt = bottom + overscan;
 
     let target: Item | undefined;
@@ -92,7 +95,7 @@ abstract class Core extends Model {
     while((target = this.locate(first)) && target.end <= beginAt)
       first++;
 
-    let last = current[1];
+    let last = range[1];
 
     while(cache[last] && cache[last].start > stopAt)
       last--;
@@ -107,8 +110,8 @@ abstract class Core extends Model {
     this.frame = [start, stop];
     this.end = last == this.length - 1;
 
-    if(current[0] == first && current[1] == last)
-      return current;
+    if(range[0] == first && range[1] == last)
+      return range;
 
     return [first, last];
   }
