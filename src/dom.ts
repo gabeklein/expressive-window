@@ -1,18 +1,33 @@
-import { Core } from ".";
+interface Controller {
+  maintain?: boolean;
+  horizontal?: boolean;
+  areaX: number;
+  areaY: number;
+  offset: number;
+}
 
-export function observeContainer(this: Core, element: HTMLElement){
+export function observeContainer(
+  this: Controller,
+  element: HTMLElement){
+
   if(!element)
     return;
 
+  let { maintain } = this;
   let scrollOffset = 0;
-  let watchSize = this.maintain;
 
-  const { scrollKey } = this;
-  const [ x, y ] = this.axis;
+  const direction = this.horizontal
+    ? "scrollLeft"
+    : "scrollTop";
+
+  const [ x, y ] = this.horizontal
+    ? ['width', 'height'] as const
+    : ['height', 'width'] as const;
+
   const content = element.firstChild as HTMLDivElement;
 
   const getSize = () => {
-    if(watchSize)
+    if(maintain)
       window.requestAnimationFrame(getSize);
 
     const outerRect = element.getBoundingClientRect();
@@ -25,7 +40,7 @@ export function observeContainer(this: Core, element: HTMLElement){
   }
 
   const getOffset = () => {
-    this.offset = element[scrollKey] + scrollOffset;
+    this.offset = element[direction] + scrollOffset;
   }
 
   getSize();
@@ -36,7 +51,7 @@ export function observeContainer(this: Core, element: HTMLElement){
   });
 
   return () => {
-    watchSize = false;
+    maintain = false;
     element.removeEventListener("scroll", getOffset);
   }
 }

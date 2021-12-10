@@ -3,7 +3,7 @@ import React, { CSSProperties, FC, ReactNode, useMemo } from 'react';
 
 import Control from './Core';
 
-interface ComponentProps {
+interface RowProps {
   index: number;
   style: CSSProperties;
 }
@@ -16,20 +16,22 @@ interface ContainerProps {
 }
 
 type RenderFunction =
-  (info: ComponentProps, index: number) => ReactNode;
+  (info: RowProps, index: number) => ReactNode;
 
 type WindowProps =
-  | (ContainerProps & { component: FC<ComponentProps> })
+  | (ContainerProps & { component: FC<RowProps> })
   | (ContainerProps & { render: RenderFunction })
 
 export default function Window(props: WindowProps){
   const {
     get: controller,
-    axis: [ direction ],
+    axis,
     scrollArea,
     container,
     visible,
   } = (props.for as any).use();
+
+  const direction = axis ? axis[0] : "height";
 
   const renderRow = useMemo(() => (
     "component" in props
