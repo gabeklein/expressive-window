@@ -1,5 +1,6 @@
 import Model, { from, ref } from '@expressive/mvc';
 import { observeContainer } from './dom';
+import { WindowCompat } from './Window';
 
 type Alignment = "center" | "start" | "end" | "auto";
 type value = string | number;
@@ -7,12 +8,12 @@ type value = string | number;
 export interface Item {
   index: number;
   key: value;
-  start: number;
-  end: number;
+  offset: number;
+  size: number;
   style: {};
 }
 
-abstract class Core extends Model {
+abstract class Core extends Model implements WindowCompat {
   container = ref(observeContainer);
   horizontal = false;
   overscan = 0;
@@ -73,37 +74,42 @@ abstract class Core extends Model {
       frame
     } = this;
 
-    const bottom = offset + this.areaX;
-
     if(!range || !this.areaX)
       return [0,0];
 
-    if(bottom <= frame[1] && offset >= frame[0])
-      return range;
-
     const beginAt = offset - overscan;
-    const stopAt = bottom + overscan;
+    const stopAt = offset + overscan + this.areaX;
+
+    if(beginAt >= frame[0] && stopAt <= frame[1])
+      return range;
 
     let target: Item | undefined;
     let first = 0;
-
-    while(first > 0 && cache[first - 1] && cache[first - 1].end > beginAt)
-      first--;
-
-    while((target = this.locate(first)) && target.end <= beginAt)
-      first++;
-
     let last = range[1];
 
-    while(cache[last] && cache[last].start > stopAt)
+    while(
+      (target = cache[first - 1]) && 
+      (target.offset + target.size > beginAt))
+      first--;
+
+    while(
+      (target = this.locate(first)) &&
+      (target.offset + target.size <= beginAt))
+      first++;
+
+    const start = first ? target!.offset : -Infinity;
+
+    while(
+      (target = cache[last]) &&
+      (target.offset > stopAt))
       last--;
 
-    const start = first ? target!.start : -Infinity;
-
-    while((target = this.locate(last + 1)) && target.start <= stopAt)
+    while(
+      (target = this.locate(last + 1)) &&
+      (target.offset <= stopAt))
       last++;
 
-    const stop = target ? target.start : Infinity;
+    const stop = target ? target.offset : Infinity;
 
     if(frame[0] != start || frame[1] != stop)
       this.frame = [start, stop];
@@ -132,7 +138,9 @@ abstract class Core extends Model {
       
       for(const entry of insert){
         cache.push(entry);
-        end = Math.max(end, entry.end);
+        end = Math.max(end,
+          entry.offset + entry.size
+        );
       }
 
       this.scrollArea = end;
@@ -196,8 +204,8 @@ abstract class Core extends Model {
     if(!measurement)
       return;
 
-    const { start, end } = measurement;
-    const range = end - start;
+    const start = measurement.offset;
+    const end = start + measurement.size;
 
     if(align == 'auto')
       if(end >= offset + this.areaX)
@@ -208,7 +216,7 @@ abstract class Core extends Model {
         return;
 
     return (
-      align == 'center' ? start + range / 2 :
+      align == 'center' ? end / 2 :
       align == 'end' ? end : start
     )
   }

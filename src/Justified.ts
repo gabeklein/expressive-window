@@ -8,9 +8,11 @@ export type Sizable =
 
 export interface Inline extends Item {
   offset: number;
+  pos: number;
   row: number;
   column: number;
-  size: [number, number];
+  size: number;
+  width: number;
 }
 
 export default class Justified extends Core {
@@ -62,22 +64,28 @@ export default class Justified extends Core {
     let offset = 0;
     const row = this.rows;
     const start = this.scrollArea + (row ? padding : 0);
-    const end = Math.round(start + rowSize);
     const insert = [] as Inline[];    
 
     items.forEach((item, column) => {
       const index = next + column;
       const aspect = this.getItemAspect(item);
       const width = decimal(rowSize * aspect, 3);
-      const size = [width, rowSize] as [number, number];
-      const style = this.position(size, [offset, start]);
+      const size = Math.round(rowSize);
+      const style = this.position([width, size], [offset, start]);
       const key = this.uniqueKey(index);
 
       offset = decimal(offset + width + padding, 3);
 
       insert.push({
-        index, key, row, column,
-        offset, start, end, size, style
+        index,
+        key,
+        row,
+        column,
+        offset: start,
+        pos: offset,
+        size,
+        width,
+        style
       });
     });
 

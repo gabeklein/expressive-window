@@ -24,16 +24,22 @@ class Dynamic extends Core {
     if(index >= this.length)
       return;
 
-    const start = this.scrollArea + this.gap;
+    const offset = this.scrollArea + this.gap;
     const size = this.measurements[index] || this.estimateSize(index);
-    const end = this.scrollArea = start + size;
+    const end = this.scrollArea = offset + size;
 
     const key = this.uniqueKey ? this.uniqueKey(index) : index;
-    const style = this.horizontal ? { left: start } : { top: start };
+    const style = this.horizontal ? { left: offset } : { top: offset };
     const ref = this.measureSize(index);
 
     return [{
-      index, key, start, size, end, style, ref
+      index,
+      key,
+      offset,
+      size,
+      end,
+      style,
+      ref
     }]
   }
 
@@ -47,13 +53,13 @@ class Dynamic extends Core {
         return;
 
       const [ direction ] = this.axis; 
-      const { size, start } = this.cache[forIndex];
+      const { size, offset } = this.cache[forIndex];
       const measured = element.getBoundingClientRect()[direction];
   
       if(measured === size)
         return;
   
-      if(start < this.offset)
+      if(offset < this.offset)
         this.scrollTo(this.offset + measured - size)
   
       this.measurements[forIndex] = measured;

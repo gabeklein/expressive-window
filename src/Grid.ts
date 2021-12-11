@@ -2,8 +2,7 @@ import { from } from "@expressive/mvc";
 import Core, { Item } from "./Core";
 
 export interface Cell extends Item {
-  start: number;
-  end: number;
+  offset: number;
   column: number;
 }
 
@@ -27,7 +26,6 @@ class Grid extends Core {
     const { columns, height } = this;
     const percent = 100 / columns;
     const start = next ? this.scrollArea : 0;
-    const end = start + height;
     const insert = [] as Cell[];
     
     for(
@@ -45,8 +43,12 @@ class Grid extends Core {
       );
 
       insert.push({
-        index, key, start,
-        end, column, style
+        index,
+        key,
+        offset: start,
+        size: height,
+        column,
+        style
       })
     }
 

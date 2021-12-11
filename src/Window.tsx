@@ -1,7 +1,22 @@
-import { Provider } from '@expressive/mvc';
+import Model, { Provider } from '@expressive/mvc';
 import React, { CSSProperties, FC, ReactNode, useMemo } from 'react';
 
 import Control from './Core';
+
+export interface Item {
+  index: number;
+  offset: number;
+  size: number;
+}
+
+export interface WindowCompat extends Model {
+  axis?:
+  | readonly ["width", "height"]
+  | readonly ["height", "width"];
+  scrollArea: number;
+  container: Model.Ref<HTMLElement>;
+  visible: Item[];
+}
 
 interface RowProps {
   index: number;
