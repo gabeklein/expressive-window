@@ -3,41 +3,41 @@ import React, { CSSProperties, FC, ReactNode, useMemo } from 'react';
 
 import Control from './Core';
 
-export interface Item {
-  index: number;
-  offset: number;
-  size: number;
+namespace Window {
+  export interface Item {
+    index: number;
+    offset: number;
+    size: number;
+  }
+
+  export interface Compat extends Model {
+    axis?: readonly ["width", "height"] | readonly ["height", "width"];
+    scrollArea: number;
+    container: Model.Ref<HTMLElement>;
+    visible: Item[];
+  }
+
+  interface RowProps {
+    index: number;
+    style: CSSProperties;
+  }
+
+  interface ContainerProps {
+    for: typeof Control | Control;
+    children?: ReactNode;
+    style?: CSSProperties;
+    className?: string;
+  }
+
+  type RenderFunction =
+    (info: RowProps, index: number) => ReactNode;
+
+  export type Props =
+    | (ContainerProps & { component: FC<RowProps> })
+    | (ContainerProps & { render: RenderFunction })
 }
 
-export interface WindowCompat extends Model {
-  axis?:
-  | readonly ["width", "height"]
-  | readonly ["height", "width"];
-  scrollArea: number;
-  container: Model.Ref<HTMLElement>;
-  visible: Item[];
-}
-
-interface RowProps {
-  index: number;
-  style: CSSProperties;
-}
-
-interface ContainerProps {
-  for: typeof Control | Control;
-  children?: ReactNode;
-  style?: CSSProperties;
-  className?: string;
-}
-
-type RenderFunction =
-  (info: RowProps, index: number) => ReactNode;
-
-type WindowProps =
-  | (ContainerProps & { component: FC<RowProps> })
-  | (ContainerProps & { render: RenderFunction })
-
-export default function Window(props: WindowProps){
+function Window(props: Window.Props){
   const {
     get: controller,
     axis,
@@ -65,3 +65,5 @@ export default function Window(props: WindowProps){
     </Provider>
   )
 }
+
+export default Window;

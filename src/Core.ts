@@ -1,6 +1,6 @@
 import Model, { from, ref } from '@expressive/mvc';
 import { observeContainer } from './dom';
-import { WindowCompat } from './Window';
+import Window from './Window';
 
 type Alignment = "center" | "start" | "end" | "auto";
 type value = string | number;
@@ -13,7 +13,7 @@ export interface Item {
   style: {};
 }
 
-abstract class Core extends Model implements WindowCompat {
+abstract class Core extends Model implements Window.Compat {
   container = ref(observeContainer);
   horizontal = false;
   overscan = 0;
