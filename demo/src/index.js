@@ -6,7 +6,7 @@ import Grid from "./Grid";
 import List from "./List";
 import Justified from "./Justified";
 
-const App = () => do {
+const App = () => {
   <BrowserRouter>
     <Routes>
       <Route path="/*" element={<Grid />} />

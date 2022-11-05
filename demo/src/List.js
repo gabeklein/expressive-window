@@ -6,7 +6,7 @@ class List extends Fixed {
   length = 100;
 }
 
-const Item = ({ index, offset, size }) => do {
+const Item = ({ index, offset, size }) => {
   position: absolute;
   left: 0;
   right: 0;
@@ -24,7 +24,7 @@ const Item = ({ index, offset, size }) => do {
   <this>Hello #{index + 1}</this>
 }
 
-const Scrollable = () => do {
+const Scrollable = () => {
   Window: {
     overflow: scroll;
     fixed: 50, 10, 10, 10;

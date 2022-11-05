@@ -10,7 +10,7 @@ export class Images extends Justified {
   gap = 10;
 }
 
-const Image = ({ style, index }) => do {
+const Image = ({ style, index }) => {
   const { items } = Images.tap();
   const { src } = items[index] || {};
 
@@ -31,7 +31,7 @@ const Image = ({ style, index }) => do {
   </this>
 }
 
-const Scrollable = () => do {
+const Scrollable = () => {
   Window: {
     overflow: scroll;
     fixed: 50, 10, 10, 10;
