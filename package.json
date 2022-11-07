@@ -21,7 +21,6 @@
     "build": "rollup --config",
     "test": "jest --watchAll",
     "prebuild": "rm -rf lib/",
-    "publish:minor": "npm version minor",
     "postversion": "npm run build; npm publish",
     "postpublish": "git push; git push --tags; rm -rf lib"
   },
