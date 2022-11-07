@@ -1,6 +1,6 @@
 {
   "name": "@expressive/window",
-  "version": "1.0.0-beta.5",
+  "version": "0.5.0",
   "module": "src",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -22,7 +22,7 @@
     "build": "rollup --config",
     "test": "jest --watchAll",
     "prebuild": "rm -rf lib/",
-    "publish:beta": "npm version prerelease --preid=beta",
+    "publish:minor": "npm version minor",
     "preversion": "jest",
     "postversion": "npm run build; npm publish",
     "postpublish": "git push; git push --tags; rm -rf lib"
