@@ -15,8 +15,7 @@
     "access": "public"
   },
   "files": [
-    "lib/*.js",
-    "index.d.ts"
+    "lib"
   ],
   "scripts": {
     "build": "rollup --config",
