@@ -1,5 +1,6 @@
-import { from } from '@expressive/mvc';
-import Core, { Item } from './Core';
+import { get } from '@expressive/mvc';
+
+import Core, { Item } from './Variable';
 
 export type Sizable =
   | { aspect: number; }
@@ -18,16 +19,27 @@ export interface Inline extends Item {
 export default class Justified extends Core {
   items = [] as Sizable[];
   cache = [] as Inline[];
+
+  /** Minimum row-height used to while filling row. */
   rowSize = 150;
+  scrollArea = 0;
+
+  /** Number of rows generated so far. */
   rows = 0;
   gap = 1;
+
+  /** Hide final row of elements if not full. */
   chop = false;
   horizontal = false;
 
-  readonly length = from(() => this.getLength);
+  readonly length = get(() => this.getLength);
 
   protected getLength(){
     return this.items.length;
+  }
+
+  getItem(index: number){
+    return this.cache[index];
   }
 
   public extend(){
@@ -52,7 +64,7 @@ export default class Justified extends Core {
       const idealSize = totalSize / totalAspect;
 
       if(idealSize <= rowSize){
-        rowSize = decimal(idealSize, 3);
+        rowSize = clamp(idealSize, 3);
         full = true;
         break;
       }
@@ -69,12 +81,12 @@ export default class Justified extends Core {
     items.forEach((item, column) => {
       const index = next + column;
       const aspect = this.getItemAspect(item);
-      const width = decimal(rowSize * aspect, 3);
+      const width = clamp(rowSize * aspect, 3);
       const size = Math.round(rowSize);
       const style = this.position([width, size], [offset, start]);
       const key = this.uniqueKey(index);
 
-      offset = decimal(offset + width + padding, 3);
+      offset = clamp(offset + width + padding, 3);
 
       insert.push({
         index,
@@ -89,6 +101,7 @@ export default class Justified extends Core {
       });
     });
 
+    this.scrollArea = start + Math.ceil(rowSize);
     this.rows += 1;
 
     return insert;
@@ -107,7 +120,7 @@ export default class Justified extends Core {
   }
 }
 
-function decimal(number: number, decimals = 1){
-  const factor = Math.pow(10, decimals);
+function clamp(number: number, decimalPlace = 1){
+  const factor = 10 ** decimalPlace;
   return Math.round(number * factor) / factor;
 }

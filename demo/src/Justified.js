@@ -5,7 +5,7 @@ import Birds from './birds';
 export class Images extends Justified {
   items = Birds;
   length = this.items.length;
-  rowSize = 300;
+  rowSize = 200;
   overscan = 150;
   gap = 10;
 }

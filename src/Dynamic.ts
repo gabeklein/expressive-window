@@ -1,4 +1,4 @@
-import Core, { Item } from "./Core";
+import Core, { Item } from './Variable';
 
 interface Row extends Item {
   ref: (element: HTMLElement) => void;
@@ -15,7 +15,7 @@ class Dynamic extends Core {
 
   constructor(){
     super();
-    this.on($ => $.length, () => this.measurements = {});
+    this.on("length", () => this.measurements = {});
   }
 
   extend(){
@@ -43,6 +43,7 @@ class Dynamic extends Core {
     }]
   }
 
+  /** Determines initial size to allocate before rendering a list element. */
   estimateSize(index: number){
     return 50;
   }
@@ -52,7 +53,7 @@ class Dynamic extends Core {
       if(!element)
         return;
 
-      const [ direction ] = this.axis; 
+      const direction = this.DOM.sizeX; 
       const { size, offset } = this.cache[forIndex];
       const measured = element.getBoundingClientRect()[direction];
   

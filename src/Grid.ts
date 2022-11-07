@@ -1,58 +1,75 @@
-import { from } from "@expressive/mvc";
-import Core, { Item } from "./Core";
+import { get } from '@expressive/mvc';
+
+import Controller, { Item } from './Controller';
 
 export interface Cell extends Item {
-  offset: number;
+  row: number;
   column: number;
+  offset: number;
 }
 
-class Grid extends Core {
-  cache = [] as Cell[];
-  columns = 1;
-  scrollArea = 0;
-  horizontal = false;
+class Grid extends Controller {
+  /** Size of virtual collection */
   length = 0;
 
-  height = from(this, state => {
+  cache = [] as Cell[];
+
+  /** Number of columns to break elements into. */
+  columns = 1;
+
+  /**
+   * Still render items an amount of pixels above and below viewport.
+   * 
+   * Useful to prevent unnecessary reloading of elements breifly out of view.
+   * 
+   * Default: 0;
+   * */
+  overscan = 0;
+
+  size = get(this, state => (
+    state.itemSize * Math.ceil(state.length / this.columns)
+  ))
+
+  itemSize = get(this, state => {
     return Math.floor(state.areaY / state.columns);
   });
 
-  extend(){
-    const next = this.cache.length;
+  getItem(index: number){
+    const { columns, itemSize: size } = this;
+    const row = Math.floor(index / columns);
+    const column = index % columns;
+    const offset = row * size;
+    const width = 100 / columns;
 
-    if(!this.areaY || next >= this.length)
-      return;
-
-    const { columns, height } = this;
-    const percent = 100 / columns;
-    const start = next ? this.scrollArea : 0;
-    const insert = [] as Cell[];
-    
-    for(
-      let column = 0;
-      this.columns > column &&
-      this.length > column + next; 
-      column++
-    ){
-      const index = next + column;
-      const key = this.uniqueKey(index);
-      const width = percent + "%";
-      const offset = (column * percent) + "%";
-      const style = this.position(
-        [width, height], [offset, start]
-      );
-
-      insert.push({
-        index,
-        key,
-        offset: start,
-        size: height,
-        column,
-        style
-      })
+    return {
+      index,
+      key: index,
+      row,
+      column,
+      offset,
+      size,
+      width 
     }
+  }
 
-    return insert;
+  getVisibleRange(){
+    const {
+      offset,
+      overscan,
+      itemSize,
+      length,
+      areaX,
+      columns
+    } = this;
+
+    const start = offset - overscan;
+    const space = areaX + overscan;
+  
+    const first = Math.max(0, Math.floor(start / itemSize)) * columns;
+    const rendered = (Math.ceil(space / itemSize) + 1) * columns - 1;
+    const last = Math.min(length - 1, first + rendered);
+
+    return [first, last] as const;
   }
 }
 

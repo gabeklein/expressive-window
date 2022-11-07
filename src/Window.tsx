@@ -1,7 +1,7 @@
-import Model, { Provider } from '@expressive/mvc';
+import { Provider } from '@expressive/mvc';
 import React, { CSSProperties, FC, ReactNode, useMemo } from 'react';
 
-import Control from './Core';
+import Controller from './Controller';
 
 namespace Window {
   export interface Item {
@@ -10,56 +10,42 @@ namespace Window {
     size: number;
   }
 
-  export interface Compat extends Model {
-    axis?: readonly ["width", "height"] | readonly ["height", "width"];
-    scrollArea: number;
-    container: Model.Ref<HTMLElement>;
-    visible: Item[];
-  }
-
-  interface RowProps {
-    index: number;
-    style: CSSProperties;
-  }
-
   interface ContainerProps {
-    for: typeof Control | Control;
+    for: { use(): Controller };
     children?: ReactNode;
     style?: CSSProperties;
     className?: string;
   }
 
   type RenderFunction =
-    (info: RowProps, index: number) => ReactNode;
+    (info: Item, index: number) => ReactNode;
 
   export type Props =
-    | (ContainerProps & { component: FC<RowProps> })
+    | (ContainerProps & { component: FC<Item> })
     | (ContainerProps & { render: RenderFunction })
 }
 
 function Window(props: Window.Props){
   const {
-    get: controller,
-    axis,
-    scrollArea,
+    is: control,
     container,
-    visible,
-  } = (props.for as any).use();
-
-  const direction = axis ? axis[0] : "height";
+    slice,
+    size: scrollArea,
+    DOM
+  } = props.for.use();
 
   const renderRow = useMemo(() => (
     "component" in props
-      ? (p: any) => <props.component context={controller} {...p} />
+      ? (p: any) => <props.component context={control} {...p} />
       : props.render
   ), []);
 
   return (
-    <Provider of={controller}>
+    <Provider for={control}>
       <div ref={container} style={props.style} className={props.className}>
-        <div style={{ position: "relative", [direction]: scrollArea }}>
+        <div style={{ position: "relative", [DOM.sizeX]: scrollArea }}>
           {props.children}
-          {visible.map(renderRow)}
+          {slice.map(renderRow)}
         </div>
       </div>
     </Provider>

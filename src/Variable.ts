@@ -1,6 +1,4 @@
-import Model, { from, ref } from '@expressive/mvc';
-import { observeContainer } from './dom';
-import Window from './Window';
+import Controller from './Controller';
 
 type Alignment = "center" | "start" | "end" | "auto";
 type value = string | number;
@@ -13,59 +11,50 @@ export interface Item {
   style: {};
 }
 
-abstract class Core extends Model implements Window.Compat {
-  container = ref(observeContainer);
-  horizontal = false;
+abstract class Core extends Controller {
   overscan = 0;
-  maintain = false;
-
-  areaX = 0;
-  areaY = 0;
-
   frame: readonly [number, number] = [0, 0];
   cache: Item[] = [];
-  scrollArea = 0;
   offset = 0;
+
+  /** Final element is currently visible. */
   end = false;
+  length = 0;
 
-  abstract length: number;
-  abstract extend(): undefined | Item[];
-
-  get axis(){
-    return this.horizontal
-      ? ['width', 'height'] as const
-      : ['height', 'width'] as const
+  estimate(){
+    return 40;
   }
 
-  get scrollKey(){
-    return this.horizontal ? 'scrollLeft' : 'scrollTop';
+  row(index: number){
+    const size = this.estimate();
+    const key = this.uniqueKey(index);
+    const offset = index ? this.size : 0;
+
+    return {
+      index,
+      key,
+      offset,
+      size
+    };
   }
 
-  readonly visible = from(() => this.getVisible);
-  readonly range = from(() => this.getVisibleRange);
+  /** Logic to generate a new row. */
+  extend(){
+    const index = this.cache.length;
 
-  public use(){
-    return this.tap();
+    if(!this.areaY || index >= this.length)
+      return;
+
+    return [
+      this.row(index)
+    ];
+  }
+  
+  getItem(index: number){
+    return Object.assign({ index }, this.cache[index]);
   }
 
-  protected getVisible(): this["cache"] {
-    const {
-      cache,
-      range: [ start, end ]
-    } = this;
-
-    if(end - start == 0)
-      return [];
-
-    const items = [];
-
-    for(let i = start; i <= end; i++)
-      items.push(cache[i]);
-
-    return items;
-  }
-
-  protected getVisibleRange(): [number, number] {
+  getVisibleRange(){
     const {
       range,
       cache,
@@ -75,7 +64,7 @@ abstract class Core extends Model implements Window.Compat {
     } = this;
 
     if(!range || !this.areaX)
-      return [0,0];
+      return [0,0] as const;
 
     const beginAt = offset - overscan;
     const stopAt = offset + overscan + this.areaX;
@@ -119,7 +108,7 @@ abstract class Core extends Model implements Window.Compat {
     if(range[0] == first && range[1] == last)
       return range;
 
-    return [first, last];
+    return [first, last] as const;
   }
 
   protected locate(index: number){
@@ -134,16 +123,17 @@ abstract class Core extends Model implements Window.Compat {
       if(!insert || !insert.length)
         return;
 
-      let end = this.scrollArea;
+      let end = this.size;
       
       for(const entry of insert){
-        cache.push(entry);
+        //TODO remove any
+        cache.push(entry as any);
         end = Math.max(end,
           entry.offset + entry.size
         );
       }
 
-      this.scrollArea = end;
+      this.size = end;
     }
     
     return cache[index];
@@ -153,7 +143,10 @@ abstract class Core extends Model implements Window.Compat {
     size: [value, value],
     offset: [value, value]){
 
-    let width, height, top, left;
+    let width;
+    let height;
+    let left;
+    let top;
 
     if(this.horizontal){
       [height, width] = size;
@@ -164,26 +157,39 @@ abstract class Core extends Model implements Window.Compat {
       [left, top] = offset;
     }
 
-    return { width, height, left, top } as const;
+    return {
+      width,
+      height,
+      left,
+      top
+    } as const;
   }
 
   protected scrollTo(offset: number){
     const container = this.container.current;
 
     if(container)
-      container[this.scrollKey] = offset;
+      container[this.DOM.scrollX] = offset;
   }
 
+  /** 
+   * Convert position index into unique key of a target list item.
+   * Useful if items have unique IDs and reshuffling may occure.
+   * 
+   * May be overridden; returns index argument by default.
+   */
   public uniqueKey(forIndex: number): string | number {
     return forIndex;
   }
 
+  /** Programatically scroll to specific offset. */
   public gotoOffset(toOffset: number, opts: any){
     this.scrollTo(
       this.getOffset(toOffset, opts.align)
     );
   }
 
+  /** Programatically scroll to specific item by index. */
   protected gotoIndex(index: number, opts: any = {}){
     const align = opts.align || 'auto';
     const target = this.findItem(align, index);

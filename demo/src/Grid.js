@@ -4,18 +4,31 @@ import Birds from './birds';
 
 class Images extends Grid {
   gap = 10;
-  columns = 3;
+  columns = 4;
   overscan = 100;
   items = Birds;
 
   length = this.items.length;
 }
 
-const Image = ({ style, index }) => {
-  const { items } = Images.tap();
-  const { src } = items[index] || {};
+const Image = (props) => {
+  const {
+    index,
+    offset,
+    column,
+    context,
+    width,
+    size
+  } = props;
+
+  const { src } = context.items[index];
 
   position: absolute;
+  top: (offset);
+  left: `${column * width}%`;
+  width: `${width}%`;
+  height: (size);
+
   flexAlign: center;
   textAlign: center;
   font: 20;
@@ -27,7 +40,7 @@ const Image = ({ style, index }) => {
   overflow: hidden;
   radius: 4;
 
-  <this key={index} style={style}>
+  <this key={index}>
     {index}
   </this>
 }

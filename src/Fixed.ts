@@ -1,45 +1,43 @@
-import Model, { from, ref } from "@expressive/mvc";
-import { observeContainer } from "./dom";
-import Window from "./Window";
+import { get } from '@expressive/mvc';
 
-class Fixed extends Model implements Window.Compat {
-  container = ref<HTMLElement, this>(observeContainer);
-  visible = from(() => this.getVisible);
-  range = from(() => this.getVisibleRange);
-  scrollArea = from(this, state => {
-    return state.itemSize * state.length;
-  })
+import Controller from './Controller';
 
-  areaX = 0;
-  areaY = 0;
-  offset = 0;
+class Fixed extends Controller {
+  length = 0;
   itemSize = 40;
   overscan = 0;
-  length = 0;
 
-  protected getVisible(){
-    const [ start, end ] = this.range;
-    const items = [];
+  size = get(this, state => (
+    state.itemSize * state.length
+  ))
 
-    for(let i = start; i <= end; i++)
-      items.push({
-        index: i,
-        offset: i * this.itemSize,
-        size: this.itemSize
-      });
-
-    return items;
+  getItem(i: number){
+    return {
+      key: i,
+      index: i,
+      offset: i * this.itemSize,
+      size: this.itemSize
+    };
   }
 
-  protected getVisibleRange(): [number, number] {
-    const { offset, overscan, itemSize, length, areaX } = this;
+  getVisibleRange(){
+    const {
+      offset,
+      overscan,
+      itemSize,
+      length,
+      areaX
+    } = this;
+
+    if(!areaX)
+      return [0,0] as const;
 
     const begin = offset - overscan;
     const first = Math.max(0, Math.floor(begin / itemSize));
     const rendered = Math.floor((areaX + overscan) / itemSize) + 1;
     const last = Math.min(length - 1, first + rendered);
 
-    return [first, last];
+    return [first, last] as const;
   }
 }
 
