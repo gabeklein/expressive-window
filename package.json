@@ -2,8 +2,8 @@
   "name": "@expressive/window",
   "version": "1.0.0-beta.5",
   "module": "src",
-  "main": "lib",
-  "types": "index.d.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "license": "MIT",
   "author": {
     "name": "Gabe Klein",
@@ -19,7 +19,7 @@
     "index.d.ts"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "rollup --config",
     "test": "jest --watchAll",
     "prebuild": "rm -rf lib/",
     "publish:beta": "npm version prerelease --preid=beta",
@@ -31,13 +31,18 @@
     "@expressive/mvc": "0.7.2"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.0.1",
     "@testing-library/react": "^11.0.4",
     "@types/jest": "^27.0.2",
     "@types/react": "^17.0.34",
     "jest": "^27.3.1",
     "react": "^17.0.2",
     "react-dom": "17.0.2",
+    "rollup": "^2.61.1",
+    "rollup-plugin-dts": "^4.0.1",
+    "rollup-plugin-ts": "^2.0.4",
+    "rollup-plugin-typescript2": "^0.31.1",
     "ts-jest": "^27.0.7",
-    "typescript": "^3.9.6"
+    "typescript": "^4.4.2"
   }
 }
